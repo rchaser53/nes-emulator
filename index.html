@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <style>
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      
+      #nes-div {
+        width: 1px;
+        height: 1px;
+        z-index: 1;
+        transform: translateZ(1px);
+      }
+      
+      canvas {
+        transform-origin: left top;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <canvas id="nes" width="256" height="224"></canvas>
+    <script src="/static/bundle.js"></script>
+  </body>
+
+</html>
