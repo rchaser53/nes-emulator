@@ -22,6 +22,7 @@ const VRam = new Uint8Array(2000)
 const HeaderSize = 0x0010;
 const ProgramROMIndex = 4;
 const ChacterROMIndex = 5;
+const NES_HEADER_SIZE = 0x0010;
 
 const parse = (buf) => {
   const characterROMStart = HeaderSize + buf[ProgramROMIndex] * 0x4000;

@@ -28,13 +28,14 @@ const drawCharcterToCanvas = (canvasIdSelector, nesPath) => {
         const sprite = Array.apply(null, Array(8)).map((_) => [0,0,0,0,0,0,0,0]);
         for (let i = 0; i < 16; i++) {
           for (let j = 0; j < 8; j++) {
-            if (nesData[charactorROMsart + spriteNum * 16 + i] & (0x80 >> j )) {
-              sprite[i % 8][j] += 0x01 << (i / 8);
+            if (nesData[charactorROMsart + spriteNum * 16 + i] & (0x80 >> j)) {
+              sprite[i % 8][j] += 0x01 << ~~(i / 8);
             }
           }
         }
         return sprite;
       }
+
       const renderSprite = (sprite, spriteNum) => {
         for (let i = 0; i < 8; i++) {
           for (let j = 0; j < 8; j++) {
