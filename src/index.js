@@ -7,45 +7,45 @@ fetch('./static/hello.nes')
     throw new Error(err)
   })
 
-/**
- * A アキュムレータ
- * M アドレッシングによってフェッチされたメモリデータ
- * flags 命令実行によって設定するフラグ
-*/
-const HelloOpecodes = [
-  'SEI', // Set Interrupt disable
-  'SEC', // Set C flag	1 -> C
+const VRam = new Uint8Array(2000)
 
-  'LDA', // Load A from M	  M -> A
-  'LDX', // Load X from M	  M -> X
-  'LDY', //
 
-  'TXS', // Transfer X to S	  X -> S
-  'TYA', // Transfer Y to A	  Y -> A
+// 1. Header (16 bytes)
+// 2. Trainer, if present (0 or 512 bytes)
+// 3. PRG ROM data (16384 * x bytes)
+// 4. CHR ROM data, if present (8192 * y bytes)
+// 5. PlayChoice INST-ROM, if present (0 or 8192 bytes)
 
-  'STA', // Store A to M	  A -> M
-  'STX', // Store X to M
+// 4: Size of PRG ROM in 16 KB units
+// 5: Size of CHR ROM in 8 KB units (Value 0 means the board uses CHR RAM)
 
-  'BNE', // Branch on Z clear (result not equal)  Zフラグがクリアされていれば分岐します
-  'BPL', // Branch on N clear (result plus)
-  'BCS', // Branch on C set
-  'BEQ', // Branch on Z set (result equal)
-  'BCC', // Branch on C clear
+const HeaderSize = 0x0010;
+const ProgramROMIndex = 4;
+const ChacterROMIndex = 5;
 
-  'ADC', // Add M to A with C	    A + M + C -> A
-  'DEC', // Decrement M by one	  M - 1 -> M
-  'DEY', // Decrement Y by one    Y - 1 -> Y
-  'INC', // Increment M by one	M + 1 -> M
+const parse = (buf) => {
+  const characterROMStart = HeaderSize + buf[ProgramROMIndex] * 0x4000;
+  const characterROMEnd = characterROMStart + buf[ChacterROMIndex] * 0x2000;
 
-  'RTS', // Return from Subroutine サブルーチンから復帰
+  return {
+    programROM: buf.slice(NES_HEADER_SIZE, characterROMStart - 1),
+    characterROM: buf.slice(characterROMStart, characterROMEnd - 1),
+  }
+}
 
-  'EOR', // EOR ("Exclusive-OR" M with A)	A eor M -> A
 
-  'JMP', // Jump to new location ADDR -> PC flags: none
-  'JSR', // Jump to new location saving return address  ADDR -> PC *
-
-  'CMP', // Compare M and A	    A - M
-
-  'TAY', // Transfer A to Y	    A -> Y
-  'CLC', // Clear C flag
-]
+  //
+  // Memory map
+  /*
+  | addr           |  description               |   mirror       |
+  +----------------+----------------------------+----------------+
+  | 0x0000-0x07FF  |  RAM                       |                |
+  | 0x0800-0x1FFF  |  reserve                   | 0x0000-0x07FF  |
+  | 0x2000-0x2007  |  I/O(PPU)                  |                |
+  | 0x2008-0x3FFF  |  reserve                   | 0x2000-0x2007  |
+  | 0x4000-0x401F  |  I/O(APU, etc)             |                |
+  | 0x4020-0x5FFF  |  ex RAM                    |                |
+  | 0x6000-0x7FFF  |  battery backup RAM        |                |
+  | 0x8000-0xBFFF  |  program ROM LOW           |                |
+  | 0xC000-0xFFFF  |  program ROM HIGH          |                |
+  */
