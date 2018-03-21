@@ -7,8 +7,8 @@ const NES_HEADER_SIZE = 0x0010;
 
 export class Nes {
   cpu: CPU
-  programROM
-  characterROM
+  programROM: Uint8Array
+  characterROM: Uint8Array
 
   constructor() {
     this.cpu = new CPU()
@@ -36,7 +36,7 @@ export class Nes {
   }
 
   run() {
-    console.log('run')
+    this.cpu.run(this.programROM[this.cpu.register.PC])
   }
 
 }

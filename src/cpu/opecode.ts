@@ -1,4 +1,12 @@
-export const HelloOpecodesMap = {
+export interface Order {
+  opecode: string,
+  data: number,
+  address: string,
+  len: number,
+  cycle: number
+}
+
+export const HelloOpecodesMap: { [key: string]: Order} = {
   "38": { opecode: 'SEC', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       SEC           $38   1   2
   "78": { opecode: 'SEI', data: 0x0000, address: 'Implied', len: 1, cycle: 2  },          //  Implied       SEI           $78   1   2
 
