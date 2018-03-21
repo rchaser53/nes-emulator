@@ -24,7 +24,14 @@
 
   <body>
     <canvas id="nes" width="256" height="224"></canvas>
-    <script src="/static/bundle.js"></script>
+    <script src="/static/drawCharcterToCanvas.js"></script>
+    <script>
+      window.onload = () => {
+        drawCharcterToCanvas('#nes', './static/hello.nes')
+      }
+    </script>
+
+    <!-- <script src="/static/bundle.js"></script> -->
   </body>
 
 </html>
