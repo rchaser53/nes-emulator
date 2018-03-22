@@ -50,10 +50,11 @@ export class CPU {
     // return HelloOpecodesMap[byte]
   }
 
-  run(opecode) {
+  run(programRom: Uint8Array) {
+    const opecode = programRom[this.register.PC]
     const order = this.fetch(opecode)
     this.register.PC += order.len
-    this.executeOpeCode(order)
+    this.executeOpeCode(programRom, order)
   }
 
   fetch(opecode: number): Order {
@@ -65,7 +66,43 @@ export class CPU {
     return opeObject
   }
 
-  executeOpeCode(order: Order) {
+  executeDataByAddress(programRom: Uint8Array, address: string): number {
+    const PC = this.register.PC
+    switch (address) {
+      case 'Immediate':
+        return programRom[PC + 1]
+      case 'Indirect,Y':
+        return programRom[this.getIndirectIndex(programRom, PC, 'Y')]
+      case 'Absolute':
+        return programRom[this.getAbsolute(programRom, PC)]
+      case 'Absolute,Y':
+        return programRom[this.getAbsoluteIndex(programRom, PC, 'Y')]
+      case 'ZeroPage':
+        return programRom[programRom[PC + 1]]
+      case 'Relative':
+        return programRom[programRom[PC + 1] + programRom[PC + 2]]
+      default:
+        throw new Error(`${address} has not implemeneted yet`)
+    }
+  }
+
+  getIndirectIndex(programRom: Uint8Array, PC: number, registerKey: string): number {
+    const lowerAddress = 0x0000 + programRom[PC + 1]
+    const upperAddress = programRom[PC + 2] << 2
+    return upperAddress + programRom[lowerAddress] + this.register[registerKey]
+  }
+
+  getAbsolute(programRom: Uint8Array, PC: number): number {
+    const lowerAddress = 0x0000 + programRom[PC + 1]
+    const upperAddress = programRom[PC + 2] << 2
+    return upperAddress + lowerAddress
+  }
+
+  getAbsoluteIndex(programRom: Uint8Array, PC: number, registerKey: string): number {
+    return this.getAbsolute(programRom, PC) + this.register[registerKey]
+  }
+
+  executeOpeCode(programRom: Uint8Array, order: Order) {
     console.log(order)
     switch (order.opecode) {
       case 'SEI':
@@ -77,7 +114,13 @@ export class CPU {
         break;
 
       case 'LDA':
-
+        switch (order.address) {
+          case 'Immediate':
+            this.register.A = order.data
+            break;
+          case 'Indirect,Y':
+        }
+        
         break;
 
       case 'LDX':
