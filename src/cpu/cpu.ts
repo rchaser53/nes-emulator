@@ -103,7 +103,6 @@ export class CPU {
   }
 
   executeOpeCode(programRom: Uint8Array, order: Order) {
-    console.log(order)
     switch (order.opecode) {
       case 'SEI':
         this.register.P.I = false
@@ -114,51 +113,89 @@ export class CPU {
         break;
 
       case 'LDA':
-        switch (order.address) {
-          case 'Immediate':
-            this.register.A = order.data
-            break;
-          case 'Indirect,Y':
-        }
-        
+        this.register.A = this.executeDataByAddress(programRom, order.address)
         break;
 
       case 'LDX':
+        this.register.X = this.executeDataByAddress(programRom, order.address)
         break;
+
       case 'LDY':
+        this.register.Y = this.executeDataByAddress(programRom, order.address)
         break;
 
       case 'TXS':
+        this.register.S = this.register.X
         break;
+
       case 'TYA':
+        this.register.A = this.register.Y
         break;
 
       case 'STA':
+        programRom[this.executeDataByAddress(programRom, order.address)] = this.register.A
         break;
+
       case 'STX':
+        programRom[this.executeDataByAddress(programRom, order.address)] = this.register.X
         break;
 
       case 'BNE':
+        if (this.register.P.Z === false) {
+          this.register.PC = this.executeDataByAddress(programRom, order.address)
+          break;
+        }
         break;
+
       case 'BPL':
+        if (this.register.P.N === false) {
+          this.register.PC = this.executeDataByAddress(programRom, order.address)
+          break;
+        }
         break;
+
       case 'BCS':
+        if (this.register.P.C === true) {
+          this.register.PC = this.executeDataByAddress(programRom, order.address)
+          break;
+        }
         break;
+
       case 'BEQ':
+        if (this.register.P.Z === true) {
+          this.register.PC = this.executeDataByAddress(programRom, order.address)
+          break;
+        }
         break;
+
       case 'BCC':
+        if (this.register.P.C === false) {
+          this.register.PC = this.executeDataByAddress(programRom, order.address)
+          break;
+        }
         break;
 
       case 'ADC':
+        if (this.isCarry(this.register.A, programRom[this.executeDataByAddress(programRom, order.address)]) === true) {
+          this.register.P.C = true
+        }
+        this.register.A = this.register.A + programRom[this.executeDataByAddress(programRom, order.address)]
         break;
+
       case 'DEC':
+        programRom[this.executeDataByAddress(programRom, order.address)] -= 1
         break;
+
       case 'DEY':
+        this.register.Y -= 1
         break;
+
       case 'INC':
+        programRom[this.executeDataByAddress(programRom, order.address)] += 1
         break;
 
       case 'RTS':
+
         break;
 
       case 'EOR':
@@ -178,6 +215,11 @@ export class CPU {
         break;
 
     }
+  }
+
+  isCarry(registerNum: number, romNumber: number): boolean {
+    const sum = registerNum + romNumber
+    return ((sum >> 16) & 0x1) === 1
   }
 
   // TODO
