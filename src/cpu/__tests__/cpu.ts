@@ -22,6 +22,11 @@ describe('Hexadecimal', () => {
     expect(0x14 << 4).toEqual(0x140)
     expect(0x14 << 8).toEqual(0x1400)
   })
+
+  test('(0x1XXXX >> 16) & 0x1 === 1', async () => {
+    expect((0x10000 >> 16) & 0x1).toEqual(1)
+    expect(0x9999 >> 16 & 0x01).toEqual(0)
+  })
 })
 
 describe('CPU', () => {
