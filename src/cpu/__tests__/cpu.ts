@@ -23,3 +23,20 @@ describe('Hexadecimal', () => {
     expect(0x14 << 8).toEqual(0x1400)
   })
 })
+
+describe('CPU', () => {
+  let memory, cpu: CPU;
+  beforeEach(() => {
+    memory = Array.apply(null, Array(3000)).map((_, index) => (index % 256))
+    cpu = new CPU()
+  })
+
+	test('getAbsolute', async () => {
+    expect(cpu.getAbsolute(memory, 11)).toEqual(0xd0c)
+  })
+
+	test('getIndirectIndex', async () => {
+    cpu.register.Y = 0x1234
+    expect(cpu.getIndirectIndex(memory, 11, 'Y')).toEqual(0xd0c + 0x1234)
+	})
+})

@@ -88,13 +88,13 @@ export class CPU {
 
   getIndirectIndex(programRom: Uint8Array, PC: number, registerKey: string): number {
     const lowerAddress = 0x0000 + programRom[PC + 1]
-    const upperAddress = programRom[PC + 2] << 2
+    const upperAddress = programRom[PC + 2] << 8
     return upperAddress + programRom[lowerAddress] + this.register[registerKey]
   }
 
   getAbsolute(programRom: Uint8Array, PC: number): number {
     const lowerAddress = 0x0000 + programRom[PC + 1]
-    const upperAddress = programRom[PC + 2] << 2
+    const upperAddress = programRom[PC + 2] << 8
     return upperAddress + lowerAddress
   }
 
