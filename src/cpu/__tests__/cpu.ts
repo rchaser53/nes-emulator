@@ -40,6 +40,11 @@ describe('CPU', () => {
     expect(cpu.getAbsolute(memory, 11)).toEqual(0xd0c)
   })
 
+  test('getAbsoluteIndex', async () => {
+    cpu.register.X = 0x1234
+    expect(cpu.getAbsoluteIndex(memory, 11, 'X')).toEqual(0xd0c + 0x1234)
+  })
+
 	test('getIndirectIndex', async () => {
     cpu.register.Y = 0x1234
     expect(cpu.getIndirectIndex(memory, 11, 'Y')).toEqual(0xd0c + 0x1234)
