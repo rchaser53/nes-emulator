@@ -36,7 +36,9 @@ export class Nes {
   }
 
   run() {
-    this.cpu.run(this.programROM)
+    while (true) {
+      this.cpu.run(this.programROM)
+    }
   }
 
 }

@@ -40,6 +40,17 @@ export const DefualtRegister: Register = {
   PC: 0x00                    // Program Count    16bit
 }
 
+const NoProgressPCOrder = [
+  'BNE',
+  'BPL',
+  'BCS',
+  'BEQ',
+  'BCC',
+  'JMP',
+  'JSR',
+  'RTS'
+]
+
 export class CPU {
   register: Register
   constructor() {
@@ -53,7 +64,6 @@ export class CPU {
   run(programRom: Uint8Array) {
     const opecode = programRom[this.register.PC]
     const order = this.fetch(opecode)
-    this.register.PC += order.len
     this.executeOpeCode(programRom, order)
   }
 
@@ -195,7 +205,7 @@ export class CPU {
         break;
 
       case 'RTS':
-        this.returnCaller(programRom)
+        this.register.PC = this.returnCaller(programRom)
         break;
 
       case 'EOR':
@@ -207,7 +217,7 @@ export class CPU {
         break;
 
       case 'JSR':
-        this.goToSubroutine(programRom, order.address)
+        this.register.PC = this.goToSubroutine(programRom, order.address)
         break;
 
       case 'CMP':
@@ -221,14 +231,24 @@ export class CPU {
       case 'CLC':
         this.register.P.C = false
         break;
-
+      
+      default:
+        throw new Error(`${JSON.stringify(order)} is not implemented!`)
     }
+
+    this.changeProgramCount(order)
   }
 
-  goToSubroutine(programRom: Uint8Array, address: string) {
+  changeProgramCount(order: Order) {
+    if (NoProgressPCOrder.includes(order.opecode) === true) return
+    this.register.PC += order.len
+  }
+
+  // 'JSR'
+  goToSubroutine(programRom: Uint8Array, address: string): number {
     const jumpedAddress = programRom[this.executeDataByAddress(programRom, address)]
     this.pushStack(programRom)
-    this.register.PC = jumpedAddress
+    return jumpedAddress
   }
 
   pushStack(programRom: Uint8Array) {
@@ -238,15 +258,16 @@ export class CPU {
     this.register.S += 2
   }
 
-  returnCaller(programRom: Uint8Array) {
-    this.popStack(programRom)
+  // 'RTS'
+  returnCaller(programRom: Uint8Array): number {
+    return this.popStack(programRom)
   }
 
-  popStack(programRom: Uint8Array) {
+  popStack(programRom: Uint8Array): number {
     const lowwer = programRom[0x100 | programRom[this.register.S]]
     const upper = programRom[0x100 | programRom[this.register.S - 1]] << 8
-    this.register.PC = lowwer + upper + 1
     this.register.S -= 2;
+    return lowwer + upper + 1
   }
 
   isCarry(registerNum: number, romNumber: number): boolean {
@@ -254,9 +275,15 @@ export class CPU {
     return ((sum >> 16) & 0x1) === 1
   }
 
-  // TODO
-  reset() {
+  reset(programRom) {
+      // 初期化のための6クロックの後に動作を開始します。
+      // todo
 
+      this.register.P.I = true
+      
+      const lowwer = programRom[0xfffc] & 0xff
+      const upper = (programRom[0xfffd] & 0xff) << 8
+      this.register.PC = upper + lowwer
   }
 }
 

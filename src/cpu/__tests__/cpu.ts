@@ -54,11 +54,11 @@ describe('CPU', () => {
     cpu.register.S = 0x0010
     cpu.register.PC = 0x0123
 
-    cpu.goToSubroutine(memory, 'Immediate')
+    cpu.register.PC = cpu.goToSubroutine(memory, 'Immediate')
     expect(cpu.register.PC).toEqual(0x0024)
     expect(cpu.register.S).toEqual(0x0012)
 
-    cpu.returnCaller(memory)
+    cpu.register.PC = cpu.returnCaller(memory)
     expect(cpu.register.PC).toEqual(0x0124)
     expect(cpu.register.S).toEqual(0x0010)
   })
