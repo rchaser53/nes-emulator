@@ -195,23 +195,41 @@ export class CPU {
         break;
 
       case 'RTS':
-
+        this.register.PC = programRom[this.register.S] + (programRom[this.register.S + 1] << 8)
+        this.register.S += 2;
         break;
 
       case 'EOR':
+        this.register.A = this.register.A ^ programRom[this.executeDataByAddress(programRom, order.address)]
         break;
 
       case 'JMP':
+        this.register.PC = programRom[this.executeDataByAddress(programRom, order.address)]
         break;
+
       case 'JSR':
+        // まずジャンプ先のアドレスをアドレス指定によって取得した後
+        const jumpedAddress = programRom[this.executeDataByAddress(programRom, order.address)]
+        
+        // PCを上位バイト、下位バイトの順にスタックへプッシュ
+        programRom[jumpedAddress + 1] = (this.register.PC >> 8) ^ 0xFF
+        programRom[jumpedAddress + 2] = this.register.PC ^ 0xFF
+        
+        // PCはトラップの項にもあるようにJSRの最後のバイトアドレスです
+        // 最後にジャンプ先へジャンプ
+        this.register.PC = jumpedAddress
         break;
 
       case 'CMP':
+        this.register.P.C = 0 <= (this.register.A - programRom[this.executeDataByAddress(programRom, order.address)])
         break;
 
       case 'TAY':
+        this.register.Y = this.register.A
         break;
+
       case 'CLC':
+        this.register.P.C = false
         break;
 
     }
