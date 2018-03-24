@@ -195,8 +195,7 @@ export class CPU {
         break;
 
       case 'RTS':
-        this.register.PC = programRom[this.register.S] + (programRom[this.register.S + 1] << 8)
-        this.register.S += 2;
+        this.returnCaller(programRom)
         break;
 
       case 'EOR':
@@ -208,16 +207,7 @@ export class CPU {
         break;
 
       case 'JSR':
-        // まずジャンプ先のアドレスをアドレス指定によって取得した後
-        const jumpedAddress = programRom[this.executeDataByAddress(programRom, order.address)]
-        
-        // PCを上位バイト、下位バイトの順にスタックへプッシュ
-        programRom[jumpedAddress + 1] = (this.register.PC >> 8) ^ 0xFF
-        programRom[jumpedAddress + 2] = this.register.PC ^ 0xFF
-        
-        // PCはトラップの項にもあるようにJSRの最後のバイトアドレスです
-        // 最後にジャンプ先へジャンプ
-        this.register.PC = jumpedAddress
+        this.goToSubroutine(programRom, order.address)
         break;
 
       case 'CMP':
@@ -233,6 +223,30 @@ export class CPU {
         break;
 
     }
+  }
+
+  goToSubroutine(programRom: Uint8Array, address: string) {
+    const jumpedAddress = programRom[this.executeDataByAddress(programRom, address)]
+    this.pushStack(programRom)
+    this.register.PC = jumpedAddress
+  }
+
+  pushStack(programRom: Uint8Array) {
+    const address = this.register.PC
+    programRom[0x100 | programRom[this.register.S + 1]] = (address >> 8) & 0xff
+    programRom[0x100 | programRom[this.register.S + 2]] = address & 0xff
+    this.register.S += 2
+  }
+
+  returnCaller(programRom: Uint8Array) {
+    this.popStack(programRom)
+  }
+
+  popStack(programRom: Uint8Array) {
+    const lowwer = programRom[0x100 | programRom[this.register.S]]
+    const upper = programRom[0x100 | programRom[this.register.S - 1]] << 8
+    this.register.PC = lowwer + upper + 1
+    this.register.S -= 2;
   }
 
   isCarry(registerNum: number, romNumber: number): boolean {

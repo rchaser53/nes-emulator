@@ -48,5 +48,18 @@ describe('CPU', () => {
 	test('getIndirectIndex', async () => {
     cpu.register.Y = 0x1234
     expect(cpu.getIndirectIndex(memory, 11, 'Y')).toEqual(0xd0c + 0x1234)
-	})
+  })
+
+	test('stack', async () => {
+    cpu.register.S = 0x0010
+    cpu.register.PC = 0x0123
+
+    cpu.goToSubroutine(memory, 'Immediate')
+    expect(cpu.register.PC).toEqual(0x0024)
+    expect(cpu.register.S).toEqual(0x0012)
+
+    cpu.returnCaller(memory)
+    expect(cpu.register.PC).toEqual(0x0124)
+    expect(cpu.register.S).toEqual(0x0010)
+  })
 })
