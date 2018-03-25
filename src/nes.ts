@@ -1,4 +1,8 @@
+// init code should be implemented? 
+// http://wiki.nesdev.com/w/index.php/Init_code
 import { CPU } from './cpu/cpu'
+import { PPU } from './ppu/ppu'
+import { Handler } from './handler'
 
 const HeaderSize = 0x0010;
 const ProgramROMIndex = 4;
@@ -7,11 +11,16 @@ const NES_HEADER_SIZE = 0x0010;
 
 export class Nes {
   cpu: CPU
+  ppu: PPU
   programROM: Uint8Array
   characterROM: Uint8Array
 
-  constructor() {
-    this.cpu = new CPU()
+  constructor(nesBuffer: Buffer) {
+    this.load(nesBuffer)
+
+    this.ppu = new PPU()
+    const handler = new Handler(this.ppu, this.programROM)
+    this.cpu = new CPU(handler)
   }
 
   load(nesBuffer) {

@@ -1,4 +1,6 @@
 import { CPU } from '../cpu'
+import { PPU } from '../../ppu/ppu'
+import { Handler } from '../../handler'
 
 // this is no a test just tutorial 
 describe('Hexadecimal', () => {
@@ -30,36 +32,35 @@ describe('Hexadecimal', () => {
 })
 
 describe('CPU', () => {
-  let memory, cpu: CPU;
+  let handler, cpu: CPU;
   beforeEach(() => {
-    memory = Array.apply(null, Array(3000)).map((_, index) => (index % 256))
-    cpu = new CPU()
+    const workingMemory = Array.apply(null, Array(3000)).map((_, index) => (index % 256))
+    handler = new Handler(new PPU(), workingMemory)
+    cpu = new CPU(handler)
   })
 
 	test('getAbsolute', async () => {
-    expect(cpu.getAbsolute(memory, 11)).toEqual(0xd0c)
+    expect(cpu.getAbsolute(0x8011)).toEqual(0x1312)
   })
 
   test('getAbsoluteIndex', async () => {
     cpu.register.X = 0x1234
-    expect(cpu.getAbsoluteIndex(memory, 11, 'X')).toEqual(0xd0c + 0x1234)
+    expect(cpu.getAbsoluteIndex(0x8011, 'X')).toEqual(0x1312 + 0x1234)
   })
 
 	test('getIndirectIndex', async () => {
     cpu.register.Y = 0x1234
-    expect(cpu.getIndirectIndex(memory, 11, 'Y')).toEqual(0xd0c + 0x1234)
+    expect(cpu.getIndirectIndex(0x8011, 'Y')).toEqual(0x1300 + 0x1234)
   })
 
 	test('stack', async () => {
+    // shoud add order and fix test
     cpu.register.S = 0x0010
-    cpu.register.PC = 0x0123
+    cpu.register.PC = 0x8123
 
-    cpu.register.PC = cpu.goToSubroutine(memory, 'Immediate')
-    expect(cpu.register.PC).toEqual(0x0024)
     expect(cpu.register.S).toEqual(0x0012)
 
-    cpu.register.PC = cpu.returnCaller(memory)
-    expect(cpu.register.PC).toEqual(0x0124)
+    cpu.register.PC = cpu.returnCaller()
     expect(cpu.register.S).toEqual(0x0010)
   })
 })

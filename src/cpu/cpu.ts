@@ -1,4 +1,5 @@
 import { HelloOpecodesMap, Order } from './opecode'
+import { Handler }  from '../handler'
 
 export interface StatusRegister {  
   C: boolean
@@ -37,7 +38,7 @@ export const DefualtRegister: Register = {
   Y: 0x00,                    // IndexesY         8bit
   S: 0x00,                    // Stack Pointer    8bit
   P: DefaultStatusRegister,   // Status Register  8bit
-  PC: 0x00                    // Program Count    16bit
+  PC: 0x0000                  // Program Count    16bit
 }
 
 const NoProgressPCOrder = [
@@ -53,18 +54,18 @@ const NoProgressPCOrder = [
 
 export class CPU {
   register: Register
-  constructor() {
+  handler: Handler
+
+  constructor(handler: Handler) {
     this.register = DefualtRegister
+    this.handler = handler
   }
 
-  load() {
-    // return HelloOpecodesMap[byte]
-  }
-
-  run(programRom: Uint8Array) {
+  run(programRom: Uint8Array): number {
     const opecode = programRom[this.register.PC]
     const order = this.fetch(opecode)
     this.executeOpeCode(programRom, order)
+    return order.cycle
   }
 
   fetch(opecode: number): Order {
@@ -76,40 +77,40 @@ export class CPU {
     return opeObject
   }
 
-  executeDataByAddress(programRom: Uint8Array, address: string): number {
+  executeDataByAddress(address: string): number {
     const PC = this.register.PC
     switch (address) {
       case 'Immediate':
-        return programRom[PC + 1]
+        return this.handler.readCPU(PC + 1)
       case 'Indirect,Y':
-        return programRom[this.getIndirectIndex(programRom, PC, 'Y')]
+        return this.handler.readCPU(this.getIndirectIndex(PC, 'Y'))
       case 'Absolute':
-        return programRom[this.getAbsolute(programRom, PC)]
+        return this.handler.readCPU(this.getAbsolute(PC))
       case 'Absolute,Y':
-        return programRom[this.getAbsoluteIndex(programRom, PC, 'Y')]
+        return this.handler.readCPU(this.getAbsoluteIndex(PC, 'Y'))
       case 'ZeroPage':
-        return programRom[programRom[PC + 1]]
+        return this.handler.readCPU(this.handler.readCPU(PC + 1))
       case 'Relative':
-        return programRom[programRom[PC + 1] + programRom[PC + 2]]
+        return this.handler.readCPU(this.handler.readCPU(PC + 1) + this.handler.readCPU(PC + 2))
       default:
         throw new Error(`${address} has not implemeneted yet`)
     }
   }
 
-  getIndirectIndex(programRom: Uint8Array, PC: number, registerKey: string): number {
-    const lowerAddress = 0x0000 | programRom[PC + 1]
-    const upperAddress = programRom[PC + 2] << 8
-    return upperAddress | programRom[lowerAddress] + this.register[registerKey]
+  getIndirectIndex(PC: number, registerKey: string): number {
+    const lowerAddress = 0x0000 | this.handler.readCPU(PC + 1)
+    const upperAddress = this.handler.readCPU(PC + 2) << 8
+    return (upperAddress | this.handler.readCPU(lowerAddress)) + this.register[registerKey]
   }
 
-  getAbsolute(programRom: Uint8Array, PC: number): number {
-    const lowerAddress = 0x0000 | programRom[PC + 1]
-    const upperAddress = programRom[PC + 2] << 8
+  getAbsolute(PC: number): number {
+    const lowerAddress = 0x0000 | this.handler.readCPU(PC + 1)
+    const upperAddress = this.handler.readCPU(PC + 2) << 8
     return upperAddress | lowerAddress
   }
 
-  getAbsoluteIndex(programRom: Uint8Array, PC: number, registerKey: string): number {
-    return this.getAbsolute(programRom, PC) + this.register[registerKey]
+  getAbsoluteIndex(PC: number, registerKey: string): number {
+    return this.getAbsolute(PC) + this.register[registerKey]
   }
 
   executeOpeCode(programRom: Uint8Array, order: Order) {
@@ -123,15 +124,15 @@ export class CPU {
         break;
 
       case 'LDA':
-        this.register.A = this.executeDataByAddress(programRom, order.address)
+        this.register.A = this.executeDataByAddress(order.address)
         break;
 
       case 'LDX':
-        this.register.X = this.executeDataByAddress(programRom, order.address)
+        this.register.X = this.executeDataByAddress(order.address)
         break;
 
       case 'LDY':
-        this.register.Y = this.executeDataByAddress(programRom, order.address)
+        this.register.Y = this.executeDataByAddress(order.address)
         break;
 
       case 'TXS':
@@ -143,57 +144,57 @@ export class CPU {
         break;
 
       case 'STA':
-        programRom[this.executeDataByAddress(programRom, order.address)] = this.register.A
+        this.handler.writeCPU(this.executeDataByAddress(order.address), this.register.A)
         break;
 
       case 'STX':
-        programRom[this.executeDataByAddress(programRom, order.address)] = this.register.X
+        this.handler.writeCPU(this.executeDataByAddress(order.address), this.register.X)
         break;
 
       case 'BNE':
         if (this.register.P.Z === false) {
-          this.register.PC = this.executeDataByAddress(programRom, order.address)
+          this.register.PC = this.executeDataByAddress(order.address)
           break;
         }
         break;
 
       case 'BPL':
         if (this.register.P.N === false) {
-          this.register.PC = this.executeDataByAddress(programRom, order.address)
+          this.register.PC = this.executeDataByAddress(order.address)
           break;
         }
         break;
 
       case 'BCS':
         if (this.register.P.C === true) {
-          this.register.PC = this.executeDataByAddress(programRom, order.address)
+          this.register.PC = this.executeDataByAddress(order.address)
           break;
         }
         break;
 
       case 'BEQ':
         if (this.register.P.Z === true) {
-          this.register.PC = this.executeDataByAddress(programRom, order.address)
+          this.register.PC = this.executeDataByAddress(order.address)
           break;
         }
         break;
 
       case 'BCC':
         if (this.register.P.C === false) {
-          this.register.PC = this.executeDataByAddress(programRom, order.address)
+          this.register.PC = this.executeDataByAddress(order.address)
           break;
         }
         break;
 
       case 'ADC':
-        if (this.isCarry(this.register.A, programRom[this.executeDataByAddress(programRom, order.address)]) === true) {
+        if (this.isCarry(this.register.A, this.handler.readCPU(this.executeDataByAddress(order.address))) === true) {
           this.register.P.C = true
         }
-        this.register.A = this.register.A + programRom[this.executeDataByAddress(programRom, order.address)]
+        this.register.A = this.register.A + this.handler.readCPU(this.executeDataByAddress(order.address))
         break;
 
       case 'DEC':
-        programRom[this.executeDataByAddress(programRom, order.address)] -= 1
+        this.handler.writeCPU(this.executeDataByAddress(order.address), -1)
         break;
 
       case 'DEY':
@@ -201,27 +202,27 @@ export class CPU {
         break;
 
       case 'INC':
-        programRom[this.executeDataByAddress(programRom, order.address)] += 1
+        this.handler.writeCPU(this.executeDataByAddress(order.address), 1)
         break;
 
       case 'RTS':
-        this.register.PC = this.returnCaller(programRom)
+        this.register.PC = this.returnCaller()
         break;
 
       case 'EOR':
-        this.register.A = this.register.A ^ programRom[this.executeDataByAddress(programRom, order.address)]
+        this.register.A = this.register.A ^ this.handler.readCPU(this.executeDataByAddress(order.address))
         break;
 
       case 'JMP':
-        this.register.PC = programRom[this.executeDataByAddress(programRom, order.address)]
+        this.register.PC = this.handler.readCPU(this.executeDataByAddress(order.address))
         break;
 
       case 'JSR':
-        this.register.PC = this.goToSubroutine(programRom, order.address)
+        this.register.PC = this.goToSubroutine(order.address)
         break;
 
       case 'CMP':
-        this.register.P.C = 0 <= (this.register.A - programRom[this.executeDataByAddress(programRom, order.address)])
+        this.register.P.C = 0 <= (this.register.A - this.handler.readCPU(this.executeDataByAddress(order.address)))
         break;
 
       case 'TAY':
@@ -245,27 +246,27 @@ export class CPU {
   }
 
   // 'JSR'
-  goToSubroutine(programRom: Uint8Array, address: string): number {
-    const jumpedAddress = programRom[this.executeDataByAddress(programRom, address)]
-    this.pushStack(programRom)
+  goToSubroutine(address: string): number {
+    const jumpedAddress = this.handler.readCPU(this.executeDataByAddress(address))
+    this.pushStack()
     return jumpedAddress
   }
 
-  pushStack(programRom: Uint8Array) {
+  pushStack() {
     const address = this.register.PC
-    programRom[0x100 | programRom[this.register.S + 1]] = (address >> 8) & 0xff
-    programRom[0x100 | programRom[this.register.S + 2]] = address & 0xff
+    this.handler.writeCPU(0x100 | this.handler.readCPU(this.register.S + 1), (address >> 8) & 0xff)
+    this.handler.writeCPU(0x100 | this.handler.readCPU(this.register.S + 2), address & 0xff)
     this.register.S += 2
   }
 
   // 'RTS'
-  returnCaller(programRom: Uint8Array): number {
-    return this.popStack(programRom)
+  returnCaller(): number {
+    return this.popStack()
   }
 
-  popStack(programRom: Uint8Array): number {
-    const lowwer = programRom[0x100 | programRom[this.register.S]]
-    const upper = programRom[0x100 | programRom[this.register.S - 1]] << 8
+  popStack(): number {
+    const lowwer = this.handler.readCPU(0x100 | this.handler.readCPU(this.register.S))
+    const upper = this.handler.readCPU(0x100 | this.handler.readCPU(this.register.S - 1)) << 8
     this.register.S -= 2;
     return lowwer + upper + 1
   }
@@ -275,14 +276,14 @@ export class CPU {
     return ((sum >> 16) & 0x1) === 1
   }
 
-  reset(programRom) {
+  reset() {
       // 初期化のための6クロックの後に動作を開始します。
       // todo
 
       this.register.P.I = true
       
-      const lowwer = programRom[0xfffc] & 0xff
-      const upper = (programRom[0xfffd] & 0xff) << 8
+      const lowwer = this.handler.readCPU(0xfffc) & 0xff
+      const upper = (this.handler.readCPU(0xfffd) & 0xff) << 8
       this.register.PC = upper + lowwer
   }
 }
