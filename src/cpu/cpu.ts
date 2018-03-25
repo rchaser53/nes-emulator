@@ -61,10 +61,10 @@ export class CPU {
     this.handler = handler
   }
 
-  run(programRom: Uint8Array): number {
-    const opecode = programRom[this.register.PC]
+  run(): number {
+    const opecode = this.handler.readCPU(this.register.PC)
     const order = this.fetch(opecode)
-    this.executeOpeCode(programRom, order)
+    this.executeOpeCode(order)
     return order.cycle
   }
 
@@ -113,7 +113,7 @@ export class CPU {
     return this.getAbsolute(PC) + this.register[registerKey]
   }
 
-  executeOpeCode(programRom: Uint8Array, order: Order) {
+  executeOpeCode(order: Order) {
     switch (order.opecode) {
       case 'SEI':
         this.register.P.I = false
@@ -284,7 +284,7 @@ export class CPU {
       
       const lowwer = this.handler.readCPU(0xfffc) & 0xff
       const upper = (this.handler.readCPU(0xfffd) & 0xff) << 8
-      this.register.PC = upper + lowwer
+      this.register.PC = upper | lowwer
   }
 }
 

@@ -15,12 +15,13 @@ export class Nes {
   programROM: Uint8Array
   characterROM: Uint8Array
 
-  constructor(nesBuffer: Buffer) {
+  constructor(nesBuffer: ArrayBuffer) {
     this.load(nesBuffer)
 
     this.ppu = new PPU()
     const handler = new Handler(this.ppu, this.programROM)
     this.cpu = new CPU(handler)
+    this.cpu.reset();
   }
 
   load(nesBuffer) {
@@ -45,11 +46,10 @@ export class Nes {
   }
 
   run() {
-    while (true) {
-      this.cpu.run(this.programROM)
-    }
+    setInterval(() => {
+      this.cpu.run()
+    }, 33)
   }
-
 }
 
 // 1. Header (16 bytes)
