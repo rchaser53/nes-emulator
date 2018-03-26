@@ -52,6 +52,13 @@ const NoProgressPCOrder = [
   'RTS'
 ]
 
+const TwoPCUseAddress = [
+  'Indirect,Absolute',    // need to implement
+  'Absolute,Y',           // need to implement
+  'Absolute,X',
+  'Absolute'
+]
+
 export class CPU {
   register: Register
   handler: Handler
@@ -242,7 +249,7 @@ export class CPU {
 
   changeProgramCount(order: Order) {
     if (NoProgressPCOrder.includes(order.opecode) === true) return
-    this.register.PC += order.len
+    this.register.PC += TwoPCUseAddress.includes(order.address) ? 2 : 1
   }
 
   // 'JSR'
