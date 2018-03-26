@@ -83,7 +83,7 @@ export class CPU {
       case 'Indirect,Y':
         return this.handler.readCPU(this.getIndirectIndex(PC, 'Y'))
       case 'Absolute':
-        return this.handler.readCPU(this.getAbsolute(PC))
+        return this.getAbsolute(PC)
       case 'Absolute,Y':
         return this.handler.readCPU(this.getAbsoluteIndex(PC, 'Y'))
       case 'ZeroPage':
@@ -96,14 +96,14 @@ export class CPU {
   }
 
   getIndirectIndex(PC: number, registerKey: string): number {
-    const lowerAddress = 0x0000 | this.handler.readCPU(PC + 1)
-    const upperAddress = this.handler.readCPU(PC + 2) << 8
+    const lowerAddress = 0x0000 | this.handler.readCPU(PC)
+    const upperAddress = this.handler.readCPU(PC + 1) << 8
     return (upperAddress | this.handler.readCPU(lowerAddress)) + this.register[registerKey]
   }
 
   getAbsolute(PC: number): number {
-    const lowerAddress = 0x0000 | this.handler.readCPU(PC + 1)
-    const upperAddress = this.handler.readCPU(PC + 2) << 8
+    const lowerAddress = 0x0000 | this.handler.readCPU(PC)
+    const upperAddress = this.handler.readCPU(PC + 1) << 8
     return upperAddress | lowerAddress
   }
 
@@ -242,7 +242,7 @@ export class CPU {
 
   // 'JSR'
   goToSubroutine(address: string): number {
-    const jumpedAddress = this.handler.readCPU(this.executeDataByAddress(address))
+    const jumpedAddress = this.executeDataByAddress(address)
     this.pushStack()
     return jumpedAddress
   }

@@ -40,17 +40,17 @@ describe('CPU', () => {
   })
 
 	test('getAbsolute', async () => {
-    expect(cpu.getAbsolute(0x8011)).toEqual(0x1312)
+    expect(cpu.getAbsolute(0x8011)).toEqual(0x1211)
   })
 
   test('getAbsoluteIndex', async () => {
     cpu.register.X = 0x1234
-    expect(cpu.getAbsoluteIndex(0x8011, 'X')).toEqual(0x1312 + 0x1234)
+    expect(cpu.getAbsoluteIndex(0x8011, 'X')).toEqual(0x1211 + 0x1234)
   })
 
 	test('getIndirectIndex', async () => {
     cpu.register.Y = 0x1234
-    expect(cpu.getIndirectIndex(0x8011, 'Y')).toEqual(0x1300 + 0x1234)
+    expect(cpu.getIndirectIndex(0x8011, 'Y')).toEqual(0x1200 + 0x1234)
   })
 
 	test('stack', async () => {
@@ -58,6 +58,7 @@ describe('CPU', () => {
     cpu.register.S = 0x0010
     cpu.register.PC = 0x8123
 
+    cpu.goToSubroutine('Immediate')
     expect(cpu.register.S).toEqual(0x0012)
 
     cpu.register.PC = cpu.returnCaller()

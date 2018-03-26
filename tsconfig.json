@@ -10,6 +10,7 @@
 		"strictNullChecks": true,
     "noUnusedLocals": true,
     "sourceMap": true,
+    "inlineSourceMap": true,
 		"noEmit": false,
 		"noImplicitReturns": true,
 		"noImplicitThis": false,
