@@ -41,17 +41,6 @@ export const DefualtRegister: Register = {
   PC: 0x0000                  // Program Count    16bit
 }
 
-const NoProgressPCOrder = [
-  'BNE',
-  'BPL',
-  'BCS',
-  'BEQ',
-  'BCC',
-  'JMP',
-  'JSR',
-  'RTS'
-]
-
 const TwoPCUseAddress = [
   'Indirect,Absolute',    // need to implement
   'Absolute,Y',           // need to implement
@@ -76,6 +65,7 @@ export class CPU {
   }
 
   fetch(opecode: number): Order {
+    this.register.PC++
     const opeObject = HelloOpecodesMap[opecode.toString(16)];
     if (opeObject == null) {
       throw new Error(`${opecode} is not correct code or not implementation.`)
@@ -86,6 +76,7 @@ export class CPU {
 
   executeDataByAddress(address: string): number {
     const PC = this.register.PC
+    this.changeProgramCount(address)
     switch (address) {
       case 'Immediate':
         return this.handler.readCPU(PC + 1)
@@ -243,13 +234,10 @@ export class CPU {
       default:
         throw new Error(`${JSON.stringify(order)} is not implemented!`)
     }
-
-    this.changeProgramCount(order)
   }
 
-  changeProgramCount(order: Order) {
-    if (NoProgressPCOrder.includes(order.opecode) === true) return
-    this.register.PC += TwoPCUseAddress.includes(order.address) ? 2 : 1
+  changeProgramCount(address: string) {
+    this.register.PC += TwoPCUseAddress.includes(address) ? 2 : 1
   }
 
   // 'JSR'
