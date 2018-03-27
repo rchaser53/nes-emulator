@@ -246,9 +246,9 @@ export class CPU {
 
   pushStack() {
     const address = this.register.PC
-    this.handler.writeCPU(0x100 | this.handler.readCPU(this.register.S + 1), (address >> 8) & 0xff)
-    this.handler.writeCPU(0x100 | this.handler.readCPU(this.register.S + 2), address & 0xff)
-    this.register.S += 2
+    this.handler.writeCPU(0x100 | this.register.S, (address >> 8) & 0xff)
+    this.handler.writeCPU(0x100 | this.register.S - 1, (address - 1) & 0xff)
+    this.register.S -= 2
   }
 
   // 'RTS'
