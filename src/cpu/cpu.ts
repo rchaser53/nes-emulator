@@ -82,7 +82,7 @@ export class CPU {
       case 'Immediate':
         return this.handler.readCPU(PC + 1)
       case 'Indirect,Y':
-        return this.handler.readCPU(this.getIndirectIndex(PC, 'Y'))
+        return this.getIndirectIndex(PC, 'Y')
       case 'Absolute':
         return this.getAbsolute(PC)
       case 'Absolute,Y':
