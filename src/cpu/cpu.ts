@@ -80,7 +80,7 @@ export class CPU {
     this.changeProgramCount(address)
     switch (address) {
       case 'Immediate':
-        return this.handler.readCPU(PC + 1)
+        return this.handler.readCPU(PC)
       case 'Indirect,Y':
         return this.getIndirectIndex(PC, 'Y')
       case 'Absolute':
