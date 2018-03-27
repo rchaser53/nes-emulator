@@ -60,6 +60,7 @@ export class CPU {
   run(): number {
     const opecode = this.handler.readCPU(this.register.PC)
     const order = this.fetch(opecode)
+    console.log(this.register.PC, order, opecode, 1)
     this.executeOpeCode(order)
     return order.cycle
   }
@@ -89,7 +90,7 @@ export class CPU {
       case 'ZeroPage':
         return this.handler.readCPU(this.handler.readCPU(PC + 1))
       case 'Relative':
-        return this.handler.readCPU(this.handler.readCPU(PC + 1) + this.handler.readCPU(PC + 2))
+        return this.handler.readCPU(PC) + PC + 1
       default:
         throw new Error(`${address} has not implemeneted yet`)
     }
@@ -152,35 +153,30 @@ export class CPU {
       case 'BNE':
         if (this.register.P.Z === false) {
           this.register.PC = this.executeDataByAddress(order.address)
-          break;
         }
         break;
 
       case 'BPL':
         if (this.register.P.N === false) {
           this.register.PC = this.executeDataByAddress(order.address)
-          break;
         }
         break;
 
       case 'BCS':
         if (this.register.P.C === true) {
           this.register.PC = this.executeDataByAddress(order.address)
-          break;
         }
         break;
 
       case 'BEQ':
         if (this.register.P.Z === true) {
           this.register.PC = this.executeDataByAddress(order.address)
-          break;
         }
         break;
 
       case 'BCC':
         if (this.register.P.C === false) {
           this.register.PC = this.executeDataByAddress(order.address)
-          break;
         }
         break;
 
