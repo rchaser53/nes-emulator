@@ -97,8 +97,9 @@ export class CPU {
   }
 
   getIndirectIndex(PC: number, registerKey: string): number {
-    const lowerAddress = 0x0000 | this.handler.readCPU(PC)
-    const upperAddress = this.handler.readCPU(PC + 1) << 8
+    const base = this.handler.readCPU(PC)
+    const lowerAddress = 0x0000 | this.handler.readCPU(base)
+    const upperAddress = this.handler.readCPU((base + 1) & 0xff) << 8
     return (upperAddress | this.handler.readCPU(lowerAddress)) + this.register[registerKey]
   }
 
