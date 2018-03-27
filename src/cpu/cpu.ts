@@ -88,7 +88,7 @@ export class CPU {
       case 'Absolute,Y':
         return this.handler.readCPU(this.getAbsoluteIndex(PC, 'Y'))
       case 'ZeroPage':
-        return this.handler.readCPU(this.handler.readCPU(PC + 1))
+        return this.handler.readCPU(PC)
       case 'Relative':
         return this.handler.readCPU(PC) + PC + 1
       default:
