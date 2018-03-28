@@ -258,9 +258,9 @@ export class CPU {
   }
 
   popStack(): number {
-    const lowwer = this.handler.readCPU(0x100 | this.handler.readCPU(this.register.S))
-    const upper = this.handler.readCPU(0x100 | this.handler.readCPU(this.register.S - 1)) << 8
-    this.register.S -= 2;
+    const lowwer = this.handler.readCPU(0x100 | this.register.S + 1)
+    const upper = this.handler.readCPU(0x100 | this.register.S + 2) << 8
+    this.register.S += 2;
     return lowwer + upper + 1
   }
 
