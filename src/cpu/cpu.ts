@@ -136,7 +136,7 @@ export class CPU {
         break;
 
       case 'TXS':
-        this.register.S = this.register.X
+        this.register.S = this.register.X + 0x0100;
         break;
 
       case 'TYA':
