@@ -80,7 +80,7 @@ export class CPU {
     this.changeProgramCount(address)
     switch (address) {
       case 'Immediate':
-        return this.handler.readCPU(PC)
+        return PC
       case 'Indirect,Y':
         return this.getIndirectIndex(PC, 'Y')
       case 'Absolute':
@@ -124,15 +124,15 @@ export class CPU {
         break;
 
       case 'LDA':
-        this.register.A = this.executeDataByAddress(order.address)
+        this.register.A = this.handler.readCPU(this.executeDataByAddress(order.address))
         break;
 
       case 'LDX':
-        this.register.X = this.executeDataByAddress(order.address)
+        this.register.X = this.handler.readCPU(this.executeDataByAddress(order.address))
         break;
 
       case 'LDY':
-        this.register.Y = this.executeDataByAddress(order.address)
+        this.register.Y = this.handler.readCPU(this.executeDataByAddress(order.address))
         break;
 
       case 'TXS':
