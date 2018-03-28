@@ -189,7 +189,8 @@ export class CPU {
         break;
 
       case 'DEC':
-        this.handler.writeCPU(this.executeDataByAddress(order.address), -1)
+        const targetMemory = this.executeDataByAddress(order.address)
+        this.handler.writeCPU(targetMemory, this.handler.readCPU(targetMemory)  -1)
         break;
 
       case 'DEY':
