@@ -181,11 +181,8 @@ export class CPU {
         }
         break;
 
-      case 'ADC':
-        if (this.isCarry(this.register.A, this.handler.readCPU(this.executeDataByAddress(order.address))) === true) {
-          this.register.P.C = true
-        }
-        this.register.A = this.register.A + this.handler.readCPU(this.executeDataByAddress(order.address))
+			case 'ADC':
+				this.addRegister(order, 'A')
         break;
 
       case 'DEC':
@@ -233,6 +230,14 @@ export class CPU {
         throw new Error(`${JSON.stringify(order)} is not implemented!`)
     }
   }
+
+	addRegister(order: Order, registerKey: string) {
+		const tempMemory = this.handler.readCPU(this.executeDataByAddress(order.address))
+		if (this.isCarry(this.register[registerKey], tempMemory) === true) {
+			this.register.P.C = true
+		}
+		this.register[registerKey] = this.register[registerKey]+ tempMemory
+	}
 
   changeProgramCount(address: string) {
     this.register.PC += TwoPCUseAddress.includes(address) ? 2 : 1
