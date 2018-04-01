@@ -131,24 +131,24 @@ export class CPU {
         break;
 
       case 'LDA':
-        this.register.A = this.handler.readCPU(this.executeDataByAddress(order.address))
+				this.insertRegister('A', this.handler.readCPU(this.executeDataByAddress(order.address)))
         break;
 
       case 'LDX':
-        this.register.X = this.handler.readCPU(this.executeDataByAddress(order.address))
+				this.insertRegister('X', this.handler.readCPU(this.executeDataByAddress(order.address)))
         break;
 
       case 'LDY':
-        this.register.Y = this.handler.readCPU(this.executeDataByAddress(order.address))
+				this.insertRegister('Y', this.handler.readCPU(this.executeDataByAddress(order.address)))
         break;
 
       case 'TXS':
-        this.register.S = this.register.X + 0x0100;
+				this.insertRegister('S', this.register.X + 0x0100)
         break;
 
-      case 'TYA':
-        this.register.A = this.register.Y
-        break;
+			case 'TYA':
+				this.insertRegister('A', this.register.Y)
+				break;
 
       case 'STA':
         this.handler.writeCPU(this.executeDataByAddress(order.address), this.register.A)
@@ -189,7 +189,7 @@ export class CPU {
         break;
 
 			case 'ADC':
-				this.addRegister(order, 'A')
+				this.addRegister('A', this.handler.readCPU(this.executeDataByAddress(order.address)))
         break;
 
       case 'DEC':
@@ -197,8 +197,8 @@ export class CPU {
         this.handler.writeCPU(targetMemory, this.handler.readCPU(targetMemory)  -1)
         break;
 
-      case 'DEY':
-        this.register.Y -= 1
+			case 'DEY':
+				this.decreaseRegister('Y', 1)
         break;
 
       case 'INC':
@@ -209,7 +209,7 @@ export class CPU {
         this.register.PC = this.returnCaller()
         break;
 
-      case 'EOR':
+			case 'EOR':
         this.register.A = this.register.A ^ this.handler.readCPU(this.executeDataByAddress(order.address))
         break;
 
@@ -225,8 +225,8 @@ export class CPU {
         this.register.P.C = 0 <= (this.register.A - this.handler.readCPU(this.executeDataByAddress(order.address)))
         break;
 
-      case 'TAY':
-        this.register.Y = this.register.A
+			case 'TAY':
+				this.insertRegister('Y', this.register.A)
         break;
 
       case 'CLC':
@@ -238,12 +238,29 @@ export class CPU {
     }
   }
 
-	addRegister(order: Order, registerKey: string) {
-		const tempMemory = this.handler.readCPU(this.executeDataByAddress(order.address))
-		if (this.isCarry(this.register[registerKey], tempMemory) === true) {
+	insertRegister(registerKey: string, value: number) {
+		this.register[registerKey] = value
+		if (0 < this.register[registerKey]) {
+			this.register.P.N = false
+		}
+	}
+
+	addRegister(registerKey: string, value: number) {
+		if (this.isCarry(this.register[registerKey], value) === true) {
 			this.register.P.C = true
 		}
-		this.register[registerKey] = this.register[registerKey]+ tempMemory
+		this.register[registerKey] = (this.register[registerKey] + value) & 0xFF
+
+		if (0 <= this.register[registerKey]) {
+			this.register.P.N = false
+		}
+	}
+
+	decreaseRegister(registerKey: string, value: number) {
+		this.register[registerKey] -= value
+		if (this.register[registerKey] < 0) {
+			this.register.P.N = true
+		}
 	}
 
   changeProgramCount(address: string) {
