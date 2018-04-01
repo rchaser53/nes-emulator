@@ -90,11 +90,18 @@ export class CPU {
       case 'ZeroPage':
         return this.handler.readCPU(PC)
       case 'Relative':
-        return this.handler.readCPU(PC) + PC + 1
+        return this.getRelative(PC)
       default:
         throw new Error(`${address} has not implemeneted yet`)
     }
   }
+
+	getRelative(PC: number): number {
+		const base = this.handler.readCPU(PC)
+		return (base < 0x80)
+							? this.handler.readCPU(PC) + PC + 1
+							: this.handler.readCPU(PC) + PC + 1 - 256;
+	}
 
   getIndirectIndex(PC: number, registerKey: string): number {
     const base = this.handler.readCPU(PC)
