@@ -213,8 +213,8 @@ export class CPU {
         this.register.A = this.register.A ^ this.handler.readCPU(this.executeDataByAddress(order.address))
         break;
 
-      case 'JMP':
-        this.register.PC = this.handler.readCPU(this.executeDataByAddress(order.address))
+			case 'JMP':
+				this.register.PC = this.executeDataByAddress(order.address)
         break;
 
       case 'JSR':
