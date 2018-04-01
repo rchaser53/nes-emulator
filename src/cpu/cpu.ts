@@ -100,7 +100,7 @@ export class CPU {
     const base = this.handler.readCPU(PC)
     const lowerAddress = 0x0000 | this.handler.readCPU(base)
     const upperAddress = this.handler.readCPU((base + 1) & 0xff) << 8
-    return (upperAddress | this.handler.readCPU(lowerAddress)) + this.register[registerKey]
+    return (upperAddress | lowerAddress) + this.register[registerKey]
   }
 
   getAbsolute(PC: number): number {
