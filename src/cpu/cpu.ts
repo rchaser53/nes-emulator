@@ -233,6 +233,10 @@ export class CPU {
         this.register.P.C = false
         break;
       
+      case 'SED':
+        // this order is no mean
+        break;
+
       default:
         throw new Error(`${JSON.stringify(order)} is not implemented!`)
     }

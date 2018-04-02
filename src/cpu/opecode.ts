@@ -50,6 +50,7 @@ export const HelloOpecodesMap: { [key: string]: Order} = {
 
   "a8": { opecode: 'TAY', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       TAY           $A8   1   2
   "18": { opecode: 'CLC', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       CLC           $18   1   2
+  "f8": { opecode: 'SED', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       SED           $f8   1   2
 }
 
 export const HelloOpecodes = [
@@ -88,4 +89,5 @@ export const HelloOpecodes = [
 
   'TAY', // Transfer A to Y	    A -> Y
   'CLC', // Clear C flag
+  'SED', // Set Decimal Mode    1 -> D
 ]
