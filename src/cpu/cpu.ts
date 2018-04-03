@@ -158,34 +158,24 @@ export class CPU {
         this.handler.writeCPU(this.executeDataByAddress(order.address), this.register.X)
         break;
 
-      case 'BNE':
-        if (this.register.P.Z === false) {
-          this.register.PC = this.executeDataByAddress(order.address)
-        }
+			case 'BNE':
+				this.branchPC(this.register.P.Z, false, order.address)
         break;
 
-      case 'BPL':
-        if (this.register.P.N === false) {
-          this.register.PC = this.executeDataByAddress(order.address)
-        }
+			case 'BPL':
+				this.branchPC(this.register.P.N, false, order.address)
         break;
 
-      case 'BCS':
-        if (this.register.P.C === true) {
-          this.register.PC = this.executeDataByAddress(order.address)
-        }
+			case 'BCS':
+				this.branchPC(this.register.P.C, true, order.address)
         break;
 
-      case 'BEQ':
-        if (this.register.P.Z === true) {
-          this.register.PC = this.executeDataByAddress(order.address)
-        }
+			case 'BEQ':
+				this.branchPC(this.register.P.Z, true, order.address)
         break;
 
-      case 'BCC':
-        if (this.register.P.C === false) {
-          this.register.PC = this.executeDataByAddress(order.address)
-        }
+			case 'BCC':
+				this.branchPC(this.register.P.C, false, order.address)
         break;
 
 			case 'ADC':
@@ -241,6 +231,13 @@ export class CPU {
         throw new Error(`${JSON.stringify(order)} is not implemented!`)
     }
   }
+
+	branchPC(register: boolean, condition: boolean, address: string) {
+		const nextPC = this.executeDataByAddress(address);
+		if (register === condition) {
+			this.register.PC = nextPC
+		}
+	}
 
 	insertRegister(registerKey: string, value: number) {
 		this.register[registerKey] = value
