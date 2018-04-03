@@ -41,7 +41,7 @@ export const HelloOpecodesMap: { [key: string]: Order} = {
   "71": { opecode: 'ADC', data: 0x0044, address: 'Indirect,Y', len: 2, cycle: 5 },        //  Indirect,Y    ADC ($44),Y   $71   2   5 +1
   "88": { opecode: 'DEY', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       DEY           $88   1   2
   "c6": { opecode: 'DEC', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 5  },         //  Zero Page     DEC $44       $C6   2   5
-  "e6": { opecode: 'INC', data: 0x0044, address: 'ZeroPage ', len: 2, cycle: 5 },         //  Zero Page     INC $44       $E6   2   5
+  "e6": { opecode: 'INC', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 5 },         //  Zero Page     INC $44       $E6   2   5
   
   "4c": { opecode: 'JMP', data: 0x5597, address: 'Absolute', len: 3, cycle: 3 },          //  Absolute      JMP $5597     $4C   3   3
   "20": { opecode: 'JSR', data: 0x5597, address: 'Absolute', len: 3, cycle: 6  },         //  Absolute      JSR $5597     $20   3   6
