@@ -21,6 +21,9 @@ const PPURegisterMap = {
   7: 'PPUDATA',
 }
 
+const BoarderCycle = 341;
+const DrawLine = 240;
+
 export class PPU {
   cycle: number = 0
   line: number = 0
@@ -47,19 +50,19 @@ export class PPU {
   }
 
   getSpriteId(tileX, tileY): number {
-
+		return 0
   }
 
   getBlockId(tileX, tileY): number {
-
+		return 0
   }
 
   getAttribute(tileX, tileY): number {
-
+		return 0
   }
 
   readCharacterRAM(addr: number): number {
-
+		return 0
   }
 
   writeRegister(index: number, value: number) {
@@ -70,28 +73,29 @@ export class PPU {
     return this.register[PPURegisterMap[index]]
   }
 
-  run(cycle){
+  run(cycle: number){
     this.cycle += cycle;
     if(this.line === 0) {
       this.background.length = 0;
     }
 
-    // 1ライン分のサイクル
-    if (this.cycle >= 341) {
-      this.cycle -= 341;
+    if (BoarderCycle <= this.cycle) {
+      this.cycle -= BoarderCycle;
       this.line++;
 
-      if (this.line <= 240 && this.line % 8 === 0) {
+      if (this.line <= DrawLine && this.line % 8 === 0) {
         this.buildBackground();
-      }
+			}
+
       if (this.line === 262) {
         this.line = 0;
         return {
           background: this.background,
           palette: this.getPalette(),
         };
-      }
-    }
+			}
+		}
+		return
   }
 
   buildSprite(spriteId) {
