@@ -21,7 +21,7 @@ export class Nes {
     this.ppu = new PPU()
     const handler = new Handler(this.ppu, this.programROM)
     this.cpu = new CPU(handler)
-    this.cpu.reset();
+    this.cpu.reset()
   }
 
   load(nesBuffer) {
@@ -46,9 +46,11 @@ export class Nes {
   }
 
   run() {
-    setInterval(() => {
-      this.cpu.run()
-    }, 33)
+		setInterval(() => {
+			const cycle = this.cpu.run();
+			const result = this.ppu.run(cycle);
+
+		}, 33)
   }
 }
 
