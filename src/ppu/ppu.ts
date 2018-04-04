@@ -23,13 +23,15 @@ const PPURegisterMap = {
 
 const BoarderCycle = 341;
 const DrawLine = 240;
+const SpriteNumber = 100;
 
 export class PPU {
   cycle: number = 0
   line: number = 0
   background: any[] = []
   tileY: number
-  vram: Uint8Array
+	vram: Uint8Array
+	spriteRam: Uint8Array
 
   register: PPURegister = {
     PPUCTRL: 0x00,
@@ -42,7 +44,8 @@ export class PPU {
     PPUDATA: 0x00,
   }
   constructor() {
-    this.vram = new Uint8Array(0x4000)
+		this.vram = new Uint8Array(0x4000)
+		this.spriteRam = new Uint8Array(0x100);
   }
 
   getPalette(): any {
@@ -76,7 +79,8 @@ export class PPU {
   run(cycle: number){
     this.cycle += cycle;
     if(this.line === 0) {
-      this.background.length = 0;
+			this.background.length = 0;
+			this.buildSprites();
     }
 
     if (BoarderCycle <= this.cycle) {
@@ -97,6 +101,10 @@ export class PPU {
 		}
 		return
   }
+
+	buildSprites() {
+		// TODO
+	}
 
   buildSprite(spriteId) {
     const sprite = new Array(8).fill(0).map(() => [0, 0, 0, 0, 0, 0, 0, 0]);
