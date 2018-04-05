@@ -68,8 +68,17 @@ export class PPU {
 		return 0
   }
 
-  writeRegister(index: number, value: number) {
-    this.register[PPURegisterMap[index]] = value
+  write(index: number, value: number) {
+    switch (PPURegisterMap[index]) {
+      case 'OAMADDR':
+        this.spriteRamAddr = value;
+        break;
+      case 'OAMDATA':
+        this.spriteRam[this.spriteRamAddr] = value;
+        break;
+      default:
+        break;
+    }
   }
 
   readRegister(index: number): number {
