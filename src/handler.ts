@@ -31,7 +31,7 @@ export class Handler {
     if (address <= 0x1fff) {
       return this.workingMemory[address]
     } else if (address <= 0x2007) {
-      return this.ppu.readRegister(address - 0x2000)
+      return this.ppu.read(address - 0x2000)
     } else if (address <= 0x3fff) {
       throw new Error(`${address} is used. need to search!`)
     } else if (address <= 0x5fff) {

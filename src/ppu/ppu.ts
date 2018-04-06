@@ -178,8 +178,17 @@ export class PPU {
     this.isVramAddrUpper = !this.isVramAddrUpper
   }
 
-  readRegister(index: number): number {
-    return this.register[PPURegisterMap[index]]
+  getNameSpace(): number {
+    const upper = this.register.PPUCTRL.nameTableUpper
+    const lowwer = this.register.PPUCTRL.nameTableLowwer
+    let base = 0x2000
+    base += (upper === true)
+              ? 0x0800
+              : 0
+    base += (lowwer === true)
+              ? 0x0400
+              : 0
+    return base
   }
 
   run(cycle: number){

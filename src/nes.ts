@@ -48,7 +48,7 @@ export class Nes {
   run() {
 		setInterval(() => {
 			const cycle = this.cpu.run();
-			const result = this.ppu.run(cycle);
+			this.ppu.run(cycle * 3);
 
 		}, 33)
   }
