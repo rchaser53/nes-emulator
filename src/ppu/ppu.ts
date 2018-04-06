@@ -107,8 +107,8 @@ export class PPU {
       case 'PPUDATA':
         this.vram[this.vRamAddr] = value;
         this.vRamAddr += (this.register.PPUCTRL.ppuAddressIncrementMode)
-                            ? 1
-                            : 32
+                            ? 32
+                            : 1
         break;
       default:
         break;
