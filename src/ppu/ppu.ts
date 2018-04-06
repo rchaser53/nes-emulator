@@ -50,7 +50,7 @@ export class PPU {
     OAMADDR: 0x00,
     OAMDATA: 0x00,
     PPUSCROLL: 0x00,
-    PPUADDR: 0x00,
+    PPUADDR: 0x0000,
     PPUDATA: 0x00,
   }
   constructor() {
