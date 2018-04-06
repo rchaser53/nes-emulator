@@ -91,6 +91,18 @@ export class PPU {
 		return 0
   }
 
+  read(index: number): number {
+    switch (PPURegisterMap[index]) {
+      case 'PPUDATA':
+        const ret = this.vram[this.vRamAddr];
+        this.moveNextVramAddr();
+        return ret;
+      default:
+        break;
+    }
+    throw new Error(`should not come here! ${this}`)
+  }
+
   write(index: number, value: number) {
     switch (PPURegisterMap[index]) {
       case 'OAMADDR':
@@ -103,14 +115,20 @@ export class PPU {
         this.writeVRamAddress(value)
         break;
       case 'PPUDATA':
-        this.vram[this.vRamAddr] = value;
-        this.vRamAddr += (this.register.PPUCTRL.ppuAddressIncrementMode)
-                            ? 32
-                            : 1
+        this.vram[this.vRamAddr] = value
+        this.moveNextVramAddr()
         break;
       default:
         break;
     }
+  }
+
+  moveNextVramAddr() {
+    this.vRamAddr += (this.register.PPUCTRL.ppuAddressIncrementMode)
+                        ? 32
+                        : 1
+  }
+
   writeVRamAddress(value: number) {
     if (this.isVramAddrUpper === true) {
       this.vRamBaffer = value;
