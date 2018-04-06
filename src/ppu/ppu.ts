@@ -45,6 +45,7 @@ export class PPU {
 	sprites: any[] = []
   spriteRamAddr: number = 0
   vRamAddr: number = 0
+  vRamBaffer: number = 0x00
   isVramAddrUpper: boolean = true
 
   register: PPURegister = {
@@ -99,10 +100,7 @@ export class PPU {
         this.spriteRam[this.spriteRamAddr] = value;
         break;
       case 'PPUADDR':
-        this.vRamAddr = (this.isVramAddrUpper === true)
-                            ? value << 8
-                            : value
-        this.isVramAddrUpper = !this.isVramAddrUpper
+        this.writeVRamAddress(value)
         break;
       case 'PPUDATA':
         this.vram[this.vRamAddr] = value;
@@ -113,6 +111,13 @@ export class PPU {
       default:
         break;
     }
+  writeVRamAddress(value: number) {
+    if (this.isVramAddrUpper === true) {
+      this.vRamBaffer = value;
+    } else {
+      this.vRamAddr = (this.vRamBaffer << 8) | value
+    }
+    this.isVramAddrUpper = !this.isVramAddrUpper
   }
 
   readRegister(index: number): number {
@@ -122,8 +127,8 @@ export class PPU {
   run(cycle: number){
     this.cycle += cycle;
     if(this.line === 0) {
-			this.background.length = 0;
-			this.buildSprites();
+      this.background.length = 0;
+      this.buildSprites();
     }
 
     if (BoarderCycle <= this.cycle) {
@@ -132,7 +137,7 @@ export class PPU {
 
       if (this.line <= DrawLine && this.line % 8 === 0) {
         this.buildBackground();
-			}
+      }
 
       if (this.line === 262) {
         this.line = 0;
@@ -140,9 +145,9 @@ export class PPU {
           background: this.background,
           palette: this.getPalette(),
         };
-			}
-		}
-		return
+      }
+    }
+    return
   }
 
 	buildSprites() {
