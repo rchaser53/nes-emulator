@@ -42,9 +42,21 @@ export class PPU {
   tileY: number
 	vram: Uint8Array
 	spriteRam: Uint8Array
+	sprites: any[] = []
+  spriteRamAddr: number = 0
+  vRamAddr: number = 0
+  isVramAddrUpper: boolean = true
 
   register: PPURegister = {
-    PPUCTRL: 0x00,
+    PPUCTRL: {
+      isEnableNmi: false,
+      masterslabe: true,
+      isLargeSplite: false,
+      isBgBase: false,
+      isSpliteBase: false,
+      ppuAddressIncrementMode: false,
+      nameTable: 0
+    },
     PPUMASK: 0x00,
     PPUSTATUS: 0x00,
     OAMADDR: 0x00,
@@ -54,8 +66,8 @@ export class PPU {
     PPUDATA: 0x00,
   }
   constructor() {
-		this.vram = new Uint8Array(0x4000)
-		this.spriteRam = new Uint8Array(0x100);
+    this.vram = new Uint8Array(0x4000)
+    this.spriteRam = new Uint8Array(0x100);
   }
 
   getPalette(): any {
@@ -85,6 +97,18 @@ export class PPU {
         break;
       case 'OAMDATA':
         this.spriteRam[this.spriteRamAddr] = value;
+        break;
+      case 'PPUADDR':
+        this.vRamAddr = (this.isVramAddrUpper === true)
+                            ? value << 8
+                            : value
+        this.isVramAddrUpper = !this.isVramAddrUpper
+        break;
+      case 'PPUDATA':
+        this.vram[this.vRamAddr] = value;
+        this.vRamAddr += (this.register.PPUCTRL.ppuAddressIncrementMode)
+                            ? 1
+                            : 32
         break;
       default:
         break;
