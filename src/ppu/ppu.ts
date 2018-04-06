@@ -1,6 +1,6 @@
 // 0x2000 - 0x2007
 export interface PPURegister {
-  PPUCTRL: number,                  // コントロールレジスタ1	割り込みなどPPUの設定
+  PPUCTRL: ControlRegister,         // コントロールレジスタ1	割り込みなどPPUの設定
   PPUMASK: number,                  // コントロールレジスタ2	背景 enableなどのPPU設定
   PPUSTATUS: number,                // ppu status
   OAMADDR: number,                  // スプライトメモリデータ	書き込むスプライト領域のアドレス
@@ -8,6 +8,16 @@ export interface PPURegister {
   PPUSCROLL: number,                // 背景スクロールオフセット	背景スクロール値
   PPUADDR: number,                  // PPUメモリアドレス	書き込むPPUメモリ領域のアドレス
   PPUDATA: number,                  // PPUメモリデータ	PPUメモリ領域のデータ
+}
+
+export interface ControlRegister {
+  isEnableNmi: boolean,             // false: 無効  true: 有効
+  masterslabe: true,                // 常時true
+  isLargeSplite: boolean,           // false: 8x8  true: 8x16
+  isBgBase: boolean,                // false: $0000  true: $1000
+  isSpliteBase: boolean,            // false: $0000  true: $1000
+  ppuAddressIncrementMode: boolean  // false: +1, true: +32
+  nameTable: 0 | 1 | 2 | 3          // 0: $2000, 1: $2400, 2: $2800, 3: $2C00
 }
 
 const PPURegisterMap = {
