@@ -17,7 +17,8 @@ export interface ControlRegister {
   isBgBase: boolean,                // false: $0000  true: $1000
   isSpliteBase: boolean,            // false: $0000  true: $1000
   ppuAddressIncrementMode: boolean  // false: +1, true: +32
-  nameTable: 0 | 1 | 2 | 3          // 0: $2000, 1: $2400, 2: $2800, 3: $2C00
+  nameTableUpper: boolean,          // 00(false, false): $2000, 01(false, true): $2400
+  nameTableLowwer: boolean,         // 10(true, false): $2800, 11(true, true): $2C00
 }
 
 const PPURegisterMap = {
@@ -31,9 +32,20 @@ const PPURegisterMap = {
   7: 'PPUDATA',
 }
 
+const ControlRegisterMap = {
+  0: 'isEnableNmi',
+  1: 'masterslabe',
+  2: 'isLargeSplite',
+  3: 'isBgBase',
+  4: 'OAMDATA',
+  5: 'ppuAddressIncrementMode',
+  6: 'nameTableUpper',
+  7: 'nameTableLowwer',
+}
+
 const BoarderCycle = 341;
 const DrawLine = 240;
-const SpriteNumber = 100;
+// const SpriteNumber = 100;
 
 export class PPU {
   cycle: number = 0
@@ -56,7 +68,8 @@ export class PPU {
       isBgBase: false,
       isSpliteBase: false,
       ppuAddressIncrementMode: false,
-      nameTable: 0
+      nameTableUpper: false,
+      nameTableLowwer: false,
     },
     PPUMASK: 0x00,
     PPUSTATUS: 0x00,
@@ -105,6 +118,8 @@ export class PPU {
 
   write(index: number, value: number) {
     switch (PPURegisterMap[index]) {
+      case 'PPUCTRL':
+        this.writeCtrlRegister(value);
       case 'OAMADDR':
         this.spriteRamAddr = value;
         break;
@@ -121,6 +136,31 @@ export class PPU {
       default:
         break;
     }
+  }
+
+  convertDecimalToBinary(decimal: number): number {
+    const AllTrue8bit = 0b11111111
+    return parseInt((decimal).toString(2), 2) & AllTrue8bit
+  }
+  
+  isDegitTrue (binary: number, degit: number): boolean {
+    const compare = 1 << (degit)
+    return ((binary & compare) >> degit) === 1
+  }
+
+  convertDecimalToBoolArray(decimal: number): boolean[] {
+    const binary = this.convertDecimalToBinary(decimal)
+    let boolArray: boolean[] = []
+    for (let i = 0; i < 8; i++) {
+      boolArray.push(this.isDegitTrue(binary, i))
+    }
+    return boolArray
+  }
+
+  writeCtrlRegister(value: number) {
+    this.convertDecimalToBoolArray(value).forEach((bool, index) => {
+      this.register.PPUCTRL[ControlRegisterMap[index]] = bool
+    })
   }
 
   moveNextVramAddr() {
@@ -170,7 +210,7 @@ export class PPU {
 
 	buildSprites() {
 		// TODO
-	}
+  }
 
   buildSprite(spriteId) {
     const sprite = new Array(8).fill(0).map(() => [0, 0, 0, 0, 0, 0, 0, 0]);
