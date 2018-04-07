@@ -97,10 +97,10 @@ export class CPU {
   }
 
 	getRelative(PC: number): number {
-		const base = this.handler.readCPU(PC)
+    const base = this.handler.readCPU(PC)
 		return (base < 0x80)
-							? this.handler.readCPU(PC) + PC + 1
-							: this.handler.readCPU(PC) + PC + 1 - 256;
+							? base + PC + 1
+							: base + PC + 1 - 256;
 	}
 
   getIndirectIndex(PC: number, registerKey: string): number {
