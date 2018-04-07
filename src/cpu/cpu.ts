@@ -178,8 +178,8 @@ export class CPU {
 				this.branchPC(this.register.P.C, false, order.address)
         break;
 
-			case 'ADC':
-				this.addRegister('A', this.handler.readCPU(this.executeDataByAddress(order.address)))
+      case 'ADC':
+				this.addRegister('A', this.createADCData(order.address))
         break;
 
       case 'DEC':
@@ -230,6 +230,13 @@ export class CPU {
       default:
         throw new Error(`${JSON.stringify(order)} is not implemented!`)
     }
+  }
+
+  createADCData(address: string): number {
+    const flagValue = (this.register.P.C === true)
+                        ? 1
+                        : 0
+    return this.register.A + this.handler.readCPU(this.executeDataByAddress(address)) + flagValue
   }
 
 	branchPC(register: boolean, condition: boolean, address: string) {
