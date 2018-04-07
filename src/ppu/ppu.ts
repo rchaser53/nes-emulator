@@ -144,8 +144,10 @@ export class PPU {
     switch (PPURegisterMap[index]) {
       case 'PPUCTRL':
         this.writeBoolArrayRegister(value);
+        break;
       case 'PPUMASK':
         this.writeBoolArrayRegister(value);
+        break;
       case 'OAMADDR':
         this.spriteRamAddr = value;
         break;
