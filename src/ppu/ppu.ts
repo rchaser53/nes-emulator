@@ -1,7 +1,7 @@
 // 0x2000 - 0x2007
 export interface PPURegister {
   PPUCTRL: ControlRegister,         // コントロールレジスタ1	割り込みなどPPUの設定
-  PPUMASK: number,                  // コントロールレジスタ2	背景 enableなどのPPU設定
+  PPUMASK: MaskRegister,            // コントロールレジスタ2	背景 enableなどのPPU設定
   PPUSTATUS: number,                // ppu status
   OAMADDR: number,                  // スプライトメモリデータ	書き込むスプライト領域のアドレス
   OAMDATA: number,                  // デシマルモード	スプライト領域のデータ
@@ -19,6 +19,17 @@ export interface ControlRegister {
   ppuAddressIncrementMode: boolean  // false: +1, true: +32
   nameTableUpper: boolean,          // 00(false, false): $2000, 01(false, true): $2400
   nameTableLowwer: boolean,         // 10(true, false): $2800, 11(true, true): $2C00
+}
+
+export interface MaskRegister {
+  bgColorFlag2: boolean,            // 背景色
+  bgColorFlag1: boolean,            // 000:黒, 001:緑
+  bgColorFlag0: boolean,            // 010:青, 100:赤
+  isSpliteEnable: boolean,          // スプライト有効　0:無効、1:有効
+  isBackgroundEnable: boolean,      // 背景有効　0:無効、1:有効
+  spliteMask: boolean,              // スプライトマスク、画面左8ピクセルを描画しない。0:描画しない、1:描画
+  backgroundMask: boolean,          // 背景マスク、画面左8ピクセルを描画しない。0:描画しない、1:描画
+  isDisplayMono: boolean,           // ディスプレイタイプ　0:カラー、1:モノクロ
 }
 
 const PPURegisterMap = {
@@ -47,6 +58,28 @@ const BoarderCycle = 341;
 const DrawLine = 240;
 // const SpriteNumber = 100;
 
+const DefaultPPUCTRL: ControlRegister = {
+  isEnableNmi: false,
+  masterslabe: true,
+  isLargeSplite: false,
+  isBgBase: false,
+  isSpliteBase: false,
+  ppuAddressIncrementMode: false,
+  nameTableUpper: false,
+  nameTableLowwer: false,
+}
+
+const DefaultPPUMASK: MaskRegister = {
+  bgColorFlag2: false,
+  bgColorFlag1: false,
+  bgColorFlag0: false,
+  isSpliteEnable: false,
+  isBackgroundEnable: false,
+  spliteMask: false,
+  backgroundMask: false,
+  isDisplayMono: false,
+}
+
 export class PPU {
   cycle: number = 0
   line: number = 0
@@ -61,17 +94,8 @@ export class PPU {
   isVramAddrUpper: boolean = true
 
   register: PPURegister = {
-    PPUCTRL: {
-      isEnableNmi: false,
-      masterslabe: true,
-      isLargeSplite: false,
-      isBgBase: false,
-      isSpliteBase: false,
-      ppuAddressIncrementMode: false,
-      nameTableUpper: false,
-      nameTableLowwer: false,
-    },
-    PPUMASK: 0x00,
+    PPUCTRL: DefaultPPUCTRL,
+    PPUMASK: DefaultPPUMASK,
     PPUSTATUS: 0x00,
     OAMADDR: 0x00,
     OAMDATA: 0x00,
@@ -119,7 +143,9 @@ export class PPU {
   write(index: number, value: number) {
     switch (PPURegisterMap[index]) {
       case 'PPUCTRL':
-        this.writeCtrlRegister(value);
+        this.writeBoolArrayRegister(value);
+      case 'PPUMASK':
+        this.writeBoolArrayRegister(value);
       case 'OAMADDR':
         this.spriteRamAddr = value;
         break;
@@ -157,7 +183,7 @@ export class PPU {
     return boolArray
   }
 
-  writeCtrlRegister(value: number) {
+  writeBoolArrayRegister(value: number) {
     this.convertDecimalToBoolArray(value).forEach((bool, index) => {
       this.register.PPUCTRL[ControlRegisterMap[index]] = bool
     })
