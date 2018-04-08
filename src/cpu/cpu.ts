@@ -183,8 +183,7 @@ export class CPU {
         break;
 
       case 'DEC':
-        const targetMemory = this.executeDataByAddress(order.address)
-        this.handler.writeCPU(targetMemory, this.handler.readCPU(targetMemory)  -1)
+        this.addMemoryData(order.address, -1)
         break;
 
 			case 'DEY':
@@ -192,7 +191,7 @@ export class CPU {
         break;
 
       case 'INC':
-        this.handler.writeCPU(this.executeDataByAddress(order.address), 1)
+        this.addMemoryData(order.address, 1)
         break;
 
       case 'RTS':
@@ -230,6 +229,11 @@ export class CPU {
       default:
         throw new Error(`${JSON.stringify(order)} is not implemented!`)
     }
+  }
+
+  addMemoryData(address: string, value: number) {
+    const targetMemory = this.executeDataByAddress(address)
+    this.handler.writeCPU(targetMemory, this.handler.readCPU(targetMemory) + value)
   }
 
   createADCData(address: string): number {
