@@ -179,7 +179,7 @@ export class CPU {
         break;
 
       case 'ADC':
-				this.addRegister('A', this.createADCData(order.address))
+        this.addRegister('A', this.handler.readCPU(this.executeDataByAddress(order.address)))
         break;
 
       case 'DEC':
@@ -253,16 +253,20 @@ export class CPU {
 		}
 	}
 
-	addRegister(registerKey: string, value: number) {
-		if (this.isCarry(this.register[registerKey], value) === true) {
-			this.register.P.C = true
-		}
-		this.register[registerKey] = (this.register[registerKey] + value) & 0xFF
+  addRegister(registerKey: string, value: number) {
+    let flagValue = 0;
+    if (this.isCarry(this.register[registerKey], value) === true) {
+      this.register.P.C = true
+      flagValue = 1
+    }
+    this.register[registerKey] = (this.register[registerKey] + value + flagValue) & 0xFF
 
-		if (0 <= this.register[registerKey]) {
-			this.register.P.N = false
-		}
-	}
+    if (0 <= this.register[registerKey]) {
+      this.register.P.N = false
+    }
+
+    this.register.P.Z === (0 === this.register[registerKey])
+  }
 
 	decreaseRegister(registerKey: string, value: number) {
 		this.register[registerKey] -= value
