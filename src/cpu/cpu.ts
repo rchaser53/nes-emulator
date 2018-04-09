@@ -198,8 +198,8 @@ export class CPU {
         this.register.PC = this.returnCaller()
         break;
 
-			case 'EOR':
-        this.register.A = this.register.A ^ this.handler.readCPU(this.executeDataByAddress(order.address))
+      case 'EOR':
+        this.insertRegister('A', this.register.A ^ this.handler.readCPU(this.executeDataByAddress(order.address)))
         break;
 
 			case 'JMP':
@@ -211,11 +211,11 @@ export class CPU {
         break;
 
       case 'CMP':
-        this.register.P.C = 0 <= (this.register.A - this.handler.readCPU(this.executeDataByAddress(order.address)))
+        this.register.P.C = this.setCompare('A', this.handler.readCPU(this.executeDataByAddress(order.address)))
         break;
 
-			case 'TAY':
-				this.insertRegister('Y', this.register.A)
+      case 'TAY':
+        this.insertRegister('Y', this.register.A)
         break;
 
       case 'CLC':
@@ -231,9 +231,18 @@ export class CPU {
     }
   }
 
+  setCompare(key: string, value: number): boolean {
+    const ret = this.register['A'] - value
+    this.register.P.Z = (ret === 0)
+    return 0 <= ret
+  }
+
   addMemoryData(address: string, value: number) {
     const targetMemory = this.executeDataByAddress(address)
-    this.handler.writeCPU(targetMemory, this.handler.readCPU(targetMemory) + value)
+    const ret = this.handler.readCPU(targetMemory) + value
+    this.handler.writeCPU(targetMemory, ret)
+
+    this.register.P.Z === (0 === ret)
   }
 
   createADCData(address: string): number {
@@ -250,12 +259,14 @@ export class CPU {
 		}
 	}
 
-	insertRegister(registerKey: string, value: number) {
-		this.register[registerKey] = value
-		if (0 < this.register[registerKey]) {
-			this.register.P.N = false
-		}
-	}
+  insertRegister(registerKey: string, value: number) {
+    this.register[registerKey] = value
+    if (0 < this.register[registerKey]) {
+      this.register.P.N = false
+    }
+
+    this.register.P.Z === (0 === this.register[registerKey])
+  }
 
   addRegister(registerKey: string, value: number) {
     let flagValue = 0;
@@ -278,7 +289,8 @@ export class CPU {
       this.register.P.N = true
       this.register[registerKey] += 0x100
     }
-	}
+    this.register.P.Z === (0 === this.register[registerKey])
+  }
 
   changeProgramCount(address: string) {
     this.register.PC += TwoPCUseAddress.includes(address) ? 2 : 1
