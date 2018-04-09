@@ -272,11 +272,12 @@ export class CPU {
     this.register.P.Z === (0 === this.register[registerKey])
   }
 
-	decreaseRegister(registerKey: string, value: number) {
-		this.register[registerKey] -= value
-		if (this.register[registerKey] < 0) {
-			this.register.P.N = true
-		}
+  decreaseRegister(registerKey: string, value: number) {
+    this.register[registerKey] -= value
+    if (this.register[registerKey] < 0) {
+      this.register.P.N = true
+      this.register[registerKey] += 0x100
+    }
 	}
 
   changeProgramCount(address: string) {
