@@ -311,7 +311,7 @@ export class CPU {
 
   isCarry(registerNum: number, romNumber: number): boolean {
     const sum = registerNum + romNumber
-    return ((sum >> 16) & 0x1) === 1
+    return ((sum >> 8) & 0x1) === 1
   }
 
   reset() {
