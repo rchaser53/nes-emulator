@@ -1,14 +1,17 @@
 import { PPU } from './ppu/ppu'
+import { Logger } from './debug/logger'
 
 export class Handler {
   ppu: PPU
   workingMemory: Uint8Array
   programMemory: Uint8Array
+  logger: Logger
 
-  constructor(ppu: PPU, programRam: Uint8Array) {
+  constructor(ppu: PPU, programRam: Uint8Array, logger?: Logger) {
     this.ppu = ppu
     this.workingMemory = new Uint8Array(0x2000)
     this.programMemory = programRam
+    this.logger = logger || new Logger(false)
   }
 
   writeCPU(address: number, value: number) {
@@ -19,9 +22,9 @@ export class Handler {
     } else if (address <= 0x3fff) {
       throw new Error(`${address} is used. need to search!`)
     } else if (address <= 0x5fff) {
-      console.error(address, 'extra ram')
+      this.logger.log('error', address, 'extra ram')
     } else if (address <= 0x7fff) {
-      console.error(address, 'backup ram')
+      this.logger.log('error', address, 'backup ram')
     } else if (0x8000 <= address) {
       throw new Error(`${address} shouldn't be written address!`)
     }

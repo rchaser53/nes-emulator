@@ -2,6 +2,7 @@
 // http://wiki.nesdev.com/w/index.php/Init_code
 import { CPU } from './cpu/cpu'
 import { PPU } from './ppu/ppu'
+import { Logger } from './debug/logger'
 import { Handler } from './handler'
 
 const HeaderSize = 0x0010;
@@ -9,17 +10,21 @@ const ProgramROMIndex = 4;
 const ChacterROMIndex = 5;
 const NES_HEADER_SIZE = 0x0010;
 
+const IsDebug = false
+
 export class Nes {
   cpu: CPU
   ppu: PPU
+  logger: Logger
   programROM: Uint8Array
   characterROM: Uint8Array
 
   constructor(nesBuffer: ArrayBuffer) {
     this.load(nesBuffer)
 
+    this.logger = new Logger(IsDebug)
     this.ppu = new PPU()
-    const handler = new Handler(this.ppu, this.programROM)
+    const handler = new Handler(this.ppu, this.programROM, this.logger)
     this.cpu = new CPU(handler)
     this.cpu.reset()
   }
