@@ -25,7 +25,7 @@ export class Nes {
     this.logger = new Logger(IsDebug)
     this.ppu = new PPU()
     const handler = new Handler(this.ppu, this.programROM, this.logger)
-    this.cpu = new CPU(handler)
+    this.cpu = new CPU(handler, this.logger)
     this.cpu.reset()
   }
 

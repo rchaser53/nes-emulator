@@ -1,3 +1,4 @@
+import { Logger } from '../debug/logger'
 import { HelloOpecodesMap, Order } from './opecode'
 import { Handler }  from '../handler'
 
@@ -51,16 +52,20 @@ const TwoPCUseAddress = [
 export class CPU {
   register: Register
   handler: Handler
+  logger: Logger
 
-  constructor(handler: Handler) {
+  constructor(handler: Handler, logger?: Logger) {
     this.register = DefualtRegister
     this.handler = handler
+    this.logger = logger || new Logger(false)
   }
 
   run(): number {
     const opecode = this.handler.readCPU(this.register.PC)
     const order = this.fetch(opecode)
-    console.log(this.register.PC, order, opecode, 1)
+
+    this.logger.log(this.register.PC, order, opecode, 1)
+
     this.executeOpeCode(order)
     return order.cycle
   }

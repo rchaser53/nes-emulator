@@ -22,9 +22,9 @@ export class Handler {
     } else if (address <= 0x3fff) {
       throw new Error(`${address} is used. need to search!`)
     } else if (address <= 0x5fff) {
-      this.logger.log('error', address, 'extra ram')
+      this.logger.error(address, 'extra ram')
     } else if (address <= 0x7fff) {
-      this.logger.log('error', address, 'backup ram')
+      this.logger.error(address, 'backup ram')
     } else if (0x8000 <= address) {
       throw new Error(`${address} shouldn't be written address!`)
     }
