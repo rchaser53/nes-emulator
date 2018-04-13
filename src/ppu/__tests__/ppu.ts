@@ -1,7 +1,8 @@
 import { PPU } from '../ppu'
 import {
   convertDecimalToBoolArray,
-  createTwoBitTupple
+  createTwoBitTupple,
+  createSpliteInputs,
 } from '../util'
 
 describe('PPU', () => {
@@ -31,7 +32,7 @@ describe('PPU', () => {
   })
 
   describe('createTwoBitTupple', () => {
-    test('create boolean tupple', async () => {
+    test('create boolean tupple array', async () => {
       const inputA = [true, false, false, true]
       const inputB = [true, true, true, false]
       const expected = [
@@ -41,6 +42,26 @@ describe('PPU', () => {
       expect(createTwoBitTupple(inputA, inputB)).toEqual(expected)
     })
   })
+
+  describe('createSpliteInputs', () => {
+    test('create boolean tupple array array', async () => {
+      const input = [60, 60, 126, 126, 255, 255, 255, 231, 56, 56, 108, 108, 198, 254, 198, 0]
+      const expected = [
+        [[false, false], [false, false], [false, true], [true, true], [true, true], [true, true], [false, false], [false, false]],
+        [[false, false], [false, false], [false, true], [true, true], [true, true], [true, true], [false, false], [false, false]],
+        [[false, false], [false, true], [true, true], [true, true], [false, true], [true, true], [true, true], [false, false]],
+        [[false, false], [false, true], [true, true], [true, true], [false, true], [true, true], [true, true], [false, false]],
+        [[false, true], [true, true], [true, true], [false, true], [false, true], [false, true], [true, true], [true, true]],
+        [[false, true], [true, true], [true, true], [true, true], [true, true], [true, true], [true, true], [true, true]],
+        [[false, true], [true, true], [true, true], [false, true], [false, true], [false, true], [true, true], [true, true]],
+        [[false, true], [false, true], [false, true], [false, false], [false, false], [false, true], [false, true], [false, true]]
+      ]
+
+      expect(createSpliteInputs(input)).toEqual(expected)
+    })
+  })
+
+  
 
   describe('getNameSpace', () => {
     test('false, false is 0x2000', async () => {
