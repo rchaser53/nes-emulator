@@ -1,6 +1,7 @@
 import { PPU } from '../ppu'
 import {
   convertDecimalToBoolArray,
+  createTwoBitTupple
 } from '../util'
 
 describe('PPU', () => {
@@ -29,7 +30,19 @@ describe('PPU', () => {
     })
   })
 
-	describe('getNameSpace', () => {
+  describe('createTwoBitTupple', () => {
+    test('create boolean tupple', async () => {
+      const inputA = [true, false, false, true]
+      const inputB = [true, true, true, false]
+      const expected = [
+        [true, true],  [false, true],
+        [false, true], [true, false]
+      ]
+      expect(createTwoBitTupple(inputA, inputB)).toEqual(expected)
+    })
+  })
+
+  describe('getNameSpace', () => {
     test('false, false is 0x2000', async () => {
       ppu.register.PPUCTRL.nameTableUpper = false
       ppu.register.PPUCTRL.nameTableLowwer = false

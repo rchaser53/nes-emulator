@@ -16,3 +16,11 @@ export const convertDecimalToBoolArray = (decimal: number): boolean[] => {
   }
   return boolArray
 }
+
+export type boolTupple = [ boolean, boolean ]
+
+export const createTwoBitTupple = (front: boolean[], back: boolean[] ): boolTupple[] => {
+  return front.reduce<boolTupple[]>((stack, _, index) => {
+    return stack.concat([ [ front[index], back[index] ]]);
+  }, [])
+}
