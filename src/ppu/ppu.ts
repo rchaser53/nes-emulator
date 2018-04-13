@@ -1,3 +1,5 @@
+import { convertDecimalToBoolArray } from './util';
+
 // 0x2000 - 0x2007
 export interface PPURegister {
   PPUCTRL: ControlRegister,         // コントロールレジスタ1	割り込みなどPPUの設定
@@ -143,6 +145,7 @@ export class PPU {
   }
 
   write(index: number, value: number) {
+    console.log(index, value, 'nya-n', this)
     switch (PPURegisterMap[index]) {
       case 'PPUCTRL':
         this.writeBoolArrayRegister(value);
@@ -172,27 +175,8 @@ export class PPU {
     }
   }
 
-  convertDecimalToBinary(decimal: number): number {
-    const AllTrue8bit = 0b11111111
-    return parseInt((decimal).toString(2), 2) & AllTrue8bit
-  }
-  
-  isDegitTrue (binary: number, degit: number): boolean {
-    const compare = 1 << (degit)
-    return ((binary & compare) >> degit) === 1
-  }
-
-  convertDecimalToBoolArray(decimal: number): boolean[] {
-    const binary = this.convertDecimalToBinary(decimal)
-    let boolArray: boolean[] = []
-    for (let i = 0; i < 8; i++) {
-      boolArray.push(this.isDegitTrue(binary, i))
-    }
-    return boolArray
-  }
-
   writeBoolArrayRegister(value: number) {
-    this.convertDecimalToBoolArray(value).forEach((bool, index) => {
+    convertDecimalToBoolArray(value).forEach((bool, index) => {
       this.register.PPUCTRL[ControlRegisterMap[index]] = bool
     })
   }
@@ -293,6 +277,24 @@ export class PPU {
 }
 
 
+// BG（Back Ground）は8×8のタイルパターンを32×30個配置することで、 256×240ピクセルの解像度を持ちます。 
+
+// BG描画は、まずスキャン座標と設定されたスクロール値によって算出された座標を、
+// 範囲内に持つネームテーブルから描画するパターンのアドレスIDをフェッチします。 
+/* 15 */ 
+
+// また、色情報として属性テーブルからデータをフェッチします。
+/* 15 */ 
+
+// 次にパターンアドレスIDに対応する下位パターンと上位パターンをフェッチします。
+// パターンは上位ビットから描画され、 下位パターンと上位パターンの各ビットが有効なら、
+// 色情報とパターンビットによりBGパレットから色が選択されます。
+
+// パターンのいずれのビットも有効でなければ透過色となり、 スプライトパレットの$3F10の色が選択されます。
+
+const addressId = 72 //スキャン座標と設定されたスクロール値によって算出された座標
+
+
 // Initial Register Values
 // Register	                          At Power	              After Reset
 // PPUCTRL ($2000)	                    0000 0000	              0000 0000
@@ -307,3 +309,30 @@ export class PPU {
 // OAM	                                pattern	                pattern
 // NT RAM (external, in Control Deck)	  mostly $FF	            unchanged
 // CHR RAM (external, in Game Pak)	    unspecified pattern	    unchanged
+
+
+// OAMADDR: 0
+// OAMDATA: 0
+// PPUADDR: 0
+// PPUCTRL: OAMDATA: false
+// isBgBase: false
+// isEnableNmi: false
+// isLargeSplite: false
+// isSpliteBase: false
+// masterslabe: false
+// nameTableLowwer: false
+// nameTableUpper: false
+// ppuAddressIncrementMode: false
+
+// PPUDATA: 0
+// PPUMASK:
+//   backgroundMask: false
+//   bgColorFlag0: false
+//   bgColorFlag1: false
+//   bgColorFlag2: false
+//   isBackgroundEnable: false
+//   isDisplayMono: false
+//   isSpliteEnable: false
+//   spliteMask: false
+// PPUSCROLL: 0
+// PPUSTATUS: 0

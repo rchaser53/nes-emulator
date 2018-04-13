@@ -1,4 +1,7 @@
 import { PPU } from '../ppu'
+import {
+  convertDecimalToBoolArray,
+} from '../util'
 
 describe('PPU', () => {
   let ppu: PPU
@@ -13,7 +16,7 @@ describe('PPU', () => {
         true, true, false, true,
         false, true, false, true
       ]
-      expect(ppu.convertDecimalToBoolArray(input)).toEqual(expected)
+      expect(convertDecimalToBoolArray(input)).toEqual(expected)
     })
 
     test('convert short number to bool array', async () => {
@@ -22,7 +25,7 @@ describe('PPU', () => {
         true, true, false, false,
         false, false, false, false
       ]
-      expect(ppu.convertDecimalToBoolArray(input)).toEqual(expected)
+      expect(convertDecimalToBoolArray(input)).toEqual(expected)
     })
   })
 
