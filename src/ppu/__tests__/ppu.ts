@@ -3,6 +3,7 @@ import {
   convertDecimalToBoolArray,
   createTwoBitTupple,
   createSpliteInputs,
+  convertBoolArrayToDecimal,
 } from '../util'
 
 describe('PPU', () => {
@@ -61,7 +62,15 @@ describe('PPU', () => {
     })
   })
 
-  
+  describe('convertBoolArrayToDecimal', () => {
+    test('convert boolArray to decimal', async () => {
+
+      expect(convertBoolArrayToDecimal([false])).toEqual(0)
+      expect(convertBoolArrayToDecimal([true])).toEqual(1)
+      expect(convertBoolArrayToDecimal([true, false])).toEqual(2)
+      expect(convertBoolArrayToDecimal([true, false, true, false])).toEqual(10)
+    })
+  })
 
   describe('getNameSpace', () => {
     test('false, false is 0x2000', async () => {
