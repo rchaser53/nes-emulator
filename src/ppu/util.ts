@@ -11,10 +11,10 @@ export const isDegitTrue = (binary: number, degit: number): boolean => {
 }
 
 export const convertDecimalToBoolArray = (decimal: number): boolean[] => {
-  const binary = this.convertDecimalToBinary(decimal)
+  const binary = convertDecimalToBinary(decimal)
   let boolArray: boolean[] = []
   for (let i = 0; i < 8; i++) {
-    boolArray.push(this.isDegitTrue(binary, i))
+    boolArray.push(isDegitTrue(binary, i))
   }
   return boolArray
 }
