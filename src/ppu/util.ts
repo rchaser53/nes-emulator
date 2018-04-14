@@ -39,9 +39,58 @@ export const createSpliteInputs = (inputArray: number[]) => {
   }, [])
 }
 
+export const createForDecimalArrays = (inputs: number[]): number[][] => {
+  let baseIndex = 0
+  return inputs.reduce<number[][]>((stack, next, index) => {
+    if (index !== 0 && index % 4 === 0) {
+      baseIndex++
+    }
+    stack[baseIndex] = tryInitializeArray(stack[baseIndex])
+    stack[baseIndex].push(next)
+    return stack
+  }, [])
+}
+
+const tryInitializeArray = <T>(input: T[]): T[] => {
+  return input == null ? [] as T[] : input
+}
+
 export const convertBoolArrayToDecimal = (boolArray: boolean[]): number => {
   return boolArray.reduce((sum, next, index) => {
     sum += (next) ? Math.pow(2, boolArray.length - 1 - index) : 0
     return sum
   }, 0)
 }
+
+
+
+// export const createColorTopBitsTupples = (inputs) => {
+//   // const base: boolTupple[][][] = []
+
+//   const eightBitBooleansArray = inputs.map(convertDecimalToBoolArray)
+
+//   const base: any = []
+
+//   eightBitBooleansArray.forEach((eightBitBooleans, outerIndex) => {
+//     // const isAfterArea = (index % 2) === 0
+
+
+//     const rowBase = []
+//     eightBitBooleans.forEach((bool, innerIndex) => {
+//       rowBase[]
+//     })
+//   })
+
+//   // for (let row = 0; row < 16; row++) {
+//   //   base[row] = (base[row] == null)
+//   //                   ? []
+//   //                   : base[row];
+//   //   for (let column = 0; column < 16; column++) {
+//   //     base[row][column] = (base[row][column] == null)
+//   //                       ? []
+//   //                       : base[row][column];
+      
+
+//   //   }
+//   // }
+// }

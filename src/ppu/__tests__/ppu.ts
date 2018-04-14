@@ -4,6 +4,7 @@ import {
   createTwoBitTupple,
   createSpliteInputs,
   convertBoolArrayToDecimal,
+  createForDecimalArrays,
 } from '../util'
 
 describe('PPU', () => {
@@ -41,6 +42,17 @@ describe('PPU', () => {
         [false, true], [true, false]
       ]
       expect(createTwoBitTupple(inputA, inputB)).toEqual(expected)
+    })
+  })
+
+  describe('createForDecimalArrays', () => {
+    test('create length 4 decimal array array', async () => {
+      const input = [123, 142, 321, 1234, 444]
+      const expected = [
+        [123, 142, 321, 1234],
+        [444]
+      ]
+      expect(createForDecimalArrays(input)).toEqual(expected)
     })
   })
 
