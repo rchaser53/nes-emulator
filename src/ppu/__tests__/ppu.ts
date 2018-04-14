@@ -5,6 +5,7 @@ import {
   createSpliteInputs,
   convertBoolArrayToDecimal,
   createForDecimalArrays,
+  reverseArray,
 } from '../util'
 
 describe('PPU', () => {
@@ -47,12 +48,24 @@ describe('PPU', () => {
 
   describe('createForDecimalArrays', () => {
     test('create length 4 decimal array array', async () => {
-      const input = [123, 142, 321, 1234, 444]
+      const input = [123, 142, 321, 1234,
+                     444, 142, 321, 1234,
+                     444, 142, 321, 1234,]
       const expected = [
         [123, 142, 321, 1234],
-        [444]
+        [444, 142, 321, 1234],
+        [444, 142, 321, 1234],
       ]
       expect(createForDecimalArrays(input)).toEqual(expected)
+    })
+  })
+
+  describe('reverseArray', () => {
+    test('reverse array element', async () => {
+      expect(reverseArray([1, 2, 3, 4])).toEqual([4, 3, 2, 1])
+      expect(reverseArray([])).toEqual([])
+      expect(reverseArray([1])).toEqual([1])
+      expect(reverseArray([1,2])).toEqual([2, 1])
     })
   })
 

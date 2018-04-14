@@ -55,6 +55,16 @@ const tryInitializeArray = <T>(input: T[]): T[] => {
   return input == null ? [] as T[] : input
 }
 
+export const reverseArray = (inputArray: number[]): number[] => {
+  if (inputArray.length === 0) return []
+  const baseArray: number[] = []
+  const arrayLength = inputArray.length
+  for (let i = 0; i < arrayLength; i++) {
+    baseArray[i] =  inputArray[arrayLength - i - 1]
+  }
+  return baseArray
+}
+
 export const convertBoolArrayToDecimal = (boolArray: boolean[]): number => {
   return boolArray.reduce((sum, next, index) => {
     sum += (next) ? Math.pow(2, boolArray.length - 1 - index) : 0
