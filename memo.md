@@ -25,3 +25,7 @@ RTS (Return from Subroutine)
 
 サブルーチン
   アセンブリ内に書かれている関数的なあれ
+
+
+- 0x3F00～0x3F0F バックグラウンドパレット が colorsのindexを指定
+- 0x3F10～0x3F1F スプライトパレット      が colorsのindexを指定
