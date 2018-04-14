@@ -55,9 +55,24 @@ const tryInitializeArray = <T>(input: T[]): T[] => {
   return input == null ? [] as T[] : input
 }
 
-export const reverseArray = (inputArray: number[]): number[] => {
+export const convertDecimalToTwoBit = (input: number): number[] => {
+  let base = [0, 0, 0, 0]
+  let arrayIndex = 0
+  const eightBitArray = reverseArray(convertDecimalToBoolArray(input))
+  for (let i = 0; i < 4; i++) {
+    for (let k = 1; 0 <= k; k--) {
+      if (eightBitArray[arrayIndex]) {
+        base[i] += Math.pow(2, k)
+      }
+      arrayIndex++
+    }
+  }
+  return base
+}
+
+export const reverseArray = (inputArray: any[]): any[] => {
   if (inputArray.length === 0) return []
-  const baseArray: number[] = []
+  const baseArray: any[] = []
   const arrayLength = inputArray.length
   for (let i = 0; i < arrayLength; i++) {
     baseArray[i] =  inputArray[arrayLength - i - 1]

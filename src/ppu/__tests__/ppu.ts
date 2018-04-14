@@ -5,6 +5,7 @@ import {
   createSpliteInputs,
   convertBoolArrayToDecimal,
   createForDecimalArrays,
+  convertDecimalToTwoBit,
   reverseArray,
 } from '../util'
 
@@ -57,6 +58,14 @@ describe('PPU', () => {
         [444, 142, 321, 1234],
       ]
       expect(createForDecimalArrays(input)).toEqual(expected)
+    })
+  })
+
+  describe('convertDecimalToTwoBit', () => {
+    test('convert decimal to 4 2bit numbers', async () => {
+      expect(convertDecimalToTwoBit(118)).toEqual([1, 3, 1, 2])
+      expect(convertDecimalToTwoBit(1)).toEqual([0, 0, 0, 1])
+      expect(convertDecimalToTwoBit(255)).toEqual([3, 3, 3, 3])
     })
   })
 
