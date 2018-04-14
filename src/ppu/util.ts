@@ -39,14 +39,14 @@ export const createSpliteInputs = (inputArray: number[]) => {
   }, [])
 }
 
-export const createForDecimalArrays = (inputs: number[]): number[][] => {
+export const createFourBitRowArrays = (inputs: number[]): number[][][] => {
   let baseIndex = 0
-  return inputs.reduce<number[][]>((stack, next, index) => {
+  return inputs.reduce<number[][][]>((stack, next, index) => {
     if (index !== 0 && index % 4 === 0) {
       baseIndex++
     }
     stack[baseIndex] = tryInitializeArray(stack[baseIndex])
-    stack[baseIndex].push(next)
+    stack[baseIndex].push(convertDecimalToTwoBit(next))
     return stack
   }, [])
 }

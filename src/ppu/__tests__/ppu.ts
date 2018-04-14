@@ -4,7 +4,7 @@ import {
   createTwoBitTupple,
   createSpliteInputs,
   convertBoolArrayToDecimal,
-  createForDecimalArrays,
+  createFourBitRowArrays,
   convertDecimalToTwoBit,
   reverseArray,
 } from '../util'
@@ -47,17 +47,17 @@ describe('PPU', () => {
     })
   })
 
-  describe('createForDecimalArrays', () => {
+  describe('createFourBitRowArrays', () => {
     test('create length 4 decimal array array', async () => {
       const input = [123, 142, 321, 1234,
                      444, 142, 321, 1234,
-                     444, 142, 321, 1234,]
+                     444, 142, 321, 1234]
       const expected = [
-        [123, 142, 321, 1234],
-        [444, 142, 321, 1234],
-        [444, 142, 321, 1234],
+        [[1, 3, 2, 3], [2, 0, 3, 2], [1, 0, 0, 1], [3, 1, 0, 2]],
+        [[2, 3, 3, 0], [2, 0, 3, 2], [1, 0, 0, 1], [3, 1, 0, 2]],
+        [[2, 3, 3, 0], [2, 0, 3, 2], [1, 0, 0, 1], [3, 1, 0, 2]]
       ]
-      expect(createForDecimalArrays(input)).toEqual(expected)
+      expect(createFourBitRowArrays(input)).toEqual(expected)
     })
   })
 
