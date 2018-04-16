@@ -133,7 +133,7 @@ export class PPU {
   read(index: number): number {
     switch (PPURegisterMap[index]) {
       case 'PPUSTATUS':
-        return this.vram[this.vRamAddr];
+        return this.register.PPUSTATUS;
       case 'PPUDATA':
         const ret = this.vram[this.vRamAddr];
         this.moveNextVramAddr();
@@ -168,7 +168,7 @@ export class PPU {
         break;
       case 'PPUSTATUS':
       case 'PPUSCROLL':
-        this.vram[index] = value;
+        this.register[PPURegisterMap[index]] = value;
         break;
       default:
         throw new Error(`should not come ${this}`)
