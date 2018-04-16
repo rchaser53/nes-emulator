@@ -39,7 +39,7 @@ export const createSpliteInputs = (inputArray: number[]) => {
   }, [])
 }
 
-export const createColorDefTiles = (inputs: number[]): number[][] => {
+export const createColorTileDef = (inputs: number[]): number[][] => {
   let baseIndex = 0
   return inputs.reduce<number[][]>((stack, next, index) => {
     if (index !== 0 && index % 4 === 0) {

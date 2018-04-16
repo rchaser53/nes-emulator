@@ -4,7 +4,7 @@ import {
   createTwoBitTupple,
   createSpliteInputs,
   convertBoolArrayToDecimal,
-  createColorDefTiles,
+  createColorTileDef,
   convertDecimalToTwoBit,
   reverseArray,
 } from '../util'
@@ -47,7 +47,7 @@ describe('PPU', () => {
     })
   })
 
-  describe('createColorDefTiles', () => {
+  describe('createColorTileDef', () => {
     test('create length 4 decimal array array', async () => {
       const input = [123, 142, 321, 1234,
                      444, 142, 321, 1234,
@@ -57,7 +57,7 @@ describe('PPU', () => {
         [2, 3, 3, 0, 2, 0, 3, 2, 1, 0, 0, 1, 3, 1, 0, 2],
         [2, 3, 3, 0, 2, 0, 3, 2, 1, 0, 0, 1, 3, 1, 0, 2]
       ]
-      expect(createColorDefTiles(input)).toEqual(expected)
+      expect(createColorTileDef(input)).toEqual(expected)
     })
   })
 
