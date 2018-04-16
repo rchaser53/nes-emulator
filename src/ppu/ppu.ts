@@ -34,6 +34,11 @@ export interface MaskRegister {
   isDisplayMono: boolean,           // ディスプレイタイプ　0:カラー、1:モノクロ
 }
 
+export interface VramAddressInfo {
+  key: string
+  index: number
+}
+
 const PPURegisterMap = {
   0: 'PPUCTRL',
   1: 'PPUMASK',
@@ -95,6 +100,24 @@ export class PPU {
   vRamBaffer: number = 0x00
   isVramAddrUpper: boolean = true
 
+  patternTable0: Uint8Array = new Uint8Array(0x1000)        //  $0000～$0FFF
+  patternTable1: Uint8Array = new Uint8Array(0x1000)        //  $1000～$1FFF
+  nameTable0: Uint8Array = new Uint8Array(0x3c0)            //  $2000～$23BF
+  attributeTable0: Uint8Array = new Uint8Array(0x40)        //  $23C0～$23FF
+  nameTable1: Uint8Array = new Uint8Array(0x3c0)            //  $2400～$27BF
+  attributeTable1: Uint8Array = new Uint8Array(0x40)        //  $27C0～$27FF
+  nameTable2: Uint8Array = new Uint8Array(0x3c0)            //  $2800～$2BBF
+  attributeTable2: Uint8Array = new Uint8Array(0x40)        //  $2BC0～$2BFF
+  nameTable3: Uint8Array = new Uint8Array(0x3c0)            //  $2C00～$2FBF
+  attributeTable3: Uint8Array = new Uint8Array(0x40)        //  $2FC0～$2FFF
+
+  nameAttributeMirror: Uint8Array = new Uint8Array(0xEFF)   //  $3000～$3EFF
+  backgroundPallete: Uint8Array = new Uint8Array(0x10)      //  $3F00～$3F0F
+  splitePallete: Uint8Array = new Uint8Array(0x10)          //  $3F10～$3F1F
+  palleteMirror: Uint8Array = new Uint8Array(0xD0)          //  $3F20～$3FFF
+
+  colorTileDefs: number[][] = []
+
   register: PPURegister = {
     PPUCTRL: DefaultPPUCTRL,
     PPUMASK: DefaultPPUMASK,
@@ -135,7 +158,8 @@ export class PPU {
       case 'PPUSTATUS':
         return this.register.PPUSTATUS;
       case 'PPUDATA':
-        const ret = this.vram[this.vRamAddr];
+        const { key, index } = this.getTargetVram()
+        const ret = this[key][index];
         this.moveNextVramAddr();
         return ret;
       default:
@@ -163,7 +187,7 @@ export class PPU {
         this.writeVRamAddress(value)
         break;
       case 'PPUDATA':
-        this.vram[this.vRamAddr] = value
+        this.writePpuData(value)
         this.moveNextVramAddr()
         break;
       case 'PPUSTATUS':
@@ -173,6 +197,45 @@ export class PPU {
       default:
         throw new Error(`should not come ${this}`)
     }
+  }
+
+  writePpuData(value: number) {
+    const { key, index } = this.getTargetVram()
+    this[key][index] = value
+  }
+
+  getTargetVram(): VramAddressInfo {
+    const address = this.vRamAddr
+    if (address < 0x1000) {
+      return { key: 'patternTable0', index: address }
+    } else if (address < 0x2000) {
+      return { key: 'patternTable1', index: address - 0x1000 }
+    } else if (address < 0x23C0) {
+      return { key: 'nameTable0', index: address - 0x2000 }
+    } else if (address < 0x2400) {
+      return { key: 'attributeTable0', index: address - 0x23C0 }
+    } else if (address < 0x27C0) {
+      return { key: 'nameTable1', index: address - 0x2400 }
+    } else if (address < 0x2800) {
+      return { key: 'attributeTable1', index: address - 0x27C0 }
+    } else if (address < 0x2BC0) {
+      return { key: 'nameTable2', index: address - 0x2800 }
+    } else if (address < 0x2C00) {
+      return { key: 'attributeTable2', index: address - 0x2BC0 }
+    } else if (address < 0x2FC0) {
+      return { key: 'nameTable3', index: address - 0x2C00 }
+    } else if (address < 0x3000) {
+      return { key: 'attributeTable3', index: address - 0x2FC0 }
+    } else if (address < 0x3F00) {
+      return { key: 'nameAttributeMirror', index: address - 0x3000 }
+    } else if (address < 0x3F10) {
+      return { key: 'backgroundPallete', index: address - 0x3F00 }
+    } else if (address < 0x3F20) {
+      return { key: 'splitePallete', index: address - 0x3F10 }
+    } else if (address < 0x4000) {
+      return { key: 'palleteMirror', index: address - 0x3F20 }
+    }
+    throw new Error(`address is too big {address}`);
   }
 
   writeBoolArrayRegister(value: number) {
