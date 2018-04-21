@@ -1,4 +1,7 @@
-import { convertDecimalToBoolArray } from './util';
+import {
+  convertDecimalToBoolArray,
+  createColorTileDef
+} from './util';
 
 // 0x2000 - 0x2007
 export interface PPURegister {
@@ -100,6 +103,7 @@ export class PPU {
   vRamBaffer: number = 0x00
   isVramAddrUpper: boolean = true
 
+  characterROM: number[][]
   patternTable0: Uint8Array = new Uint8Array(0x1000)        //  $0000～$0FFF
   patternTable1: Uint8Array = new Uint8Array(0x1000)        //  $1000～$1FFF
   nameTable0: Uint8Array = new Uint8Array(0x3c0)            //  $2000～$23BF
@@ -128,9 +132,14 @@ export class PPU {
     PPUADDR: 0x0000,
     PPUDATA: 0x00,
   }
-  constructor() {
-    this.vram = new Uint8Array(0x4000)
-    this.spriteRam = new Uint8Array(0x100);
+
+  constructor(characterROM: any) {
+    const splites: any = [];
+    const characterArray = Array.from(characterROM);
+    while (characterArray.length !== 0) {
+      splites.push(characterArray.splice(0, 16));
+    }
+    this.characterROM = splites
   }
 
   getPalette(): any {
