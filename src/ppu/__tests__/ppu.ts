@@ -78,18 +78,18 @@ describe('PPU', () => {
     })
   })
 
-  describe('createSpliteInputs', () => {
-    test('create boolean tupple array array', async () => {
+  describe('createSpliteInput', () => {
+    test('create number array array', async () => {
       const input = [60, 60, 126, 126, 255, 255, 255, 231, 56, 56, 108, 108, 198, 254, 198, 0]
       const expected = [
-        [[false, false], [false, false], [false, true], [true, true], [true, true], [true, true], [false, false], [false, false]],
-        [[false, false], [false, false], [false, true], [true, true], [true, true], [true, true], [false, false], [false, false]],
-        [[false, false], [false, true], [true, true], [true, true], [false, true], [true, true], [true, true], [false, false]],
-        [[false, false], [false, true], [true, true], [true, true], [false, true], [true, true], [true, true], [false, false]],
-        [[false, true], [true, true], [true, true], [false, true], [false, true], [false, true], [true, true], [true, true]],
-        [[false, true], [true, true], [true, true], [true, true], [true, true], [true, true], [true, true], [true, true]],
-        [[false, true], [true, true], [true, true], [false, true], [false, true], [false, true], [true, true], [true, true]],
-        [[false, true], [false, true], [false, true], [false, false], [false, false], [false, true], [false, true], [false, true]]
+        [0, 0, 1, 2, 2, 2, 0, 0],
+        [0, 0, 1, 2, 2, 2, 0, 0],
+        [0, 1, 2, 2, 1, 2, 2, 0],
+        [0, 1, 2, 2, 1, 2, 2, 0],
+        [1, 2, 2, 1, 1, 1, 2, 2],
+        [1, 2, 2, 2, 2, 2, 2, 2],
+        [1, 2, 2, 1, 1, 1, 2, 2],
+        [1, 1, 1, 0, 0, 1, 1, 1]
       ]
 
       expect(createSpliteInputs(input)).toEqual(expected)

@@ -34,8 +34,14 @@ export const createSpliteInputs = (inputArray: number[]) => {
     return convertDecimalToBoolArray(num)
   })
 
-  return front.reduce<boolTupple[][]>((stack, _, index) => {
-    return stack.concat([createTwoBitTupple(front[index], back[index])])
+  return front.reduce<number[][]>((stack, _, index) => {
+    const nums = createTwoBitTupple(front[index], back[index]).map((elem) => {
+      return elem.reduce((sum, elem) => {
+        sum += (elem === true) ? 1 : 0
+        return sum
+      }, 0)
+    })
+    return stack.concat([nums])
   }, [])
 }
 
