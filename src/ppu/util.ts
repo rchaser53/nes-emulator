@@ -1,5 +1,10 @@
 export type boolTupple = [ boolean, boolean ]
 
+export interface RowColun {
+  row: number,
+  column: number
+}
+
 export const convertDecimalToBinary = (decimal: number): number => {
   const AllTrue8bit = 0b11111111
   return parseInt((decimal).toString(2), 2) & AllTrue8bit
@@ -91,6 +96,13 @@ export const convertBoolArrayToDecimal = (boolArray: boolean[]): number => {
     sum += (next) ? Math.pow(2, boolArray.length - 1 - index) : 0
     return sum
   }, 0)
+}
+
+export const convertIndexToRowColumn = (index: number): RowColun => {
+  const row = Math.floor(index / 256)
+  const column = index - (row * 256)
+
+  return { row, column }
 }
 
 
