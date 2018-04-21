@@ -12,7 +12,7 @@ import {
 describe('PPU', () => {
   let ppu: PPU
   beforeEach(() => {
-		ppu = new PPU()
+		ppu = new PPU(new Uint8Array(0x1000))
   })
 
 	describe('convertDecimalToBoolArray', () => {
