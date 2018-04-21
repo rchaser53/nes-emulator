@@ -103,7 +103,7 @@ export class PPU {
   vRamBaffer: number = 0x00
   isVramAddrUpper: boolean = true
 
-  characterROM: number[][]
+  characteSpliteData: number[][]
   patternTable0: Uint8Array = new Uint8Array(0x1000)        //  $0000～$0FFF
   patternTable1: Uint8Array = new Uint8Array(0x1000)        //  $1000～$1FFF
   nameTable0: Uint8Array = new Uint8Array(0x3c0)            //  $2000～$23BF
@@ -139,7 +139,7 @@ export class PPU {
     while (characterArray.length !== 0) {
       splites.push(characterArray.splice(0, 16));
     }
-    this.characterROM = splites
+    this.characteSpliteData = splites
   }
 
   getPalette(): any {
@@ -345,6 +345,11 @@ export class PPU {
       const tile = this.buildTile(clampedTileX, clampedTileY);
       this.background.push(tile);
     }
+  createColorSplite(characterIndex: number, nameIndex: number) {
+    const { row, column } = convertIndexToRowColumn(nameIndex)
+    return this.characteSpliteData[characterIndex].map((elem) => {
+      return this.colorTileDefs0[row][column] << 2 | elem;
+    })
   }
 }
 
