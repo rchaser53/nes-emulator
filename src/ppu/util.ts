@@ -99,8 +99,8 @@ export const convertBoolArrayToDecimal = (boolArray: boolean[]): number => {
 }
 
 export const convertIndexToRowColumn = (index: number): RowColun => {
-  const row = Math.floor(index / 256)
-  const column = index - (row * 256)
+  const row = Math.floor(index / 64)
+  const column = Math.floor((index % 15) / 4)
 
   return { row, column }
 }
