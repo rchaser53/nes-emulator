@@ -4,6 +4,7 @@ import { CPU } from './cpu/cpu'
 import { PPU } from './ppu/ppu'
 import { Logger } from './debug/logger'
 import { Handler } from './handler'
+import { Renderer } from './renderer/renderer'
 
 const HeaderSize = 0x0010;
 const ProgramROMIndex = 4;
@@ -18,6 +19,7 @@ export class Nes {
   logger: Logger
   programROM: Uint8Array
   characterROM: Uint8Array
+  renderer: Renderer
 
   constructor(nesBuffer: ArrayBuffer) {
     this.load(nesBuffer)
@@ -27,6 +29,7 @@ export class Nes {
     const handler = new Handler(this.ppu, this.programROM, this.logger)
     this.cpu = new CPU(handler, this.logger)
     this.cpu.reset()
+    this.renderer = new Renderer()
   }
 
   load(nesBuffer) {
@@ -53,7 +56,10 @@ export class Nes {
   run() {
 		setInterval(() => {
 			const cycle = this.cpu.run();
-			this.ppu.run(cycle * 3);
+      const rendererInput = this.ppu.run(cycle * 3);
+      if (rendererInput == null) return;
+
+      this.renderer.render(rendererInput)
     }, 1)
 		// }, 33)
   }

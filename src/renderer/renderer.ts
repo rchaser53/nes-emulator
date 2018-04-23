@@ -17,41 +17,6 @@ export class Renderer {
     this.ctx = canvas.getContext('2d');
   }
 
-  render(data) {
-    const { background, palette } = data;
-    this.renderBackground(background, palette);
-    this.ctx.putImageData(this.image, 0, 0);
-  }
-
-  renderBackground(background, palette) {
-    this.background = background;
-    for (let i = 0; i < background.length; i += 1) {
-      const x = (i % 32) * 8;
-      const y = ~~(i / 32) * 8;
-      this.renderTile(background[i], x, y, palette);
-    }
-  }
-
-  renderTile({ sprite, paletteId }, tileX, tileY, palette) {
-    const { data } = this.image;
-    for (let i = 0; i < 8; i = i + 1) {
-      for (let j = 0; j < 8; j = j + 1) {
-        const paletteIndex = paletteId * 4 + sprite[i][j];
-        const colorId = palette[paletteIndex];
-        const color = colors[colorId];
-        const x = tileX + j;
-        const y = tileY + i;
-        if (x >= 0 && 0xFF >= x && y >= 0 && y < 224) {
-          const index = (x + (y * 0x100)) * 4;
-          data[index] = color[0];
-          data[index + 1] = color[1];
-          data[index + 2] = color[2];
-          data[index + 3] = 0xFF;
-        }
-      }
-    }
-  }
-
   // address         size      purpose
   //  $3F00～$3F0F	  $0010	    バックグラウンドパレット
   //  $3F10～$3F1F	  $0010	    スプライトパレット
@@ -72,5 +37,37 @@ export class Renderer {
     }
     throw new Error(`${address} is not implemented`)
   }
-}
 
+  render(renderInput) {
+    renderInput.background.forEach((splite, spliteIndex) => {
+      splite.forEach((row, rowIndex) => {
+        row.forEach((pixel, pixelIndex) => {
+          const red = colors[pixel][0];
+          const green = colors[pixel][1];
+          const blue = colors[pixel][2];
+  
+          const {x, y} = this.culculateXandY(spliteIndex, rowIndex, pixelIndex);
+          this.ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`;
+
+          if (224 < y) {
+            return
+          }
+
+          this.ctx.fillRect(x, y, 1, 1);
+        })
+      });
+    })
+  }
+
+  culculateXandY(spliteIndex: number, rowIndex: number, pixelIndex: number) {
+    const baseY = Math.floor(spliteIndex / 30) * 8
+    const baseX = (spliteIndex < 32)
+                    ? spliteIndex * 8
+                    : Math.floor(spliteIndex % 32) * 8
+  
+    return {
+      x: baseX + pixelIndex,
+      y: baseY + rowIndex,
+    }
+  }
+}
