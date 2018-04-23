@@ -296,7 +296,7 @@ export class PPU {
       return elem.map((num) => {
         const palleteIndex = this.colorTileDefs0[row][column] << 2 | num
         return this.backgroundPallete[palleteIndex]
-      })
+      }).reverse();
     })
   }
 }
