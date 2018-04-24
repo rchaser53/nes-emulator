@@ -60,7 +60,7 @@ export class Renderer {
   }
 
   culculateXandY(spliteIndex: number, rowIndex: number, pixelIndex: number) {
-    const baseY = Math.floor(spliteIndex / 30) * 8
+    const baseY = Math.floor(spliteIndex / 32) * 8
     const baseX = (spliteIndex < 32)
                     ? spliteIndex * 8
                     : Math.floor(spliteIndex % 32) * 8
