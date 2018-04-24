@@ -280,9 +280,23 @@ export class PPU {
     return
   }
 
+  getTable(key: string): string {
+    const { nameTableUpper, nameTableLowwer } = this.register.PPUCTRL
+    const tableNumber =  this.convertBoolToDecimal([ nameTableUpper, nameTableLowwer ])
+    return `${key}${tableNumber}`
+    
+  }
+
+  convertBoolToDecimal(bools: boolean[]): number {
+    return bools.reduce((sum, next) => {
+      sum += next === true ? 1 : 0;
+      return sum
+    }, 0);
+  }
 
   buildBackground() { 
-    const names = Array.from(this.nameTable0)
+    const targetTable = this.getTable('nameTable');
+    const names: number[] = Array.from(this[targetTable]);
     return names.map((elem, index) => {
       return this.createColorSplite(elem, index);
     })

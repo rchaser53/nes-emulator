@@ -4,9 +4,6 @@ const CanvasIdSelector = '#nes'
 
 export class Renderer {
   ctx
-  image
-  background
-  vram: Uint8Array
 
   constructor() {
     this.createCanvas()
@@ -15,27 +12,6 @@ export class Renderer {
   createCanvas() {
     const canvas = (window.document).querySelector(CanvasIdSelector) as HTMLCanvasElement
     this.ctx = canvas.getContext('2d');
-  }
-
-  // address         size      purpose
-  //  $3F00～$3F0F	  $0010	    バックグラウンドパレット
-  //  $3F10～$3F1F	  $0010	    スプライトパレット
-  //  $3F20～$3FFF	  -         $3F00-$3F1Fのミラー×7
-  read(address: number): number {
-    if (address <= 0x3f00) {
-      // should be implemented
-      return this.vram[address]
-    } else if (address <= 0x3f0f) {
-      // background pallet
-      return this.vram[address]
-    } else if (address <= 0x3F1F) {
-      // splite pallet
-      return this.vram[address]
-    } else if (address <= 0x3fff) {
-      // $3F00-$3F1F mirror
-      return this.vram[address]
-    }
-    throw new Error(`${address} is not implemented`)
   }
 
   render(renderInput) {
