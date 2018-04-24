@@ -68,4 +68,16 @@ describe('CPU', () => {
 		expect(cpu.register.PC).toEqual(0x8024)
     expect(cpu.register.S).toEqual(0x0010)
   })
+
+	test('convertRegisterToDecimal', async () => {
+    // const StatusRegisterMap = [
+    //   { key: 'N' }, { key: 'V' }, { key: 'R' }, { key: 'B' },
+    //   { key: 'D' }, { key: 'I' }, { key: 'Z' }, { key: 'C' }
+    // ];
+
+    expect(cpu.convertRegisterToDecimal()).toEqual(0b00000100);
+
+    cpu.register.P.Z = true;
+    expect(cpu.convertRegisterToDecimal()).toEqual(0b01000100);
+  })
 })

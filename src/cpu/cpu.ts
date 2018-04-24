@@ -3,14 +3,14 @@ import { HelloOpecodesMap, Order } from './opecode'
 import { Handler }  from '../handler'
 
 export interface StatusRegister {  
-  C: boolean
-  Z: boolean
-  I: boolean
-  D: false
-  B: boolean
-  R: true
-  O: boolean
   N: boolean
+  V: boolean
+  R: true
+  B: boolean
+  D: false
+  I: boolean
+  Z: boolean
+  C: boolean
 }
 
 export interface Register {
@@ -23,14 +23,14 @@ export interface Register {
 }
 
 const DefaultStatusRegister: StatusRegister = {
-  C: false,         // carry flag 
-  Z: false,         // zero flag
-  I: false,         // interupt? irq 0: enable irq, 1: ban irq
-  D: false,         // decimal mode not implements
-  B: false,         // breakMode set when BRK happen, clear IRQ happen
+  N: false,         // negative 演算結果のbit7が1の時にセット
+  V: false,         // overflow P演算結果がオーバーフローを起こした時にセット
   R: true,          // NOTHING
-  O: false,         // overflow P演算結果がオーバーフローを起こした時にセット
-  N: false          // negative 演算結果のbit7が1の時にセット
+  B: false,         // breakMode set when BRK happen, clear IRQ happen
+  D: false,         // decimal mode not implements
+  I: false,         // interupt? irq 0: enable irq, 1: ban irq
+  Z: false,         // zero flag
+  C: false,         // carry flag
 }
 
 export const DefualtRegister: Register = {
@@ -48,6 +48,11 @@ const TwoPCUseAddress = [
   'Absolute,X',
   'Absolute'
 ]
+
+const StatusRegisterMap = [
+  { key: 'N' }, { key: 'V' }, { key: 'R' }, { key: 'B' },
+  { key: 'D' }, { key: 'I' }, { key: 'Z' }, { key: 'C' }
+];
 
 export class CPU {
   register: Register
@@ -123,6 +128,14 @@ export class CPU {
 
   getAbsoluteIndex(PC: number, registerKey: string): number {
     return this.getAbsolute(PC) + this.register[registerKey]
+  }
+
+  convertRegisterToDecimal(): number {
+    const statusRegister = this.register.P
+    return StatusRegisterMap.reduce((sum, { key }, index) => {
+      sum += statusRegister[key] === true ? Math.pow(2, index) : 0
+      return sum
+    }, 0)
   }
 
   executeOpeCode(order: Order) {
