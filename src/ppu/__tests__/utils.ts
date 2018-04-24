@@ -105,11 +105,9 @@ describe('PPU utils', () => {
     test('convert index to row, column', async () => {
   
       expect(convertIndexToRowColumn(0)).toEqual({ row: 0, column: 0})
-      expect(convertIndexToRowColumn(255)).toEqual({ row: 0, column: 255})
-      expect(convertIndexToRowColumn(256)).toEqual({ row: 1, column: 0})
-      expect(convertIndexToRowColumn(356)).toEqual({ row: 1, column: 100})
+      expect(convertIndexToRowColumn(5)).toEqual({ row: 0, column: 1})
+      expect(convertIndexToRowColumn(63)).toEqual({ row: 0, column: 0})
+      expect(convertIndexToRowColumn(64)).toEqual({ row: 1, column: 1})
     })
   })
-
-  
 })

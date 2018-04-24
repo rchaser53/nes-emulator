@@ -104,36 +104,3 @@ export const convertIndexToRowColumn = (index: number): RowColun => {
 
   return { row, column }
 }
-
-
-
-// export const createColorTopBitsTupples = (inputs) => {
-//   // const base: boolTupple[][][] = []
-
-//   const eightBitBooleansArray = inputs.map(convertDecimalToBoolArray)
-
-//   const base: any = []
-
-//   eightBitBooleansArray.forEach((eightBitBooleans, outerIndex) => {
-//     // const isAfterArea = (index % 2) === 0
-
-
-//     const rowBase = []
-//     eightBitBooleans.forEach((bool, innerIndex) => {
-//       rowBase[]
-//     })
-//   })
-
-//   // for (let row = 0; row < 16; row++) {
-//   //   base[row] = (base[row] == null)
-//   //                   ? []
-//   //                   : base[row];
-//   //   for (let column = 0; column < 16; column++) {
-//   //     base[row][column] = (base[row][column] == null)
-//   //                       ? []
-//   //                       : base[row][column];
-      
-
-//   //   }
-//   // }
-// }
