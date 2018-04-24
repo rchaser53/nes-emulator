@@ -140,6 +140,10 @@ export class CPU {
 
   executeOpeCode(order: Order) {
     switch (order.opecode) {
+      case 'BRK':
+        this.interruput();
+        break;
+
       case 'SEI':
         this.register.P.I = false
         break;
@@ -239,13 +243,36 @@ export class CPU {
       case 'CLC':
         this.register.P.C = false
         break;
-      
+
       case 'SED':
         // this order is no mean
         break;
 
       default:
         throw new Error(`${JSON.stringify(order)} is not implemented!`)
+    }
+  }
+
+  interruput() {
+    // 割り込みが確認された時、Iフラグがセットされていれば割り込みは無視します。
+    if (this.register.P.I === false) {
+      // Iフラグがクリアされていれば、割り込み動作を開始します。
+      // BRKでは、Bフラグをセットし、PCに1を加算します。
+      this.register.P.B = true
+      this.register.PC++
+
+    // 次にPCの上位バイト、下位バイト、ステータスレジスタを順にスタックへ格納します。
+      const address = this.register.PC
+      this.handler.writeCPU(0x100 | this.register.S, (address >> 8) & 0xff) // 上位バイト
+      this.handler.writeCPU(0x100 | this.register.S - 1, address & 0xff)    // 下位バイト
+      this.handler.writeCPU(0x100 | this.register.S - 2, this.convertRegisterToDecimal())    // ステータスレジスタ
+      this.register.S -= 3
+
+      // 次にIフラグをセットし、最後にPCの下位バイトを$FFFEから、上位バイトを$FFFFからフェッチします。
+      this.register.P.I = true;
+      const upper = this.handler.readCPU(0xFFFF);
+      const lowwer = this.handler.readCPU(0xFFFE);
+      this.register.PC = upper << 8 | lowwer;
     }
   }
 
