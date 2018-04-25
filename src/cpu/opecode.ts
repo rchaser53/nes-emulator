@@ -43,7 +43,6 @@ export const OpecodesMap: { [key: string]: Order} = {
 
   "49": { opecode: 'EOR', data: 0x0044, address: 'Immediate', len: 2, cycle: 2 },         //  Immediate     EOR #$44      $49   2   2
 
-
   "65": { opecode: 'ADC', data: 0x0044, address: 'ZeroPage',   len: 2, cycle: 3 },        //  Zero Page     ADC $44       $65   2   3
   "75": { opecode: 'ADC', data: 0x0044, address: 'ZeroPage,X', len: 2, cycle: 4 },        //  Zero Page,X   ADC $44,X     $75   2   4
   "69": { opecode: 'ADC', data: 0x0044, address: 'Immediate',  len: 2, cycle: 2 },        //  Immediate     ADC #$44      $69   2   2
@@ -52,6 +51,15 @@ export const OpecodesMap: { [key: string]: Order} = {
   "6d": { opecode: 'ADC', data: 0x4400, address: 'Absolute',   len: 3, cycle: 4 },        //  Absolute      ADC $4400     $6D   3   4
   "7d": { opecode: 'ADC', data: 0x4400, address: 'Absolute,X', len: 3, cycle: 4 },        //  Absolute,X    ADC $4400,X   $7D   3   4 +1
   "79": { opecode: 'ADC', data: 0x4400, address: 'Absolute,Y', len: 3, cycle: 4 },        //  Absolute,Y    ADC $4400,Y   $79   3   4 +1
+
+  "e9": { opecode: 'SBC', data: 0x0044, address: 'Immediate',   len: 2, cycle: 2 },        //  Immediate     SBC #$44      $E9   2   2
+  "e5": { opecode: 'SBC', data: 0x0044, address: 'ZeroPage',    len: 2, cycle: 3 },        //  Zero Page     SBC $44       $E5   2   3
+  "f5": { opecode: 'SBC', data: 0x0044, address: 'ZeroPage,X',  len: 2, cycle: 4 },        //  Zero Page,X   SBC $44,X     $F5   2   4
+  "ed": { opecode: 'SBC', data: 0x4400, address: 'Absolute',    len: 3, cycle: 4 },        //  Absolute      SBC $4400     $ED   3   4
+  "fd": { opecode: 'SBC', data: 0x4400, address: 'Absolute,X',  len: 3, cycle: 4 },        //  Absolute,X    SBC $4400,X   $FD   3   4 +1
+  "f9": { opecode: 'SBC', data: 0x4400, address: 'Absolute,Y',  len: 3, cycle: 4 },        //  Absolute,Y    SBC $4400,Y   $F9   3   4 +1
+  "e1": { opecode: 'SBC', data: 0x0044, address: 'Indirect,X',  len: 2, cycle: 6 },        //  Indirect,X    SBC ($44,X)   $E1   2   6
+  "f1": { opecode: 'SBC', data: 0x0044, address: 'Indirect,Y',  len: 2, cycle: 5 },        //  Indirect,Y    SBC ($44),Y   $F1   2   5 +1
 
   "88": { opecode: 'DEY', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       DEY           $88   1   2
   "c6": { opecode: 'DEC', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 5  },         //  Zero Page     DEC $44       $C6   2   5
