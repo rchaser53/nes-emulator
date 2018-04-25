@@ -208,6 +208,10 @@ export class CPU {
         this.addRegister('A', this.handler.readCPU(this.executeDataByAddress(order.address)))
         break;
 
+      case 'SBC':
+        this.substractRegister('A', this.handler.readCPU(this.executeDataByAddress(order.address)))
+        break;
+
       case 'DEC':
         this.addMemoryData(order.address, -1)
         break;
@@ -325,6 +329,20 @@ export class CPU {
     }
     this.register[registerKey] = (this.register[registerKey] + value + flagValue) & 0xFF
 
+    this.changeNZFlag(registerKey);
+  }
+
+  substractRegister(registerKey: string, value: number) {
+    let flagValue = 1;
+    if (this.isCarry(this.register[registerKey], value) === false) {
+      this.register.P.C = false
+      flagValue = 0
+    }
+    this.register[registerKey] = (this.register[registerKey] + value - flagValue) & 0xFF
+    this.changeNZFlag(registerKey);
+  }
+
+  changeNZFlag(registerKey: string) {
     if (0 <= this.register[registerKey]) {
       this.register.P.N = false
     }
