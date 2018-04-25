@@ -322,6 +322,7 @@ export class CPU {
   }
 
   addRegister(registerKey: string, value: number) {
+    const beforeRegisterValue = this.register[registerKey];
     let flagValue = 0;
     if (this.isCarry(this.register[registerKey], value) === true) {
       this.register.P.C = true
@@ -329,25 +330,34 @@ export class CPU {
     }
     this.register[registerKey] = (this.register[registerKey] + value + flagValue) & 0xFF
 
-    this.changeNZFlag(registerKey);
+    this.changeNVZFlag(registerKey, beforeRegisterValue);
   }
 
   substractRegister(registerKey: string, value: number) {
+    const beforeRegisterValue = this.register[registerKey];
     let flagValue = 1;
     if (this.isCarry(this.register[registerKey], value) === false) {
       this.register.P.C = false
       flagValue = 0
     }
     this.register[registerKey] = (this.register[registerKey] + value - flagValue) & 0xFF
-    this.changeNZFlag(registerKey);
+    this.changeNVZFlag(registerKey, beforeRegisterValue);
   }
 
-  changeNZFlag(registerKey: string) {
+  changeNVZFlag(registerKey: string, beforeRegisterValue: number) {
+    this.register.P.V = this.isOverFlagTrue(registerKey, beforeRegisterValue);
+
     if (0 <= this.register[registerKey]) {
       this.register.P.N = false
     }
 
     this.register.P.Z === (0 === this.register[registerKey])
+  }
+
+  isOverFlagTrue(registerKey: string, beforeRegisterValue: number): boolean {
+    if (beforeRegisterValue <= 0x7f && 0x80 <= this.register[registerKey]) return true
+    if (this.register[registerKey] <= 0x7f && 0x80 <= beforeRegisterValue) return true
+    return false
   }
 
   decreaseRegister(registerKey: string, value: number) {
