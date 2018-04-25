@@ -6,14 +6,20 @@ export interface Order {
   cycle: number
 }
 
-export const HelloOpecodesMap: { [key: string]: Order} = {
+export const OpecodesMap: { [key: string]: Order} = {
   "0":  { opecode: 'BRK', data: 0x0000, address: 'Implied', len: 1, cycle: 7 },           //  Implied       BRK           $0    1   7
   "38": { opecode: 'SEC', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       SEC           $38   1   2
   "78": { opecode: 'SEI', data: 0x0000, address: 'Implied', len: 1, cycle: 2  },          //  Implied       SEI           $78   1   2
 
-  "a9": { opecode: 'LDA', data: 0x0044, address: 'Immediate', len: 2, cycle: 2  },        //  Immediate     LDA #$44      $A9   2   2
+  "a9": { opecode: 'LDA', data: 0x0044, address: 'Immediate',  len: 2, cycle: 2 },        //  Immediate     LDA #$44      $A9   2   2
+  "a5": { opecode: 'LDA', data: 0x0044, address: 'ZeroPage',   len: 2, cycle: 3 },        //  Zero Page     LDA $44       $A5   2   3
+  "b5": { opecode: 'LDA', data: 0x0044, address: 'ZeroPage,X', len: 2, cycle: 4 },        //  Zero Page,X   LDA $44,X     $B5   2   4
+  "a1": { opecode: 'LDA', data: 0x0044, address: 'Indirect,X', len: 2, cycle: 6 },        //  Indirect,X    LDA ($44,X)   $A1   2   6
   "b1": { opecode: 'LDA', data: 0x0044, address: 'Indirect,Y', len: 2, cycle: 5 },        //  Indirect,Y    LDA ($44),Y   $B1   2   5 +1
+  "bd": { opecode: 'LDA', data: 0x4400, address: 'Absolute,X', len: 3, cycle: 4 },        //  Absolute,X    LDA $4400,X   $BD   3   4 +1
   "b9": { opecode: 'LDA', data: 0x4400, address: 'Absolute,Y', len: 3, cycle: 4 },        //  Absolute,Y    LDA $4400,Y   $B9   3   4 +1
+  "ad": { opecode: 'LDA', data: 0x4400, address: 'Absolute',   len: 3, cycle: 4 },        //  Absolute      LDA $4400     $AD   3   4
+
   "a2": { opecode: 'LDX', data: 0x0044, address: 'Immediate', len: 2, cycle: 2  },        //  Immediate     LDX #$44      $A2   2   2
   "a6": { opecode: 'LDX', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 3 },          //  Zero Page     LDX $44       $A6   2   3
   "a0": { opecode: 'LDY', data: 0x0044, address: 'Immediate', len: 2, cycle: 2  },        //  Immediate     LDY #$44      $A0   2   2

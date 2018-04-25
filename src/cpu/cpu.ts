@@ -1,5 +1,5 @@
 import { Logger } from '../debug/logger'
-import { HelloOpecodesMap, Order } from './opecode'
+import { OpecodesMap, Order } from './opecode'
 import { Handler }  from '../handler'
 
 export interface StatusRegister {  
@@ -77,7 +77,7 @@ export class CPU {
 
   fetch(opecode: number): Order {
     this.register.PC++
-    const opeObject = HelloOpecodesMap[opecode.toString(16)];
+    const opeObject = OpecodesMap[opecode.toString(16)];
     if (opeObject == null) {
       throw new Error(`${opecode} is not correct code or not implementation.`)
     }
@@ -91,10 +91,14 @@ export class CPU {
     switch (address) {
       case 'Immediate':
         return PC
+      case 'Indirect,X':
+        return this.getIndirectIndex(PC, 'X')
       case 'Indirect,Y':
         return this.getIndirectIndex(PC, 'Y')
       case 'Absolute':
         return this.getAbsolute(PC)
+      case 'Absolute,X':
+				return this.getAbsoluteIndex(PC, 'X')
       case 'Absolute,Y':
 				return this.getAbsoluteIndex(PC, 'Y')
       case 'ZeroPage':
