@@ -7,6 +7,7 @@ export interface Order {
 }
 
 export const HelloOpecodesMap: { [key: string]: Order} = {
+  "0":  { opecode: 'BRK', data: 0x0000, address: 'Implied', len: 1, cycle: 7 },           //  Implied       BRK           $0    1   7
   "38": { opecode: 'SEC', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       SEC           $38   1   2
   "78": { opecode: 'SEI', data: 0x0000, address: 'Implied', len: 1, cycle: 2  },          //  Implied       SEI           $78   1   2
 
