@@ -255,6 +255,10 @@ export class CPU {
         this.addMemoryData(order.address, 1)
         break
 
+      case 'INX':
+        this.addRegister('X', this.register.X + 1)
+        break
+
       case 'RTS':
         this.register.PC = this.returnCaller()
         break
@@ -273,6 +277,10 @@ export class CPU {
 
       case 'CMP':
         this.register.P.C = this.setCompare('A', this.handler.readCPU(this.executeDataByAddress(order.address)))
+        break
+
+      case 'CPX':
+        this.register.P.C = this.setCompare('X', this.handler.readCPU(this.executeDataByAddress(order.address)))
         break
 
       case 'TAY':
