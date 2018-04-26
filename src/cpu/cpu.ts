@@ -112,7 +112,7 @@ export class CPU {
     this.register.PC++
     const opeObject = OpecodesMap[opecode.toString(16)]
     if (opeObject == null) {
-      throw new Error(`${opecode} is not correct code or not implementation.`)
+      throw new Error(`${opecode.toString(16)} is not correct code or not implementation.`)
     }
 
     return opeObject
