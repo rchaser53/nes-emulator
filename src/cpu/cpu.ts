@@ -104,7 +104,6 @@ export class CPU {
     const upper = this.handler.readCPU(0xfffb)
     const lowwer = this.handler.readCPU(0xfffa)
     this.register.PC = (upper << 8) | lowwer
-    // console.log(this, 28)
     console.log(upper, lowwer, this.register.PC)
   }
 

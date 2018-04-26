@@ -62,6 +62,7 @@ const ControlRegisterMap = {
 }
 
 const LineLimit = 262
+const VBlankLine = 241;
 // const BoarderCycle = 341;
 // const DrawLine = 240;
 // const SpriteNumber = 100;
@@ -262,10 +263,18 @@ export class PPU {
     if (this.line === LineLimit) {
       this.colorTileDefs0 = createColorTileDef(this.attributeTable0 as any)
       this.line = 0
+      this.register.PPUSTATUS  &= 0x7F;
+
       return {
         background: this.buildBackground()
       }
     }
+
+    if (VBlankLine <= this.line) {
+      this.register.PPUSTATUS |= 0x80;
+      if (this.register.PPUCTRL.isEnableNmi === true) {}
+    }
+
     return
   }
 
