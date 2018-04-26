@@ -1,18 +1,18 @@
-export type boolTupple = [ boolean, boolean ]
+export type boolTupple = [boolean, boolean]
 
 export interface RowColun {
-  row: number,
+  row: number
   column: number
 }
 
 export const convertDecimalToBinary = (decimal: number): number => {
   const AllTrue8bit = 0b11111111
-  return parseInt((decimal).toString(2), 2) & AllTrue8bit
+  return parseInt(decimal.toString(2), 2) & AllTrue8bit
 }
 
 export const isDegitTrue = (binary: number, degit: number): boolean => {
-  const compare = 1 << (degit)
-  return ((binary & compare) >> degit) === 1
+  const compare = 1 << degit
+  return (binary & compare) >> degit === 1
 }
 
 export const convertDecimalToBoolArray = (decimal: number): boolean[] => {
@@ -26,7 +26,7 @@ export const convertDecimalToBoolArray = (decimal: number): boolean[] => {
 
 export const createTwoBitTupple = (front: boolean[], back: boolean[]): boolTupple[] => {
   return front.reduce<boolTupple[]>((stack, _, index) => {
-    return stack.concat([ [ front[index], back[index] ]]);
+    return stack.concat([[front[index], back[index]]])
   }, [])
 }
 
@@ -42,7 +42,7 @@ export const createSpliteInputs = (inputArray: number[]) => {
   return front.reduce<number[][]>((stack, _, index) => {
     const nums = createTwoBitTupple(front[index], back[index]).map((elem) => {
       return elem.reduce((sum, elem) => {
-        sum += (elem === true) ? 1 : 0
+        sum += elem === true ? 1 : 0
         return sum
       }, 0)
     })
@@ -63,7 +63,7 @@ export const createColorTileDef = (inputs: number[]): number[][] => {
 }
 
 const tryInitializeArray = <T>(input: T[]): T[] => {
-  return input == null ? [] as T[] : input
+  return input == null ? ([] as T[]) : input
 }
 
 export const convertDecimalToTwoBit = (input: number): number[] => {
@@ -86,14 +86,14 @@ export const reverseArray = (inputArray: any[]): any[] => {
   const baseArray: any[] = []
   const arrayLength = inputArray.length
   for (let i = 0; i < arrayLength; i++) {
-    baseArray[i] =  inputArray[arrayLength - i - 1]
+    baseArray[i] = inputArray[arrayLength - i - 1]
   }
   return baseArray
 }
 
 export const convertBoolArrayToDecimal = (boolArray: boolean[]): number => {
   return boolArray.reduce((sum, next, index) => {
-    sum += (next) ? Math.pow(2, boolArray.length - 1 - index) : 0
+    sum += next ? Math.pow(2, boolArray.length - 1 - index) : 0
     return sum
   }, 0)
 }

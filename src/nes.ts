@@ -1,4 +1,4 @@
-// init code should be implemented? 
+// init code should be implemented?
 // http://wiki.nesdev.com/w/index.php/Init_code
 import { CPU } from './cpu/cpu'
 import { PPU } from './ppu/ppu'
@@ -6,10 +6,10 @@ import { Logger } from './debug/logger'
 import { Handler } from './handler'
 import { Renderer } from './renderer/renderer'
 
-const HeaderSize = 0x0010;
-const ProgramROMIndex = 4;
-const ChacterROMIndex = 5;
-const NES_HEADER_SIZE = 0x0010;
+const HeaderSize = 0x0010
+const ProgramROMIndex = 4
+const ChacterROMIndex = 5
+const NES_HEADER_SIZE = 0x0010
 
 const IsDebug = false
 
@@ -33,35 +33,32 @@ export class Nes {
   }
 
   load(nesBuffer) {
-    const {
-      programROM,
-      characterROM
-    } = this.parse(nesBuffer)
+    const { programROM, characterROM } = this.parse(nesBuffer)
 
-    this.programROM = programROM;
-    this.characterROM = characterROM;
+    this.programROM = programROM
+    this.characterROM = characterROM
   }
 
   parse(rawBuffer) {
-    const buf = new Uint8Array(rawBuffer);
-    const characterROMStart = HeaderSize + buf[ProgramROMIndex] * 0x4000;
-    const characterROMEnd = characterROMStart + buf[ChacterROMIndex] * 0x2000;
+    const buf = new Uint8Array(rawBuffer)
+    const characterROMStart = HeaderSize + buf[ProgramROMIndex] * 0x4000
+    const characterROMEnd = characterROMStart + buf[ChacterROMIndex] * 0x2000
 
     return {
       programROM: buf.slice(NES_HEADER_SIZE, characterROMStart - 1),
-      characterROM: buf.slice(characterROMStart, characterROMEnd - 1),
+      characterROM: buf.slice(characterROMStart, characterROMEnd - 1)
     }
   }
 
   run() {
-		setInterval(() => {
-			const cycle = this.cpu.run();
-      const rendererInput = this.ppu.run(cycle * 3);
-      if (rendererInput == null) return;
+    setInterval(() => {
+      const cycle = this.cpu.run()
+      const rendererInput = this.ppu.run(cycle * 3)
+      if (rendererInput == null) return
 
       this.renderer.render(rendererInput)
     }, 1)
-		// }, 33)
+    // }, 33)
   }
 }
 
@@ -74,10 +71,9 @@ export class Nes {
 // 4: Size of PRG ROM in 16 KB units
 // 5: Size of CHR ROM in 8 KB units (Value 0 means the board uses CHR RAM)
 
-
-  //
-  // Memory map
-  /*
+//
+// Memory map
+/*
   | addr           |  description               |   mirror       |
   +----------------+----------------------------+----------------+
   | 0x0000-0x07FF  |  RAM                       |                |
@@ -91,7 +87,7 @@ export class Nes {
   | 0xC000-0xFFFF  |  program ROM HIGH          |                |
   */
 
-  // memory map
+// memory map
 // address        size    purpose
 // |------------||------||----------------|
 // 0x0000～0x07FF	0x0800	WRAM

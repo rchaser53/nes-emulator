@@ -3,7 +3,7 @@ import { PPU } from '../ppu'
 describe('PPU', () => {
   let ppu: PPU
   beforeEach(() => {
-		ppu = new PPU(new Uint8Array(0x1000))
+    ppu = new PPU(new Uint8Array(0x1000))
   })
 
   describe('getNameSpace', () => {
@@ -31,7 +31,7 @@ describe('PPU', () => {
     test('true, true is 0x2C00', async () => {
       ppu.register.PPUCTRL.nameTableUpper = true
       ppu.register.PPUCTRL.nameTableLowwer = true
-      const expected = 0x2C00
+      const expected = 0x2c00
       expect(ppu.getNameSpace()).toEqual(expected)
     })
   })

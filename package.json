@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
+    "format": "./node_modules/.bin/prettier --write \"src/**/*.{ts,html,js,md}\"",
     "test": "jest test --no-cache",
     "build": "tsc -p ."
   },
@@ -23,6 +24,7 @@
     "@types/jest": "^22.2.0",
     "@types/whatwg-fetch": "^0.0.33",
     "jest": "^22.4.3",
+    "prettier": "^1.12.1",
     "ts-loader": "^4.1.0",
     "typescript": "^2.7.2",
     "webpack": "^4.1.1",
