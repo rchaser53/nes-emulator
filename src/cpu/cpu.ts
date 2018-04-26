@@ -72,13 +72,40 @@ export class CPU {
   }
 
   run(): number {
+    if (this.isNmi) {
+      this.nmi();
+    }
+
     const opecode = this.handler.readCPU(this.register.PC)
     const order = this.fetch(opecode)
 
-    this.logger.log(this.register.PC, order, opecode, 1)
+    // this.logger.log(this.register.PC, order, opecode)
 
     this.executeOpeCode(order)
+    this.cycle += order.cycle
     return order.cycle
+  }
+
+  get isNmi(): boolean {
+    return this.handler.ppu.register.PPUCTRL.isEnableNmi
+  }
+
+  nmi() {
+    this.register.P.B = false;
+    // PCの上位バイト、 下位バイト、ステータスレジスタを順にスタックへ格納します。
+    const address = this.register.PC
+    this.handler.writeCPU(0x100 | this.register.S, (address >> 8) & 0xff) // 上位バイト
+    this.handler.writeCPU(0x100 | (this.register.S - 1), address & 0xff) // 下位バイト
+    this.handler.writeCPU(0x100 | (this.register.S - 2), this.convertRegisterToDecimal()) // ステータスレジスタ
+    this.register.S -= 3
+
+    // 次にIフラグをセットし、最後にPCの下位バイトを$FFFAから、上位バイトを$FFFBからフェッチします。
+    this.register.P.I = true;
+    const upper = this.handler.readCPU(0xfffb)
+    const lowwer = this.handler.readCPU(0xfffa)
+    this.register.PC = (upper << 8) | lowwer
+    // console.log(this, 28)
+    console.log(upper, lowwer, this.register.PC)
   }
 
   fetch(opecode: number): Order {
