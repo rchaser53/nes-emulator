@@ -25,10 +25,10 @@ export interface Register {
 const DefaultStatusRegister: StatusRegister = {
   N: false, // negative 演算結果のbit7が1の時にセット
   V: false, // overflow P演算結果がオーバーフローを起こした時にセット
-  R: true, // NOTHING
-  B: false, // breakMode set when BRK happen, clear IRQ happen
+  R: true,  // NOTHING
+  B: true,  // breakMode set when BRK happen, clear IRQ happen
   D: false, // decimal mode not implements
-  I: false, // interupt? irq 0: enable irq, 1: ban irq
+  I: true, // interupt? irq 0: enable irq, 1: ban irq
   Z: false, // zero flag
   C: false // carry flag
 }
