@@ -380,14 +380,7 @@ export class CPU {
 
   changeNVZFlag(registerKey: string, beforeRegisterValue: number) {
     this.register.P.V = this.isOverFlagTrue(registerKey, beforeRegisterValue)
-
-    if (0 <= this.register[registerKey]) {
-      this.register.P.N = false
-    } else {
-      this.register.P.N = true
-      this.register[registerKey] += 0x100
-    }
-
+    this.register.P.N = !!(this.register[registerKey] & 0x80)
     this.register.P.Z === (0 === this.register[registerKey])
   }
 
@@ -441,7 +434,7 @@ export class CPU {
   reset() {
     // 初期化のための6クロックの後に動作を開始します。
     // todo
-
+    
     this.register.P.I = true
 
     const lowwer = this.handler.readCPU(0xfffc) & 0xff
