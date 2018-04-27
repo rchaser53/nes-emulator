@@ -270,7 +270,7 @@ export class PPU {
       }
     }
 
-    if (VBlankLine <= this.line) {
+    if (VBlankLine === this.line) {
       this.register.PPUSTATUS |= 0x80;
       if (this.register.PPUCTRL.isEnableNmi === true) {}
     }
