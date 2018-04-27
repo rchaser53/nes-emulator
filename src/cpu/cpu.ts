@@ -64,6 +64,7 @@ export class CPU {
   register: Register
   handler: Handler
   logger: Logger
+  cycle: number = 0
 
   constructor(handler: Handler, logger?: Logger) {
     this.register = DefualtRegister
@@ -349,12 +350,9 @@ export class CPU {
   }
 
   insertRegister(registerKey: string, value: number) {
+    const beforeRegisterValue = this.register[registerKey]
     this.register[registerKey] = value
-    if (0 < this.register[registerKey]) {
-      this.register.P.N = false
-    }
-
-    this.register.P.Z === (0 === this.register[registerKey])
+    this.changeNVZFlag(registerKey, beforeRegisterValue)
   }
 
   addRegister(registerKey: string, value: number) {
@@ -385,6 +383,9 @@ export class CPU {
 
     if (0 <= this.register[registerKey]) {
       this.register.P.N = false
+    } else {
+      this.register.P.N = true
+      this.register[registerKey] += 0x100
     }
 
     this.register.P.Z === (0 === this.register[registerKey])
@@ -397,12 +398,9 @@ export class CPU {
   }
 
   decreaseRegister(registerKey: string, value: number) {
+    const beforeRegisterValue = this.register[registerKey]
     this.register[registerKey] -= value
-    if (this.register[registerKey] < 0) {
-      this.register.P.N = true
-      this.register[registerKey] += 0x100
-    }
-    this.register.P.Z === (0 === this.register[registerKey])
+    this.changeNVZFlag(registerKey, beforeRegisterValue)
   }
 
   changeProgramCount(address: string) {
