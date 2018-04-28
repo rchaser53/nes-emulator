@@ -256,7 +256,7 @@ export class CPU {
         break
 
       case 'INX':
-        this.addRegister('X', this.register.X + 1)
+        this.addRegister('X', 1)
         break
 
       case 'RTS':
