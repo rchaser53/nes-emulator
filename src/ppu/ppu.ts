@@ -225,7 +225,7 @@ export class PPU {
     } else if (address < 0x4000) {
       return { key: 'palleteMirror', index: address - 0x3f20 }
     }
-    throw new Error(`address is too big {address}`)
+    throw new Error(`address '${address}' is too big {address}`)
   }
 
   writeBoolArrayRegister(value: number) {
