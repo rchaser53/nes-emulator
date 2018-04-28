@@ -105,7 +105,6 @@ export class CPU {
     const upper = this.handler.readCPU(0xfffb)
     const lowwer = this.handler.readCPU(0xfffa)
     this.register.PC = (upper << 8) | lowwer
-    console.log(upper, lowwer, this.register.PC)
   }
 
   fetch(opecode: number): Order {
@@ -324,8 +323,9 @@ export class CPU {
   }
 
   setCompare(key: string, value: number): boolean {
-    const ret = this.register['A'] - value
+    const ret = this.register[key] - value
     this.register.P.Z = ret === 0
+    this.register.P.N = !!(ret & 0x80)
     return 0 <= ret
   }
 
