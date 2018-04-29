@@ -39,6 +39,14 @@ export interface VramAddressInfo {
   index: number
 }
 
+export interface SpliteInfo {
+  x: number,
+  y: number,
+  patternIndex: number,
+  attribute: number,
+  drawInfo: number[][]
+}
+
 const PPURegisterMap = {
   0: 'PPUCTRL',
   1: 'PPUMASK',
@@ -64,7 +72,6 @@ const ControlRegisterMap = {
 const LineLimit = 262
 const VBlankLine = 241;
 // const BoarderCycle = 341;
-// const DrawLine = 240;
 // const SpriteNumber = 100;
 
 const DefaultPPUCTRL: ControlRegister = {
@@ -160,6 +167,10 @@ export class PPU {
   }
 
   write(index: number, value: number) {
+    // if (index === 7 && value === 31) {
+      console.log(index, value)
+    // }
+    
     switch (PPURegisterMap[index]) {
       case 'PPUCTRL':
         this.writeBoolArrayRegister(value)
@@ -267,11 +278,13 @@ export class PPU {
       this.register.PPUSTATUS  &= 0x7F;
 
       return {
+        splites: this.buildSplites(),
         background: this.buildBackground()
       }
     }
 
     if (VBlankLine === this.line) {
+      // console.log(11)
       this.register.PPUSTATUS |= 0x80;
       if (this.register.PPUCTRL.isEnableNmi === true) {}
     }
@@ -292,13 +305,36 @@ export class PPU {
     }, 0)
   }
 
+  buildSplites() {
+    const splites: any[] = []
+    const inputRam: number[] = Array.from(this.spriteRam)
+    while (inputRam.length !== 0) {
+      splites.push(inputRam.splice(0, 4))
+    }
+    return splites.map(this.createSpliteInfo.bind(this));
+  }
+
   createSpliteInfo(splite: number[]): SpliteInfo {
+    const upperColorBits = (splite[2] >> 1) & 0b11
     return {
       x: splite[3],
       y: splite[0] + 1,
       patternIndex: splite[1],
       attribute: splite[2],
+      drawInfo: this.buildSplite(splite[1], upperColorBits),
     }
+  }
+
+  buildSplite(spliteIndex: number, upperColorBits: number) {
+    const splite = createSpliteInputs(this.characteSpliteData[spliteIndex])
+    return splite.map((elem) => {
+      return elem
+        .map((num) => {
+          const palleteIndex = (upperColorBits << 2) | num
+          return this.splitePallete[palleteIndex]
+        })
+        .reverse()
+    })
   }
 
   buildBackground() {
