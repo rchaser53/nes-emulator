@@ -172,6 +172,7 @@ export class PPU {
         break
       case 'OAMDATA':
         this.spriteRam[this.spriteRamAddr] = value
+        this.spriteRamAddr++
         break
       case 'PPUADDR':
         this.writeVRamAddress(value)
@@ -328,28 +329,6 @@ export class PPU {
 // NT RAM (external, in Control Deck)	  mostly $FF	            unchanged
 // CHR RAM (external, in Game Pak)	    unspecified pattern	    unchanged
 
-// OAMADDR: 0
-// OAMDATA: 0
-// PPUADDR: 0
-// PPUCTRL: OAMDATA: false
-// isBgBase: false
-// isEnableNmi: false
-// isLargeSplite: false
-// isSpliteBase: false
-// masterslabe: false
-// nameTableLowwer: false
-// nameTableUpper: false
-// ppuAddressIncrementMode: false
+// 描画されるべきスプライトのために、 スプライトテンポラリレジスタとスプライトバッファレジスタが8スプライト分だけ存在します。 あるラインにおいて次のラインで描画されるべきスプライトが見つかった場合、 スプライトテンポラリレジスタに保持されます。 スプライトの探索の後、 スプライトテンポラリレジスタに基づいてスプライトバッファレジスタにスプライトのパターンがフェッチされます。 このパターンデータが次のラインで描画されます。 またスプライト用レジスタの最初のスプライトはスプライト#0と呼ばれます。 このスプライトがBG上に描画されるピクセルにおいて、ヒットフラグがセットされます。 このヒットフラグの利用例として横スクロールゲームなどでは、 ヒットするまでは横スクロール値を0として点数やタイムなどの情報を描画し、 ヒットが検出されたら横スクロール値を設定してスクロールしたゲーム画面を描画しています。
 
-// PPUDATA: 0
-// PPUMASK:
-//   backgroundMask: false
-//   bgColorFlag0: false
-//   bgColorFlag1: false
-//   bgColorFlag2: false
-//   isBackgroundEnable: false
-//   isDisplayMono: false
-//   isSpliteEnable: false
-//   spliteMask: false
-// PPUSCROLL: 0
-// PPUSTATUS: 0
+
