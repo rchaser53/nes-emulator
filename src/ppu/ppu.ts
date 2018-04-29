@@ -292,6 +292,15 @@ export class PPU {
     }, 0)
   }
 
+  createSpliteInfo(splite: number[]): SpliteInfo {
+    return {
+      x: splite[3],
+      y: splite[0] + 1,
+      patternIndex: splite[1],
+      attribute: splite[2],
+    }
+  }
+
   buildBackground() {
     const targetTable = this.getTable('nameTable')
     const names: number[] = Array.from(this[targetTable])
