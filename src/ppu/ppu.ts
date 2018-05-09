@@ -69,6 +69,17 @@ const ControlRegisterMap = {
   7: 'nameTableLowwer'
 }
 
+const MaskRegisterMap = {
+  0: 'bgColorFlag2',
+  1: 'bgColorFlag1',
+  2: 'bgColorFlag0',
+  3: 'isSpliteEnable',
+  4: 'isBackgroundEnable',
+  5: 'spliteMask',
+  6: 'backgroundMask',
+  7: 'isDisplayMono'
+}
+
 const LineLimit = 262
 const VBlankLine = 241;
 // const BoarderCycle = 341;
@@ -173,10 +184,10 @@ export class PPU {
     
     switch (PPURegisterMap[index]) {
       case 'PPUCTRL':
-        this.writeBoolArrayRegister(value)
+        this.writeBoolArrayCtrlRegister(value)
         break
       case 'PPUMASK':
-        this.writeBoolArrayRegister(value)
+        this.writeBoolArrayMaskRegister(value)
         break
       case 'OAMADDR':
         this.spriteRamAddr = value
@@ -199,6 +210,18 @@ export class PPU {
       default:
         throw new Error(`should not come ${this}`)
     }
+  }
+
+  writeBoolArrayCtrlRegister(value: number) {
+    convertDecimalToBoolArray(value).forEach((bool, index) => {
+      this.register.PPUCTRL[ControlRegisterMap[index]] = bool
+    })
+  }
+
+  writeBoolArrayMaskRegister(value: number) {
+    convertDecimalToBoolArray(value).forEach((bool, index) => {
+      this.register.PPUMASK[MaskRegisterMap[index]] = bool
+    })
   }
 
   writePpuData(value: number) {
@@ -238,12 +261,6 @@ export class PPU {
       return { key: 'palleteMirror', index: address - 0x3f20 }
     }
     throw new Error(`address '${address}' is too big {address}`)
-  }
-
-  writeBoolArrayRegister(value: number) {
-    convertDecimalToBoolArray(value).forEach((bool, index) => {
-      this.register.PPUCTRL[ControlRegisterMap[index]] = bool
-    })
   }
 
   moveNextVramAddr() {
