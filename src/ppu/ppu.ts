@@ -339,12 +339,13 @@ export class PPU {
 
   createSpliteInfo(splite: number[]): SpliteInfo {
     const upperColorBits = (splite[2] >> 1) & 0b11
+    const patternIndex = splite[1] + this.offsetCharacteSpliteData
     return {
       x: splite[3],
       y: splite[0] + 1,
-      patternIndex: splite[1] + this.offsetCharacteSpliteData,
+      patternIndex,
       attribute: splite[2],
-      drawInfo: this.buildSplite(splite[1], upperColorBits),
+      drawInfo: this.buildSplite(patternIndex, upperColorBits),
     }
   }
 
