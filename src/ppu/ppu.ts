@@ -13,25 +13,25 @@ export interface PPURegister {
 }
 
 export interface ControlRegister {
-  isEnableNmi: boolean // false: 無効  true: 有効
-  masterslabe: true // 常時true
-  isLargeSplite: boolean // false: 8x8  true: 8x16
-  isBgBase: boolean // false: $0000  true: $1000
-  isSpliteBase: boolean // false: $0000  true: $1000
-  ppuAddressIncrementMode: boolean // false: +1, true: +32
-  nameTableUpper: boolean // 00(false, false): $2000, 01(false, true): $2400
   nameTableLowwer: boolean // 10(true, false): $2800, 11(true, true): $2C00
+  nameTableUpper: boolean // 00(false, false): $2000, 01(false, true): $2400
+  ppuAddressIncrementMode: boolean // false: +1, true: +32
+  isSpliteBase: boolean // false: $0000  true: $1000
+  isBgBase: boolean // false: $0000  true: $1000
+  isLargeSplite: boolean // false: 8x8  true: 8x16
+  masterslabe: true // 常時true
+  isEnableNmi: boolean // false: 無効  true: 有効
 }
 
 export interface MaskRegister {
+  isDisplayMono: boolean // ディスプレイタイプ　0:カラー、1:モノクロ
+  backgroundMask: boolean // 背景マスク、画面左8ピクセルを描画しない。0:描画しない、1:描画
+  spliteMask: boolean // スプライトマスク、画面左8ピクセルを描画しない。0:描画しない、1:描画
+  isBackgroundEnable: boolean // 背景有効　0:無効、1:有効
+  isSpliteEnable: boolean // スプライト有効　0:無効、1:有効
   bgColorFlag2: boolean // 背景色
   bgColorFlag1: boolean // 000:黒, 001:緑
   bgColorFlag0: boolean // 010:青, 100:赤
-  isSpliteEnable: boolean // スプライト有効　0:無効、1:有効
-  isBackgroundEnable: boolean // 背景有効　0:無効、1:有効
-  spliteMask: boolean // スプライトマスク、画面左8ピクセルを描画しない。0:描画しない、1:描画
-  backgroundMask: boolean // 背景マスク、画面左8ピクセルを描画しない。0:描画しない、1:描画
-  isDisplayMono: boolean // ディスプレイタイプ　0:カラー、1:モノクロ
 }
 
 export interface VramAddressInfo {
@@ -59,25 +59,25 @@ const PPURegisterMap = {
 }
 
 const ControlRegisterMap = {
-  0: 'isEnableNmi',
-  1: 'masterslabe',
-  2: 'isLargeSplite',
-  3: 'isBgBase',
-  4: 'OAMDATA',
-  5: 'ppuAddressIncrementMode',
-  6: 'nameTableUpper',
-  7: 'nameTableLowwer'
+  0: 'nameTableLowwer',
+  1: 'nameTableUpper',
+  2: 'ppuAddressIncrementMode',
+  3: 'isSpliteBase',
+  4: 'isBgBase',
+  5: 'isLargeSplite',
+  6: 'masterslabe',
+  7: 'isEnableNmi',
 }
 
 const MaskRegisterMap = {
-  0: 'bgColorFlag2',
-  1: 'bgColorFlag1',
-  2: 'bgColorFlag0',
-  3: 'isSpliteEnable',
-  4: 'isBackgroundEnable',
-  5: 'spliteMask',
-  6: 'backgroundMask',
-  7: 'isDisplayMono'
+  0: 'isDisplayMono',
+  1: 'backgroundMask',
+  2: 'spliteMask',
+  3: 'isBackgroundEnable',
+  4: 'isSpliteEnable',
+  5: 'bgColorFlag2',
+  6: 'bgColorFlag1',
+  7: 'bgColorFlag0',
 }
 
 const LineLimit = 262
@@ -331,12 +331,18 @@ export class PPU {
     return splites.map(this.createSpliteInfo.bind(this));
   }
 
+  get offsetCharacteSpliteData() {
+    return (this.register.PPUCTRL.isSpliteBase === true)
+              ? 0x1000 / 16
+              : 0
+  }
+
   createSpliteInfo(splite: number[]): SpliteInfo {
     const upperColorBits = (splite[2] >> 1) & 0b11
     return {
       x: splite[3],
       y: splite[0] + 1,
-      patternIndex: splite[1],
+      patternIndex: splite[1] + this.offsetCharacteSpliteData,
       attribute: splite[2],
       drawInfo: this.buildSplite(splite[1], upperColorBits),
     }
