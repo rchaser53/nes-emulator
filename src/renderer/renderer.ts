@@ -1,5 +1,7 @@
 import { colors } from './colors'
 
+import { SpliteInfo } from '../ppu/ppu'
+
 const CanvasIdSelector = '#nes'
 
 export class Renderer {
@@ -15,7 +17,12 @@ export class Renderer {
   }
 
   render(renderInput) {
-    renderInput.background.forEach((splite, spliteIndex) => {
+    this.renderBackground(renderInput.background);
+    this.renderSplite(renderInput.splites);
+  }
+
+  renderBackground(background) {
+    background.forEach((splite, spliteIndex) => {
       splite.forEach((row, rowIndex) => {
         row.forEach((pixel, pixelIndex) => {
           const red = colors[pixel][0]
@@ -28,6 +35,25 @@ export class Renderer {
           if (224 < y) {
             return
           }
+
+          this.ctx.fillRect(x, y, 1, 1)
+        })
+      })
+    })
+  }
+
+  renderSplite(splites) {
+    splites.forEach((splite: SpliteInfo, spliteIndex) => {
+      splite.drawInfo.forEach((row, rowIndex) => {
+        row.forEach((pixel, pixelIndex) => {
+          const red = colors[pixel][0]
+          const green = colors[pixel][1]
+          const blue = colors[pixel][2]
+
+          const x = pixelIndex + splite.x;
+          const y = rowIndex + splite.y;
+
+          this.ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`
 
           this.ctx.fillRect(x, y, 1, 1)
         })

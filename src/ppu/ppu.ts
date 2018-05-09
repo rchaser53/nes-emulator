@@ -301,7 +301,6 @@ export class PPU {
     }
 
     if (VBlankLine === this.line) {
-      // console.log(11)
       this.register.PPUSTATUS |= 0x80;
       if (this.register.PPUCTRL.isEnableNmi === true) {}
     }
