@@ -226,6 +226,15 @@ export class PPU {
 
   writePpuData(value: number) {
     const { key, index } = this.getTargetVram()
+    // Addresses $3F10/$3F14/$3F18/$3F1C are mirrors of $3F00/$3F04/$3F08/$3F0C
+    // Note that this goes for writing as well as reading
+    if (key === 'splitePallete') {
+      if ((index === 0x00) || (index === 0x04) || (index === 0x08) || (index === 0x0c)) {
+        this.backgroundPallete[index] = value
+        return
+      }
+    }
+
     this[key][index] = value
   }
 
@@ -354,6 +363,9 @@ export class PPU {
       return elem
         .map((num) => {
           const palleteIndex = (upperColorBits << 2) | num
+          if ((palleteIndex === 0x00) || (palleteIndex === 0x04) || (palleteIndex === 0x08) || (palleteIndex === 0x0c)) {
+            return this.backgroundPallete[palleteIndex]
+          }
           return this.splitePallete[palleteIndex]
         })
         .reverse()
@@ -375,8 +387,11 @@ export class PPU {
     return splite.map((elem) => {
       return elem
         .map((num) => {
-          const palleteIndex = (this.colorTileDefs0[row][column] << 2) | num
-          return this.backgroundPallete[palleteIndex]
+          const base = (this.colorTileDefs0[row][column] << 2) | num
+          const paletteIndex = (base === 0x04) || (base === 0x08) || (base === 0x0c)
+                                  ? 0x00
+                                  : base;
+          return this.backgroundPallete[paletteIndex]
         })
         .reverse()
     })
