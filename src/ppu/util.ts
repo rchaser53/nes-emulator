@@ -40,9 +40,9 @@ export const createSpriteInputs = (inputArray: number[]) => {
   })
 
   return front.reduce<number[][]>((stack, _, index) => {
-    const nums = createTwoBitTupple(front[index], back[index]).map((elem) => {
-      return elem.reduce((sum, elem) => {
-        sum += elem === true ? 1 : 0
+    const nums = createTwoBitTupple(back[index], front[index]).map((elem) => {
+      return elem.reduce((sum, elem, index) => {
+        sum += elem === true ? Math.pow(2, index) : 0
         return sum
       }, 0)
     })
