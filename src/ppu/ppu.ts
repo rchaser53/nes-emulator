@@ -80,6 +80,7 @@ const MaskRegisterMap = {
   7: 'bgColorFlag0',
 }
 
+const PreRenderLine = 8;
 const LineLimit = 262
 const VBlankLine = 241;
 // const BoarderCycle = 341;
@@ -350,7 +351,11 @@ export class PPU {
     const patternIndex = splite[1] + this.offsetCharacteSpliteData
     return {
       x: splite[3],
-      y: splite[0] + 1,
+      // Sprite evaluation does not happen on the pre-render scanline.
+      // Because evaluation applies to the next line's sprite rendering,
+      // no sprites will be rendered on the first scanline,
+      // and this is why there is a 1 line offset on a sprite's Y coordinate.
+      y: splite[0] - PreRenderLine,
       patternIndex,
       attribute: splite[2],
       drawInfo: this.buildSplite(patternIndex, upperColorBits),
