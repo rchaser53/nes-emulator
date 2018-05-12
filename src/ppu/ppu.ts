@@ -163,6 +163,12 @@ export class PPU {
     this.characteSpriteData = sprites
   }
 
+  get offsetCharacteSpriteData() {
+    return (this.register.PPUCTRL.isSpriteBase === true)
+              ? 0x1000 / 16
+              : 0
+  }
+
   read(index: number): number {
     switch (PPURegisterMap[index]) {
       case 'PPUSTATUS':
@@ -305,7 +311,7 @@ export class PPU {
       this.register.PPUSTATUS  &= 0x7F;
 
       return {
-        sprites: this.buildsprites(),
+        sprites: this.buildSprites(),
         background: this.buildBackground()
       }
     }
@@ -331,19 +337,13 @@ export class PPU {
     }, 0)
   }
 
-  buildsprites() {
+  buildSprites() {
     const sprites: any[] = []
     const inputRam: number[] = Array.from(this.spriteRam)
     while (inputRam.length !== 0) {
       sprites.push(inputRam.splice(0, 4))
     }
     return sprites.map(this.createSpriteInfo.bind(this));
-  }
-
-  get offsetCharacteSpriteData() {
-    return (this.register.PPUCTRL.isSpriteBase === true)
-              ? 0x1000 / 16
-              : 0
   }
 
   createSpriteInfo(sprite: number[]): SpriteInfo {
@@ -358,12 +358,13 @@ export class PPU {
       y: sprite[0] - PreRenderLine,
       patternIndex,
       attribute: sprite[2],
-      drawInfo: this.buildSprite(patternIndex, upperColorBits),
+      drawInfo: this.createSpliteDrawInfo(patternIndex, upperColorBits),
     }
   }
 
-  buildSprite(spriteIndex: number, upperColorBits: number) {
+  createSpliteDrawInfo(spriteIndex: number, upperColorBits: number) {
     const sprite = createSpriteInputs(this.characteSpriteData[spriteIndex])
+
     return sprite.map((elem) => {
       return elem
         .map((num) => {
@@ -381,11 +382,11 @@ export class PPU {
     const targetTable = this.getTable('nameTable')
     const names: number[] = Array.from(this[targetTable])
     return names.map((elem, index) => {
-      return this.createColorSprite(elem, index)
+      return this.createBackgroundSprite(elem, index)
     })
   }
 
-  createColorSprite(characterIndex: number, nameIndex: number) {
+  createBackgroundSprite(characterIndex: number, nameIndex: number) {
     const { row, column } = convertIndexToRowColumn(nameIndex)
     const sprite = createSpriteInputs(this.characteSpriteData[characterIndex])
 
