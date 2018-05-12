@@ -30,7 +30,7 @@ export const createTwoBitTupple = (front: boolean[], back: boolean[]): boolTuppl
   }, [])
 }
 
-export const createSpliteInputs = (inputArray: number[]) => {
+export const createSpriteInputs = (inputArray: number[]) => {
   const front = inputArray.slice(8, 16).map((num) => {
     return convertDecimalToBoolArray(num)
   })

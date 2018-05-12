@@ -1,4 +1,4 @@
-import { convertDecimalToBoolArray, convertIndexToRowColumn, createColorTileDef, createSpliteInputs } from './util'
+import { convertDecimalToBoolArray, convertIndexToRowColumn, createColorTileDef, createSpriteInputs } from './util'
 
 // 0x2000 - 0x2007
 export interface PPURegister {
@@ -16,9 +16,9 @@ export interface ControlRegister {
   nameTableLowwer: boolean // 10(true, false): $2800, 11(true, true): $2C00
   nameTableUpper: boolean // 00(false, false): $2000, 01(false, true): $2400
   ppuAddressIncrementMode: boolean // false: +1, true: +32
-  isSpliteBase: boolean // false: $0000  true: $1000
+  isSpriteBase: boolean // false: $0000  true: $1000
   isBgBase: boolean // false: $0000  true: $1000
-  isLargeSplite: boolean // false: 8x8  true: 8x16
+  isLargesprite: boolean // false: 8x8  true: 8x16
   masterslabe: true // 常時true
   isEnableNmi: boolean // false: 無効  true: 有効
 }
@@ -26,9 +26,9 @@ export interface ControlRegister {
 export interface MaskRegister {
   isDisplayMono: boolean // ディスプレイタイプ　0:カラー、1:モノクロ
   backgroundMask: boolean // 背景マスク、画面左8ピクセルを描画しない。0:描画しない、1:描画
-  spliteMask: boolean // スプライトマスク、画面左8ピクセルを描画しない。0:描画しない、1:描画
+  spriteMask: boolean // スプライトマスク、画面左8ピクセルを描画しない。0:描画しない、1:描画
   isBackgroundEnable: boolean // 背景有効　0:無効、1:有効
-  isSpliteEnable: boolean // スプライト有効　0:無効、1:有効
+  isSpriteEnable: boolean // スプライト有効　0:無効、1:有効
   bgColorFlag2: boolean // 背景色
   bgColorFlag1: boolean // 000:黒, 001:緑
   bgColorFlag0: boolean // 010:青, 100:赤
@@ -39,7 +39,7 @@ export interface VramAddressInfo {
   index: number
 }
 
-export interface SpliteInfo {
+export interface SpriteInfo {
   x: number,
   y: number,
   patternIndex: number,
@@ -62,9 +62,9 @@ const ControlRegisterMap = {
   0: 'nameTableLowwer',
   1: 'nameTableUpper',
   2: 'ppuAddressIncrementMode',
-  3: 'isSpliteBase',
+  3: 'isSpriteBase',
   4: 'isBgBase',
-  5: 'isLargeSplite',
+  5: 'isLargeSprite',
   6: 'masterslabe',
   7: 'isEnableNmi',
 }
@@ -72,9 +72,9 @@ const ControlRegisterMap = {
 const MaskRegisterMap = {
   0: 'isDisplayMono',
   1: 'backgroundMask',
-  2: 'spliteMask',
+  2: 'spriteMask',
   3: 'isBackgroundEnable',
-  4: 'isSpliteEnable',
+  4: 'isSpriteEnable',
   5: 'bgColorFlag2',
   6: 'bgColorFlag1',
   7: 'bgColorFlag0',
@@ -89,9 +89,9 @@ const VBlankLine = 241;
 const DefaultPPUCTRL: ControlRegister = {
   isEnableNmi: false,
   masterslabe: true,
-  isLargeSplite: false,
+  isLargesprite: false,
   isBgBase: false,
-  isSpliteBase: false,
+  isSpriteBase: false,
   ppuAddressIncrementMode: false,
   nameTableUpper: false,
   nameTableLowwer: false
@@ -101,9 +101,9 @@ const DefaultPPUMASK: MaskRegister = {
   bgColorFlag2: false,
   bgColorFlag1: false,
   bgColorFlag0: false,
-  isSpliteEnable: false,
+  isSpriteEnable: false,
   isBackgroundEnable: false,
-  spliteMask: false,
+  spriteMask: false,
   backgroundMask: false,
   isDisplayMono: false
 }
@@ -119,7 +119,7 @@ export class PPU {
   vRamBaffer: number = 0x00
   isVramAddrUpper: boolean = true
 
-  characteSpliteData: number[][]
+  characteSpriteData: number[][]
   spriteRam: Uint8Array = new Uint8Array(0x100)
 
   patternTable0: Uint8Array = new Uint8Array(0x1000) //  $0000～$0FFF
@@ -134,9 +134,9 @@ export class PPU {
   attributeTable3: Uint8Array = new Uint8Array(0x40) //  $2FC0～$2FFF
 
   nameAttributeMirror: Uint8Array = new Uint8Array(0xeff) //  $3000～$3EFF
-  backgroundPallete: Uint8Array = new Uint8Array(0x10) //  $3F00～$3F0F
-  splitePallete: Uint8Array = new Uint8Array(0x10) //  $3F10～$3F1F
-  palleteMirror: Uint8Array = new Uint8Array(0xd0) //  $3F20～$3FFF
+  backgroundPalette: Uint8Array = new Uint8Array(0x10) //  $3F00～$3F0F
+  spritePalette: Uint8Array = new Uint8Array(0x10) //  $3F10～$3F1F
+  paletteMirror: Uint8Array = new Uint8Array(0xd0) //  $3F20～$3FFF
 
   colorTileDefs0: number[][] = []
   colorTileDefs1: number[][] = []
@@ -155,12 +155,12 @@ export class PPU {
   }
 
   constructor(characterROM: any) {
-    const splites: any = []
+    const sprites: any = []
     const characterArray = Array.from(characterROM)
     while (characterArray.length !== 0) {
-      splites.push(characterArray.splice(0, 16))
+      sprites.push(characterArray.splice(0, 16))
     }
-    this.characteSpliteData = splites
+    this.characteSpriteData = sprites
   }
 
   read(index: number): number {
@@ -180,7 +180,7 @@ export class PPU {
 
   write(index: number, value: number) {
     // if (index === 7 && value === 31) {
-      console.log(index, value)
+      // console.log(index, value)
     // }
     
     switch (PPURegisterMap[index]) {
@@ -229,9 +229,9 @@ export class PPU {
     const { key, index } = this.getTargetVram()
     // Addresses $3F10/$3F14/$3F18/$3F1C are mirrors of $3F00/$3F04/$3F08/$3F0C
     // Note that this goes for writing as well as reading
-    if (key === 'splitePallete') {
+    if (key === 'spritePalette') {
       if ((index === 0x00) || (index === 0x04) || (index === 0x08) || (index === 0x0c)) {
-        this.backgroundPallete[index] = value
+        this.backgroundPalette[index] = value
         return
       }
     }
@@ -264,11 +264,11 @@ export class PPU {
     } else if (address < 0x3f00) {
       return { key: 'nameAttributeMirror', index: address - 0x3000 }
     } else if (address < 0x3f10) {
-      return { key: 'backgroundPallete', index: address - 0x3f00 }
+      return { key: 'backgroundPalette', index: address - 0x3f00 }
     } else if (address < 0x3f20) {
-      return { key: 'splitePallete', index: address - 0x3f10 }
+      return { key: 'spritePalette', index: address - 0x3f10 }
     } else if (address < 0x4000) {
-      return { key: 'palleteMirror', index: address - 0x3f20 }
+      return { key: 'paletteMirror', index: address - 0x3f20 }
     }
     throw new Error(`address '${address}' is too big {address}`)
   }
@@ -305,7 +305,7 @@ export class PPU {
       this.register.PPUSTATUS  &= 0x7F;
 
       return {
-        splites: this.buildSplites(),
+        sprites: this.buildsprites(),
         background: this.buildBackground()
       }
     }
@@ -331,47 +331,47 @@ export class PPU {
     }, 0)
   }
 
-  buildSplites() {
-    const splites: any[] = []
+  buildsprites() {
+    const sprites: any[] = []
     const inputRam: number[] = Array.from(this.spriteRam)
     while (inputRam.length !== 0) {
-      splites.push(inputRam.splice(0, 4))
+      sprites.push(inputRam.splice(0, 4))
     }
-    return splites.map(this.createSpliteInfo.bind(this));
+    return sprites.map(this.createSpriteInfo.bind(this));
   }
 
-  get offsetCharacteSpliteData() {
-    return (this.register.PPUCTRL.isSpliteBase === true)
+  get offsetCharacteSpriteData() {
+    return (this.register.PPUCTRL.isSpriteBase === true)
               ? 0x1000 / 16
               : 0
   }
 
-  createSpliteInfo(splite: number[]): SpliteInfo {
-    const upperColorBits = (splite[2] >> 1) & 0b11
-    const patternIndex = splite[1] + this.offsetCharacteSpliteData
+  createSpriteInfo(sprite: number[]): SpriteInfo {
+    const upperColorBits = (sprite[2] >> 1) & 0b11
+    const patternIndex = sprite[1] + this.offsetCharacteSpriteData
     return {
-      x: splite[3],
+      x: sprite[3],
       // Sprite evaluation does not happen on the pre-render scanline.
       // Because evaluation applies to the next line's sprite rendering,
       // no sprites will be rendered on the first scanline,
       // and this is why there is a 1 line offset on a sprite's Y coordinate.
-      y: splite[0] - PreRenderLine,
+      y: sprite[0] - PreRenderLine,
       patternIndex,
-      attribute: splite[2],
-      drawInfo: this.buildSplite(patternIndex, upperColorBits),
+      attribute: sprite[2],
+      drawInfo: this.buildSprite(patternIndex, upperColorBits),
     }
   }
 
-  buildSplite(spliteIndex: number, upperColorBits: number) {
-    const splite = createSpliteInputs(this.characteSpliteData[spliteIndex])
-    return splite.map((elem) => {
+  buildSprite(spriteIndex: number, upperColorBits: number) {
+    const sprite = createSpriteInputs(this.characteSpriteData[spriteIndex])
+    return sprite.map((elem) => {
       return elem
         .map((num) => {
-          const palleteIndex = (upperColorBits << 2) | num
-          if ((palleteIndex === 0x00) || (palleteIndex === 0x04) || (palleteIndex === 0x08) || (palleteIndex === 0x0c)) {
-            return this.backgroundPallete[palleteIndex]
+          const paletteIndex = (upperColorBits << 2) | num
+          if ((paletteIndex === 0x00) || (paletteIndex === 0x04) || (paletteIndex === 0x08) || (paletteIndex === 0x0c)) {
+            return this.backgroundPalette[paletteIndex]
           }
-          return this.splitePallete[palleteIndex]
+          return this.spritePalette[paletteIndex]
         })
         .reverse()
     })
@@ -381,22 +381,22 @@ export class PPU {
     const targetTable = this.getTable('nameTable')
     const names: number[] = Array.from(this[targetTable])
     return names.map((elem, index) => {
-      return this.createColorSplite(elem, index)
+      return this.createColorSprite(elem, index)
     })
   }
 
-  createColorSplite(characterIndex: number, nameIndex: number) {
+  createColorSprite(characterIndex: number, nameIndex: number) {
     const { row, column } = convertIndexToRowColumn(nameIndex)
-    const splite = createSpliteInputs(this.characteSpliteData[characterIndex])
+    const sprite = createSpriteInputs(this.characteSpriteData[characterIndex])
 
-    return splite.map((elem) => {
+    return sprite.map((elem) => {
       return elem
         .map((num) => {
           const base = (this.colorTileDefs0[row][column] << 2) | num
           const paletteIndex = (base === 0x04) || (base === 0x08) || (base === 0x0c)
                                   ? 0x00
                                   : base;
-          return this.backgroundPallete[paletteIndex]
+          return this.backgroundPalette[paletteIndex]
         })
         .reverse()
     })

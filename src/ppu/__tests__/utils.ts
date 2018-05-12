@@ -1,7 +1,7 @@
 import {
   convertDecimalToBoolArray,
   createTwoBitTupple,
-  createSpliteInputs,
+  createSpriteInputs,
   convertBoolArrayToDecimal,
   createColorTileDef,
   convertDecimalToTwoBit,
@@ -62,7 +62,7 @@ describe('PPU utils', () => {
     })
   })
 
-  describe('createSpliteInput', () => {
+  describe('createSpriteInput', () => {
     test('create number array array', async () => {
       const input = [60, 60, 126, 126, 255, 255, 255, 231, 56, 56, 108, 108, 198, 254, 198, 0]
       const expected = [
@@ -76,7 +76,7 @@ describe('PPU utils', () => {
         [1, 1, 1, 0, 0, 1, 1, 1]
       ]
 
-      expect(createSpliteInputs(input)).toEqual(expected)
+      expect(createSpriteInputs(input)).toEqual(expected)
     })
   })
 
