@@ -75,9 +75,9 @@ describe('CPU', () => {
     //   { key: 'D' }, { key: 'I' }, { key: 'Z' }, { key: 'C' }
     // ];
 
-    expect(cpu.convertRegisterToDecimal()).toEqual(0b00000100)
+    expect(cpu.convertRegisterToDecimal()).toEqual(0b00101100)
 
     cpu.register.P.Z = true
-    expect(cpu.convertRegisterToDecimal()).toEqual(0b01000100)
+    expect(cpu.convertRegisterToDecimal()).toEqual(0b01101100)
   })
 })
