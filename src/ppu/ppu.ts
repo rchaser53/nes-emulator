@@ -81,7 +81,7 @@ const MaskRegisterMap = {
 }
 
 const PreRenderLine = 8;
-const LineLimit = 262
+const LineLimit = 261
 const VBlankLine = 241;
 // const BoarderCycle = 341;
 // const SpriteNumber = 100;
@@ -185,10 +185,6 @@ export class PPU {
   }
 
   write(index: number, value: number) {
-    // if (index === 7 && value === 31) {
-      // console.log(index, value)
-    // }
-    
     switch (PPURegisterMap[index]) {
       case 'PPUCTRL':
         this.writeBoolArrayCtrlRegister(value)
@@ -308,7 +304,7 @@ export class PPU {
     if (this.line === LineLimit) {
       this.colorTileDefs0 = createColorTileDef(this.attributeTable0 as any)
       this.line = 0
-      this.register.PPUSTATUS  &= 0x7F;
+      this.register.PPUSTATUS ^= 0x80;
 
       return {
         sprites: this.buildSprites(),
@@ -316,7 +312,7 @@ export class PPU {
       }
     }
 
-    if (VBlankLine === this.line) {
+    if (this.line === VBlankLine) {
       this.register.PPUSTATUS |= 0x80;
       if (this.register.PPUCTRL.isEnableNmi === true) {}
     }
