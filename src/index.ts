@@ -1,7 +1,7 @@
 import { Nes } from './nes'
 
 // fetch('./static/hello.nes')
-fetch('./static/giko005.nes')
+fetch('./static/giko008.nes')
   .then((res) => res.arrayBuffer())
   .then((fileBuffer) => {
     const nes = new Nes(fileBuffer)
