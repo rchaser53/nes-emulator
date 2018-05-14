@@ -80,11 +80,19 @@ export const OpecodesMap: { [key: string]: Order} = {
   "f1": { opecode: 'SBC', data: 0x0044, address: 'Indirect,Y',  len: 2, cycle: 5 },        //  Indirect,Y    SBC ($44),Y   $F1   2   5 +1
 
   "88": { opecode: 'DEY', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       DEY           $88   1   2
-  "c6": { opecode: 'DEC', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 5  },         //  Zero Page     DEC $44       $C6   2   5
-  "e6": { opecode: 'INC', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 5 },         //  Zero Page     INC $44       $E6   2   5
+
+  "c6": { opecode: 'DEC', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 5 },          //  Zero Page     DEC $44       $C6   2   5
+  "d6": { opecode: 'DEC', data: 0x0044, address: 'ZeroPage,X', len: 2, cycle: 6 },        //  Zero Page,X   DEC $44,X     $D6   2   6
+  "ce": { opecode: 'DEC', data: 0x4400, address: 'Absolute', len: 3, cycle: 6 },          //  Absolute      DEC $4400     $CE   3   6
+  "de": { opecode: 'DEC', data: 0x4400, address: 'Absolute,X', len: 3, cycle: 6 },        //  Absolute,X    DEC $4400,X   $DE   3   6 +1
+
+  "e6": { opecode: 'INC', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 5 },          //  Zero Page     INC $44       $E6   2   5
+  "f6": { opecode: 'INC', data: 0x0044, address: 'ZeroPage,X', len: 2, cycle: 6 },        //  Zero Page,X   INC $44,X     $F6   2   6
+  "ee": { opecode: 'INC', data: 0x4400, address: 'Absolute', len: 3, cycle: 6 },          //  Absolute      INC $4400     $EE   3   6
+  "fe": { opecode: 'INC', data: 0x4400, address: 'Absolute,X', len: 3, cycle: 6 },        //  Absolute,X    INC $4400,X   $FE   3   6 +1
   
   "4c": { opecode: 'JMP', data: 0x5597, address: 'Absolute', len: 3, cycle: 3 },          //  Absolute      JMP $5597     $4C   3   3
-  "20": { opecode: 'JSR', data: 0x5597, address: 'Absolute', len: 3, cycle: 6  },         //  Absolute      JSR $5597     $20   3   6
+  "20": { opecode: 'JSR', data: 0x5597, address: 'Absolute', len: 3, cycle: 6 },          //  Absolute      JSR $5597     $20   3   6
 
   "c9": { opecode: 'CMP', data: 0x0044, address: 'Immediate', len: 2, cycle: 2 },         //  Immediate     CMP #$44      $C9   2   2
 
