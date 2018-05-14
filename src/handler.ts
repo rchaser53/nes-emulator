@@ -4,6 +4,8 @@ import { Logger } from './debug/logger'
 export class Handler {
   ppu: PPU
   workingMemory: Uint8Array
+  padMemory1: number = 0
+  padMemory2: number = 0
   programMemory: Uint8Array
   logger: Logger
 
@@ -21,6 +23,10 @@ export class Handler {
       this.ppu.write(address - 0x2000, value)
     } else if (address <= 0x3fff) {
       throw new Error(`${address} is used. need to search!`)
+    } else if (address === 0x4016) {
+      this.padMemory1 = value;
+    } else if (address === 0x4017) {
+      this.padMemory2 = value;
     } else if (address <= 0x5fff) {
       this.logger.error(address, 'extra ram')
     } else if (address <= 0x7fff) {
@@ -37,6 +43,10 @@ export class Handler {
       return this.ppu.read(address - 0x2000)
     } else if (address <= 0x3fff) {
       throw new Error(`${address} is used. need to search!`)
+    } else if (address === 0x4016) {
+      return this.padMemory1;
+    } else if (address === 0x4017) {
+      return this.padMemory2;
     } else if (address <= 0x5fff) {
       throw new Error(`${address} is used. need to search!`)
     } else if (address <= 0x7fff) {

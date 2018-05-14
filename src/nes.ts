@@ -2,6 +2,7 @@
 // http://wiki.nesdev.com/w/index.php/Init_code
 import { CPU } from './cpu/cpu'
 import { PPU } from './ppu/ppu'
+import { Pad } from './pad/pad'
 import { Logger } from './debug/logger'
 import { Handler } from './handler'
 import { Renderer } from './renderer/renderer'
@@ -16,6 +17,7 @@ const IsDebug = false
 export class Nes {
   cpu: CPU
   ppu: PPU
+  pad: Pad
   logger: Logger
   programROM: Uint8Array
   characterROM: Uint8Array
@@ -29,6 +31,7 @@ export class Nes {
     const handler = new Handler(this.ppu, this.programROM, this.logger)
     this.cpu = new CPU(handler, this.logger)
     this.cpu.reset()
+    this.pad = new Pad(handler);
     this.renderer = new Renderer()
   }
 
