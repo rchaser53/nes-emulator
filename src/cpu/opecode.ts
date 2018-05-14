@@ -20,6 +20,24 @@ export const OpecodesMap: { [key: string]: Order} = {
   "b9": { opecode: 'LDA', data: 0x4400, address: 'Absolute,Y', len: 3, cycle: 4 },        //  Absolute,Y    LDA $4400,Y   $B9   3   4 +1
   "ad": { opecode: 'LDA', data: 0x4400, address: 'Absolute',   len: 3, cycle: 4 },        //  Absolute      LDA $4400     $AD   3   4
 
+  "29": { opecode: 'AND', data: 0x44, address: 'Immediate',   len: 2, cycle: 2 },         //  Immediate     AND #$44      $29   2   2
+  "25": { opecode: 'AND', data: 0x44, address: 'ZeroPage',    len: 2, cycle: 3 },         //  Zero Page     AND $44       $25   2   3
+  "35": { opecode: 'AND', data: 0x44, address: 'ZeroPage,X',  len: 2, cycle: 4 },         //  Zero Page,X   AND $44,X     $35   2   4
+  "2D": { opecode: 'AND', data: 0x4400, address: 'Absolute',  len: 3, cycle: 4 },         //  Absolute      AND $4400     $2D   3   4
+  "3D": { opecode: 'AND', data: 0x4400, address: 'Absolute,X',len: 3, cycle: 4 },         //  Absolute,X    AND $4400,X   $3D   3   4 +1
+  "39": { opecode: 'AND', data: 0x4400, address: 'Absolute,Y',len: 3, cycle: 4 },         //  Absolute,Y    AND $4400,Y   $39   3   4 +1
+  "21": { opecode: 'AND', data: 0x44, address: 'Indirect,X',  len: 2, cycle: 6 },         //  Indirect,X    AND ($44,X)   $21   2   6
+  "31": { opecode: 'AND', data: 0x44, address: 'Indirect,Y',  len: 2, cycle: 5 },         //  Indirect,Y    AND ($44),Y   $31   2   5 +1
+
+  "9": { opecode: 'ORA', data: 0x44, address: 'Immediate',    len: 2, cycle: 2 },         //  Immediate     ORA #$44      $09   2   2
+  "5": { opecode: 'ORA', data: 0x44, address: 'ZeroPage',   len: 2, cycle: 6 },           //  Zero Page     ORA $44       $05   2   3
+  "15": { opecode: 'ORA', data: 0x44, address: 'ZeroPage,X',   len: 2, cycle: 4 },        //  Zero Page,X   ORA $44,X     $15   2   4
+  "d": { opecode: 'ORA', data: 0x4400, address: 'Absolute',   len: 3, cycle: 4 },         //  Absolute      ORA $4400     $0D   3   4
+  "1d": { opecode: 'ORA', data: 0x4400, address: 'Absolute,X',   len: 3, cycle: 4 },      //  Absolute,X    ORA $4400,X   $1D   3   4 +1
+  "19": { opecode: 'ORA', data: 0x4400, address: 'Absolute,Y',   len: 3, cycle: 4 },      //  Absolute,Y    ORA $4400,Y   $19   3   4 +1
+  "1": { opecode: 'ORA', data: 0x44, address: 'Indirect,X',   len: 2, cycle: 6 },         //  Indirect,X    ORA ($44,X)   $01   2   6
+  "11": { opecode: 'ORA', data: 0x44, address: 'Indirect,Y',   len: 2, cycle: 5 },        //  Indirect,Y    ORA ($44),Y   $11   2   5 +1
+
   "a2": { opecode: 'LDX', data: 0x0044, address: 'Immediate', len: 2, cycle: 2  },        //  Immediate     LDX #$44      $A2   2   2
   "a6": { opecode: 'LDX', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 3 },          //  Zero Page     LDX $44       $A6   2   3
   "a0": { opecode: 'LDY', data: 0x0044, address: 'Immediate', len: 2, cycle: 2  },        //  Immediate     LDY #$44      $A0   2   2
