@@ -238,6 +238,14 @@ export class CPU {
         this.addRegister('A', this.handler.readCPU(this.executeDataByAddress(order.address)))
         break
 
+      case 'AND':
+        this.addRegister('A', this.handler.readCPU(this.executeDataByAddress(order.address)) & this.register.A)
+        break
+
+      case 'ORA':
+        this.addRegister('A', this.handler.readCPU(this.executeDataByAddress(order.address)) | this.register.A)
+        break
+
       case 'SBC':
         this.substractRegister('A', this.handler.readCPU(this.executeDataByAddress(order.address)))
         break
