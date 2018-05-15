@@ -4,8 +4,9 @@ import { Logger } from './debug/logger'
 export class Handler {
   ppu: PPU
   workingMemory: Uint8Array
-  padMemory1: number = 0
+  padMemory1: number[] = [0, 0, 0, 0, 0, 0, 0, 0]
   padMemory2: number = 0
+  padIndex = 0
   programMemory: Uint8Array
   logger: Logger
 
@@ -16,7 +17,7 @@ export class Handler {
     this.logger = logger || new Logger(false)
   }
 
-  writeCPU(address: number, value: number) {
+  writeCPU(address: number, value: any) {
     if (address <= 0x1fff) {
       this.workingMemory[address] = value
     } else if (address <= 0x2007) {
@@ -24,7 +25,12 @@ export class Handler {
     } else if (address <= 0x3fff) {
       throw new Error(`${address} is used. need to search!`)
     } else if (address === 0x4016) {
-      this.padMemory1 = value;
+      if (Array.isArray(value) === true) {
+        this.padMemory1 = value
+      } else {
+        this.padIndex = 0;
+      }
+
     } else if (address === 0x4017) {
       this.padMemory2 = value;
     } else if (address <= 0x5fff) {
@@ -44,7 +50,11 @@ export class Handler {
     } else if (address <= 0x3fff) {
       throw new Error(`${address} is used. need to search!`)
     } else if (address === 0x4016) {
-      return this.padMemory1;
+      const value = this.padMemory1[this.padIndex];
+      this.padIndex = (this.padIndex === 7)
+                        ? 0
+                        : this.padIndex + 1;
+      return value;
     } else if (address === 0x4017) {
       return this.padMemory2;
     } else if (address <= 0x5fff) {
