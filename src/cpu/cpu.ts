@@ -239,11 +239,15 @@ export class CPU {
         break
 
       case 'AND':
-        this.addRegister('A', this.handler.readCPU(this.executeDataByAddress(order.address)) & this.register.A)
+        this.logicalOperation('A', this.handler.readCPU(this.executeDataByAddress(order.address)) & this.register.A);
         break
 
       case 'ORA':
-        this.addRegister('A', this.handler.readCPU(this.executeDataByAddress(order.address)) | this.register.A)
+        this.logicalOperation('A', this.handler.readCPU(this.executeDataByAddress(order.address)) | this.register.A);
+        break
+
+      case 'EOR':
+        this.logicalOperation('A', this.register.A ^ this.handler.readCPU(this.executeDataByAddress(order.address)))
         break
 
       case 'SBC':
@@ -268,10 +272,6 @@ export class CPU {
 
       case 'RTS':
         this.register.PC = this.returnCaller()
-        break
-
-      case 'EOR':
-        this.insertRegister('A', this.register.A ^ this.handler.readCPU(this.executeDataByAddress(order.address)))
         break
 
       case 'JMP':
@@ -355,6 +355,12 @@ export class CPU {
     if (register === condition) {
       this.register.PC = nextPC
     }
+  }
+
+  logicalOperation(key: string, value: number) {
+    this.register.P.N = !!(value & 0x80)
+    this.register.P.Z = (value === 0)
+    this.register[key] = value
   }
 
   insertRegister(registerKey: string, value: number) {
