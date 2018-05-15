@@ -11,64 +11,68 @@ export class Pad {
   addPadDown() {
     document.addEventListener('keydown', (event) => {
       const currentValue = this.handler.readCPU(0x4016);
+      let value = 0b0;
       switch (event.keyCode) {
         case 90:      // A button(z)
-          this.handler.writeCPU(0x4016, currentValue | 0x0)
+        value = (currentValue | 0b00000001)
           break;
         case 88:      // B button(x)
-          this.handler.writeCPU(0x4016, currentValue | 0x1)
+        value = (currentValue | 0b00000010)
           break;
         case 67:      // select(c)
-          this.handler.writeCPU(0x4016, currentValue | 0x2)
+        value = (currentValue | 0b00000100)
           break;
         case 86:      // start(v)
-          this.handler.writeCPU(0x4016, currentValue | 0x3)
+        value = (currentValue | 0b00001000)
           break;
         case 38:      // up
-          this.handler.writeCPU(0x4016, currentValue | 0x4)
+        value = (currentValue | 0b00010000)
           break;
         case 40:      // down
-          this.handler.writeCPU(0x4016, currentValue | 0x5)
+        value = (currentValue | 0b00100000)
           break;
         case 37:      // left
-          this.handler.writeCPU(0x4016, currentValue | 0x6)
+        value = (currentValue | 0b01000000)
           break;
         case 39:      // right
-          this.handler.writeCPU(0x4016, currentValue | 0x7)
+        value = (currentValue | 0b10000000)
           break;
       }
+      this.handler.writeCPU(0x4016, value)
     });
   }
 
   addPadUp() {
     document.addEventListener('keyup', (event) => {
       const currentValue = this.handler.readCPU(0x4016);
+      let value = 0b0;
       switch (event.keyCode) {
         case 90:      // A button(z)
-          this.handler.writeCPU(0x4016, currentValue ^ 0x0)
+        value = (currentValue ^ 0b00000001)
           break;
         case 88:      // B button(x)
-          this.handler.writeCPU(0x4016, currentValue ^ 0x1)
+        value = (currentValue ^ 0b00000010)
           break;
         case 67:      // select(c)
-          this.handler.writeCPU(0x4016, currentValue ^ 0x2)
+        value = (currentValue ^ 0b00000100)
           break;
         case 86:      // start(v)
-          this.handler.writeCPU(0x4016, currentValue ^ 0x3)
+        value = (currentValue ^ 0b00001000)
           break;
         case 38:      // up
-          this.handler.writeCPU(0x4016, currentValue ^ 0x4)
+        value = (currentValue ^ 0b00010000)
           break;
         case 40:      // down
-          this.handler.writeCPU(0x4016, currentValue ^ 0x5)
+        value = (currentValue ^ 0b00100000)
           break;
         case 37:      // left
-          this.handler.writeCPU(0x4016, currentValue ^ 0x6)
+        value = (currentValue ^ 0b01000000)
           break;
         case 39:      // right
-          this.handler.writeCPU(0x4016, currentValue ^ 0x7)
+        value = (currentValue ^ 0b10000000)
           break;
       }
+      this.handler.writeCPU(0x4016, value)
     });
   }
 }
