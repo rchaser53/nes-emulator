@@ -10,32 +10,31 @@ export class Pad {
 
   addPadDown() {
     document.addEventListener('keydown', (event) => {
-      const currentValue = this.handler.readCPU(0x4016);
-      let value = 0b0;
+      let value = [0, 0, 0, 0, 0, 0, 0, 0];
       switch (event.keyCode) {
         case 90:      // A button(z)
-        value = (currentValue | 0b00000001)
+        value[0] = 1;
           break;
         case 88:      // B button(x)
-        value = (currentValue | 0b00000010)
+        value[1] = 1;
           break;
         case 67:      // select(c)
-        value = (currentValue | 0b00000100)
+        value[2] = 1;
           break;
         case 86:      // start(v)
-        value = (currentValue | 0b00001000)
+        value[3] = 1;
           break;
         case 38:      // up
-        value = (currentValue | 0b00010000)
+        value[4] = 1;
           break;
         case 40:      // down
-        value = (currentValue | 0b00100000)
+        value[5] = 1;
           break;
         case 37:      // left
-        value = (currentValue | 0b01000000)
+        value[6] = 1;
           break;
         case 39:      // right
-        value = (currentValue | 0b10000000)
+        value[7] = 1;
           break;
       }
       this.handler.writeCPU(0x4016, value)
@@ -44,32 +43,31 @@ export class Pad {
 
   addPadUp() {
     document.addEventListener('keyup', (event) => {
-      const currentValue = this.handler.readCPU(0x4016);
-      let value = 0b0;
+      let value = [0, 0, 0, 0, 0, 0, 0, 0];
       switch (event.keyCode) {
         case 90:      // A button(z)
-        value = (currentValue ^ 0b00000001)
+        value[0] = 0;
           break;
         case 88:      // B button(x)
-        value = (currentValue ^ 0b00000010)
+        value[1] = 0;
           break;
         case 67:      // select(c)
-        value = (currentValue ^ 0b00000100)
+        value[2] = 0;
           break;
         case 86:      // start(v)
-        value = (currentValue ^ 0b00001000)
+        value[3] = 0;
           break;
         case 38:      // up
-        value = (currentValue ^ 0b00010000)
+        value[4] = 0;
           break;
         case 40:      // down
-        value = (currentValue ^ 0b00100000)
+        value[5] = 0;
           break;
         case 37:      // left
-        value = (currentValue ^ 0b01000000)
+        value[6] = 0;
           break;
         case 39:      // right
-        value = (currentValue ^ 0b10000000)
+        value[7] = 0;
           break;
       }
       this.handler.writeCPU(0x4016, value)
