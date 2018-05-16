@@ -36,6 +36,7 @@ export interface MaskRegister {
 
 export interface VramAddressInfo {
   key: string
+  address: number
   index: number
 }
 
@@ -122,26 +123,31 @@ export class PPU {
   characteSpriteData: number[][]
   spriteRam: Uint8Array = new Uint8Array(0x100)
 
-  patternTable0: Uint8Array = new Uint8Array(0x1000) //  $0000～$0FFF
-  patternTable1: Uint8Array = new Uint8Array(0x1000) //  $1000～$1FFF
-  nameTable0: Uint8Array = new Uint8Array(0x3c0) //  $2000～$23BF
-  attributeTable0: Uint8Array = new Uint8Array(0x40) //  $23C0～$23FF
-  nameTable1: Uint8Array = new Uint8Array(0x3c0) //  $2400～$27BF
-  attributeTable1: Uint8Array = new Uint8Array(0x40) //  $27C0～$27FF
-  nameTable2: Uint8Array = new Uint8Array(0x3c0) //  $2800～$2BBF
-  attributeTable2: Uint8Array = new Uint8Array(0x40) //  $2BC0～$2BFF
-  nameTable3: Uint8Array = new Uint8Array(0x3c0) //  $2C00～$2FBF
-  attributeTable3: Uint8Array = new Uint8Array(0x40) //  $2FC0～$2FFF
+  patternTables: Uint8Array[] = [
+    new Uint8Array(0x1000),
+    new Uint8Array(0x1000)
+  ];
+
+  nameTables: Uint8Array[] = [
+    new Uint8Array(0x3c0),
+    new Uint8Array(0x3c0),
+    new Uint8Array(0x3c0),
+    new Uint8Array(0x3c0)
+  ];
+
+  attributeTables: Uint8Array[] = [
+    new Uint8Array(0x40),
+    new Uint8Array(0x40),
+    new Uint8Array(0x40),
+    new Uint8Array(0x40)
+  ];
 
   nameAttributeMirror: Uint8Array = new Uint8Array(0xeff) //  $3000～$3EFF
   backgroundPalette: Uint8Array = new Uint8Array(0x10) //  $3F00～$3F0F
   spritePalette: Uint8Array = new Uint8Array(0x10) //  $3F10～$3F1F
   paletteMirror: Uint8Array = new Uint8Array(0xd0) //  $3F20～$3FFF
 
-  colorTileDefs0: number[][] = []
-  colorTileDefs1: number[][] = []
-  colorTileDefs2: number[][] = []
-  colorTileDefs3: number[][] = []
+  colorTileBuffer: number[][] = []
 
   register: PPURegister = {
     PPUCTRL: DefaultPPUCTRL,
@@ -174,8 +180,18 @@ export class PPU {
       case 'PPUSTATUS':
         return this.register.PPUSTATUS
       case 'PPUDATA':
-        const { key, index } = this.getTargetVram()
-        const ret = this[key][index]
+        let ret;
+        const { key, address, index } = this.getTargetVram()
+        switch (key) {
+          case 'patternTables':
+          case 'nameTables':
+          case 'attributeTables':
+            ret = this[key][index][address]
+            break;
+          default:
+            ret = this[key][address]
+            break;
+        }
         this.moveNextVramAddr()
         return ret
       default:
@@ -228,49 +244,58 @@ export class PPU {
   }
 
   writePpuData(value: number) {
-    const { key, index } = this.getTargetVram()
+    const { key, address, index } = this.getTargetVram()
     // Addresses $3F10/$3F14/$3F18/$3F1C are mirrors of $3F00/$3F04/$3F08/$3F0C
     // Note that this goes for writing as well as reading
     if (key === 'spritePalette') {
-      if ((index === 0x00) || (index === 0x04) || (index === 0x08) || (index === 0x0c)) {
-        this.backgroundPalette[index] = value
+      if ((address === 0x00) || (address === 0x04) || (address === 0x08) || (address === 0x0c)) {
+        this.backgroundPalette[address] = value
         return
       }
     }
 
-    this[key][index] = value
+    switch (key) {
+      case 'patternTables':
+      case 'nameTables':
+      case 'attributeTables':
+        this[key][index][address] = value
+        break;
+      default:
+        this[key][address] = value
+        break;
+    }
   }
 
   getTargetVram(): VramAddressInfo {
     const address = this.vRamAddr
     if (address < 0x1000) {
-      return { key: 'patternTable0', index: address }
+      return { key: 'patternTables', index: 0, address }
     } else if (address < 0x2000) {
-      return { key: 'patternTable1', index: address - 0x1000 }
+      return { key: 'patternTables', index: 1, address: address - 0x1000 }
     } else if (address < 0x23c0) {
-      return { key: 'nameTable0', index: address - 0x2000 }
+      return { key: 'nameTables', index: 0, address: address - 0x2000 }
     } else if (address < 0x2400) {
-      return { key: 'attributeTable0', index: address - 0x23c0 }
+      return { key: 'attributeTables', index: 0, address: address - 0x23c0 }
     } else if (address < 0x27c0) {
-      return { key: 'nameTable1', index: address - 0x2400 }
+      return { key: 'nameTables', index: 1, address: address - 0x2400 }
     } else if (address < 0x2800) {
-      return { key: 'attributeTable1', index: address - 0x27c0 }
+      return { key: 'attributeTables', index: 1, address: address - 0x27c0 }
     } else if (address < 0x2bc0) {
-      return { key: 'nameTable2', index: address - 0x2800 }
+      return { key: 'nameTables', index: 2, address: address - 0x2800 }
     } else if (address < 0x2c00) {
-      return { key: 'attributeTable2', index: address - 0x2bc0 }
+      return { key: 'attributeTables', index: 2, address: address - 0x2bc0 }
     } else if (address < 0x2fc0) {
-      return { key: 'nameTable3', index: address - 0x2c00 }
+      return { key: 'nameTables', index: 3, address: address - 0x2c00 }
     } else if (address < 0x3000) {
-      return { key: 'attributeTable3', index: address - 0x2fc0 }
+      return { key: 'attributeTables', index: 3, address: address - 0x2fc0 }
     } else if (address < 0x3f00) {
-      return { key: 'nameAttributeMirror', index: address - 0x3000 }
+      return { key: 'nameAttributeMirror', index: 0, address: address - 0x3000 }
     } else if (address < 0x3f10) {
-      return { key: 'backgroundPalette', index: address - 0x3f00 }
+      return { key: 'backgroundPalette', index: 0, address: address - 0x3f00 }
     } else if (address < 0x3f20) {
-      return { key: 'spritePalette', index: address - 0x3f10 }
+      return { key: 'spritePalette', index: 0, address: address - 0x3f10 }
     } else if (address < 0x4000) {
-      return { key: 'paletteMirror', index: address - 0x3f20 }
+      return { key: 'paletteMirror', index: 0, address: address - 0x3f20 }
     }
     throw new Error(`address '${address}' is too big {address}`)
   }
@@ -297,12 +322,26 @@ export class PPU {
     return base
   }
 
+  get currentAttributeTable() {
+    const { nameTableUpper, nameTableLowwer } = this.register.PPUCTRL;
+    let index = (nameTableUpper === true) ? 2 : 0;
+    index += (nameTableLowwer === true) ? 1: 0;
+    return Array.from(this.attributeTables[index]);
+  }
+
+  get currentNameTable() {
+    const { nameTableUpper, nameTableLowwer } = this.register.PPUCTRL;
+    let index = (nameTableUpper === true) ? 2 : 0;
+    index += (nameTableLowwer === true) ? 1: 0;
+    return Array.from(this.nameTables[index]);
+  }
+  
   run(cycle: number) {
     this.cycle += cycle
     this.line++
 
     if (this.line === LineLimit) {
-      this.colorTileDefs0 = createColorTileDef(this.attributeTable0 as any)
+      this.colorTileBuffer = createColorTileDef(this.currentAttributeTable)
       this.line = 0
       this.register.PPUSTATUS ^= 0x80;
 
@@ -375,9 +414,7 @@ export class PPU {
   }
 
   buildBackground() {
-    const targetTable = this.getTable('nameTable')
-    const names: number[] = Array.from(this[targetTable])
-    return names.map((elem, index) => {
+    return this.currentNameTable.map((elem, index) => {
       return this.createBackgroundSprite(elem, index)
     })
   }
@@ -389,7 +426,7 @@ export class PPU {
     return sprite.map((elem) => {
       return elem
         .map((num) => {
-          const base = (this.colorTileDefs0[row][column] << 2) | num
+          const base = (this.colorTileBuffer[row][column] << 2) | num
           const paletteIndex = (base === 0x04) || (base === 0x08) || (base === 0x0c)
                                   ? 0x00
                                   : base;
