@@ -186,32 +186,12 @@ export class CPU {
         this.register.P.C = true
         break
 
-      case 'LDA':
-        this.insertRegister('A', this.handler.readCPU(this.executeDataByAddress(order.address)))
-        break
-
-      case 'LDX':
-        this.insertRegister('X', this.handler.readCPU(this.executeDataByAddress(order.address)))
-        break
-
-      case 'LDY':
-        this.insertRegister('Y', this.handler.readCPU(this.executeDataByAddress(order.address)))
-        break
-
       case 'TXS':
         this.insertRegister('S', this.register.X + 0x0100)
         break
 
       case 'TYA':
         this.insertRegister('A', this.register.Y)
-        break
-
-      case 'STA':
-        this.handler.writeCPU(this.executeDataByAddress(order.address), this.register.A)
-        break
-
-      case 'STX':
-        this.handler.writeCPU(this.executeDataByAddress(order.address), this.register.X)
         break
 
       case 'BNE':
@@ -234,26 +214,6 @@ export class CPU {
         this.branchPC(this.register.P.C, false, order.address)
         break
 
-      case 'ADC':
-        this.addRegister('A', this.handler.readCPU(this.executeDataByAddress(order.address)))
-        break
-
-      case 'AND':
-        this.logicalOperation('A', this.handler.readCPU(this.executeDataByAddress(order.address)) & this.register.A);
-        break
-
-      case 'ORA':
-        this.logicalOperation('A', this.handler.readCPU(this.executeDataByAddress(order.address)) | this.register.A);
-        break
-
-      case 'EOR':
-        this.logicalOperation('A', this.register.A ^ this.handler.readCPU(this.executeDataByAddress(order.address)))
-        break
-
-      case 'SBC':
-        this.substractRegister('A', this.handler.readCPU(this.executeDataByAddress(order.address)))
-        break
-
       case 'DEC':
         this.addMemoryData(order.address, -1)
         break
@@ -274,22 +234,6 @@ export class CPU {
         this.register.PC = this.returnCaller()
         break
 
-      case 'JMP':
-        this.register.PC = this.executeDataByAddress(order.address)
-        break
-
-      case 'JSR':
-        this.register.PC = this.goToSubroutine(order.address)
-        break
-
-      case 'CMP':
-        this.register.P.C = this.setCompare('A', this.handler.readCPU(this.executeDataByAddress(order.address)))
-        break
-
-      case 'CPX':
-        this.register.P.C = this.setCompare('X', this.handler.readCPU(this.executeDataByAddress(order.address)))
-        break
-
       case 'TAY':
         this.insertRegister('Y', this.register.A)
         break
@@ -302,8 +246,72 @@ export class CPU {
         // this order is no mean
         break
 
+      case 'JSR':
+        this.register.PC = this.goToSubroutine(order.address)
+        break
+
       default:
-        throw new Error(`${JSON.stringify(order)} is not implemented!`)
+        this.executeOpeCodeWithAddress(order)
+    }
+  }
+
+  executeOpeCodeWithAddress(order) {
+    const address = this.executeDataByAddress(order.address)
+    switch (order.opecode) {
+      case 'STA':
+      this.handler.writeCPU(address, this.register.A)
+      break
+
+    case 'STX':
+      this.handler.writeCPU(address, this.register.X)
+      break
+
+    case 'ADC':
+      this.addRegister('A', this.handler.readCPU(address))
+      break
+
+    case 'AND':
+      this.logicalOperation('A', this.handler.readCPU(address) & this.register.A);
+      break
+
+    case 'ORA':
+      this.logicalOperation('A', this.handler.readCPU(address) | this.register.A);
+      break
+
+    case 'EOR':
+      this.logicalOperation('A', this.register.A ^ this.handler.readCPU(address))
+      break
+
+    case 'SBC':
+      this.substractRegister('A', this.handler.readCPU(address))
+      break
+
+    case 'LDA':
+      this.insertRegister('A', this.handler.readCPU(address))
+      break
+
+    case 'LDX':
+      this.insertRegister('X', this.handler.readCPU(address))
+      break
+
+    case 'LDY':
+      this.insertRegister('Y', this.handler.readCPU(address))
+      break
+
+    case 'JMP':
+      this.register.PC = address
+      break
+
+    case 'CMP':
+      this.register.P.C = this.setCompare('A', this.handler.readCPU(address))
+      break
+
+    case 'CPX':
+      this.register.P.C = this.setCompare('X', this.handler.readCPU(address))
+      break
+
+    default:
+      throw new Error(`${JSON.stringify(order)} is not implemented!`)
     }
   }
 
