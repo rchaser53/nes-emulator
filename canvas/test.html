@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+  <head>
+
+  </head>
+  <body>
+    <canvas id="nes" width="256" height="224"></canvas>
+    <script>
+      window.onload = () => {
+        const canvas = document.querySelector('#nes');
+        const ctx = canvas.getContext('2d');
+        const image = ctx.createImageData(256, 224);
+        for (let i=0; i< image.data.length; i++) {
+          image.data[i] = i % 255;
+        }
+        ctx.putImageData(image, 0, 0);
+
+        
+      }
+    </script>
+  </body>
+</html>
