@@ -6,6 +6,7 @@ const CanvasIdSelector = '#nes'
 
 export class Renderer {
   ctx
+  image
 
   constructor() {
     this.createCanvas()
@@ -14,29 +15,30 @@ export class Renderer {
   createCanvas() {
     const canvas = window.document.querySelector(CanvasIdSelector) as HTMLCanvasElement
     this.ctx = canvas.getContext('2d')
+    this.image = this.ctx.createImageData(256, 224);
   }
 
   render(renderInput) {
-    this.renderBackground(renderInput.background);
-    this.renderSprite(renderInput.sprites);
+    this.renderBackground(renderInput.background)
+    this.renderSprite(renderInput.sprites)
+
+    this.ctx.putImageData(this.image, 0, 0)
   }
 
   renderBackground(background) {
     background.forEach((sprite, spriteIndex) => {
       sprite.forEach((row, rowIndex) => {
         row.forEach((pixel, pixelIndex) => {
-          const red = colors[pixel][0]
-          const green = colors[pixel][1]
-          const blue = colors[pixel][2]
-
           const { x, y } = this.culculateXandY(spriteIndex, rowIndex, pixelIndex)
-          this.ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`
+          const baseIndex = (x * 4) + (y * 4 * 256)
+          this.image.data[baseIndex] = colors[pixel][0]
+          this.image.data[baseIndex + 1] = colors[pixel][1]
+          this.image.data[baseIndex + 2] = colors[pixel][2]
+          this.image.data[baseIndex + 3] = 0xff;
 
           if (224 < y) {
             return
           }
-
-          this.ctx.fillRect(x, y, 1, 1)
         })
       })
     })
@@ -46,16 +48,14 @@ export class Renderer {
     sprites.forEach((sprite: SpriteInfo, spriteIndex) => {
       sprite.drawInfo.forEach((row, rowIndex) => {
         row.forEach((pixel, pixelIndex) => {
-          const red = colors[pixel][0]
-          const green = colors[pixel][1]
-          const blue = colors[pixel][2]
-
           const x = pixelIndex + sprite.x;
           const y = rowIndex + sprite.y;
 
-          this.ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`
-
-          this.ctx.fillRect(x, y, 1, 1)
+          const baseIndex = (x * 4) + (y * 4 * 256)
+          this.image.data[baseIndex] = colors[pixel][0]
+          this.image.data[baseIndex + 1] = colors[pixel][1]
+          this.image.data[baseIndex + 2] = colors[pixel][2]
+          this.image.data[baseIndex + 3] = 0xff;
         })
       })
     })
