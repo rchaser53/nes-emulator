@@ -54,14 +54,15 @@ export class Nes {
   }
 
   run() {
-    setInterval(() => {
+    while (true) {
       const cycle = this.cpu.run()
       const rendererInput = this.ppu.run(cycle * 3)
-      if (rendererInput == null) return
+      if (rendererInput == null) continue;
 
       this.renderer.render(rendererInput)
-    }, 1)
-    // }, 33)
+      break;
+    }
+    requestAnimationFrame(this.run.bind(this));
   }
 }
 
