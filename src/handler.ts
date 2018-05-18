@@ -40,7 +40,7 @@ export class Handler {
     this.logger = logger || new Logger(false)
   }
 
-  writeCPU(address: number, value: number) {
+  writeCPU(address: number, value: any) {
     if (address <= 0x1fff) {
       this.workingMemory[address] = value
     } else if (address <= 0x2007) {

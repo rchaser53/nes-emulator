@@ -1,37 +1,15 @@
-import { convertDecimalToBoolArray, convertIndexToRowColumn, createColorTileDef, createSpriteInputs } from './util'
+import { convertIndexToRowColumn, createColorTileDef, createSpriteInputs } from './util'
 
 // 0x2000 - 0x2007
 export interface PPURegister {
-  PPUCTRL: ControlRegister // コントロールレジスタ1	割り込みなどPPUの設定
-  PPUMASK: MaskRegister // コントロールレジスタ2	背景 enableなどのPPU設定
+  PPUCTRL: number // コントロールレジスタ1	割り込みなどPPUの設定
+  PPUMASK: number // コントロールレジスタ2	背景 enableなどのPPU設定
   PPUSTATUS: number // ppu status
   OAMADDR: number // スプライトメモリデータ	書き込むスプライト領域のアドレス
   OAMDATA: number // デシマルモード	スプライト領域のデータ
   PPUSCROLL: number // 背景スクロールオフセット	背景スクロール値
   PPUADDR: number // PPUメモリアドレス	書き込むPPUメモリ領域のアドレス
   PPUDATA: number // PPUメモリデータ	PPUメモリ領域のデータ
-}
-
-export interface ControlRegister {
-  nameTableLowwer: boolean // 10(true, false): $2800, 11(true, true): $2C00
-  nameTableUpper: boolean // 00(false, false): $2000, 01(false, true): $2400
-  ppuAddressIncrementMode: boolean // false: +1, true: +32
-  isSpriteBase: boolean // false: $0000  true: $1000
-  isBgBase: boolean // false: $0000  true: $1000
-  isLargesprite: boolean // false: 8x8  true: 8x16
-  masterslabe: true // 常時true
-  isEnableNmi: boolean // false: 無効  true: 有効
-}
-
-export interface MaskRegister {
-  isDisplayMono: boolean // ディスプレイタイプ　0:カラー、1:モノクロ
-  backgroundMask: boolean // 背景マスク、画面左8ピクセルを描画しない。0:描画しない、1:描画
-  spriteMask: boolean // スプライトマスク、画面左8ピクセルを描画しない。0:描画しない、1:描画
-  isBackgroundEnable: boolean // 背景有効　0:無効、1:有効
-  isSpriteEnable: boolean // スプライト有効　0:無効、1:有効
-  bgColorFlag2: boolean // 背景色
-  bgColorFlag1: boolean // 000:黒, 001:緑
-  bgColorFlag0: boolean // 010:青, 100:赤
 }
 
 export interface VramAddressInfo {
@@ -59,55 +37,14 @@ const PPURegisterMap = {
   7: 'PPUDATA'
 }
 
-const ControlRegisterMap = {
-  0: 'nameTableLowwer',
-  1: 'nameTableUpper',
-  2: 'ppuAddressIncrementMode',
-  3: 'isSpriteBase',
-  4: 'isBgBase',
-  5: 'isLargeSprite',
-  6: 'masterslabe',
-  7: 'isEnableNmi',
-}
-
-const MaskRegisterMap = {
-  0: 'isDisplayMono',
-  1: 'backgroundMask',
-  2: 'spriteMask',
-  3: 'isBackgroundEnable',
-  4: 'isSpriteEnable',
-  5: 'bgColorFlag2',
-  6: 'bgColorFlag1',
-  7: 'bgColorFlag0',
-}
-
 const PreRenderLine = 8;
 const LineLimit = 261
 const VBlankLine = 241;
 // const BoarderCycle = 341;
 // const SpriteNumber = 100;
 
-const DefaultPPUCTRL: ControlRegister = {
-  isEnableNmi: false,
-  masterslabe: true,
-  isLargesprite: false,
-  isBgBase: false,
-  isSpriteBase: false,
-  ppuAddressIncrementMode: false,
-  nameTableUpper: false,
-  nameTableLowwer: false
-}
-
-const DefaultPPUMASK: MaskRegister = {
-  bgColorFlag2: false,
-  bgColorFlag1: false,
-  bgColorFlag0: false,
-  isSpriteEnable: false,
-  isBackgroundEnable: false,
-  spriteMask: false,
-  backgroundMask: false,
-  isDisplayMono: false
-}
+const DefaultPPUMASK = 0b00000000;
+const DefaultPPUCTRL = 0b01000000;
 
 export class PPU {
   cycle: number = 0
@@ -170,7 +107,8 @@ export class PPU {
   }
 
   get offsetCharacteSpriteData() {
-    return (this.register.PPUCTRL.isSpriteBase === true)
+    const SpriteBaseBinary = 0b1000;
+    return (this.register.PPUCTRL & SpriteBaseBinary) === SpriteBaseBinary
               ? 0x1000 / 16
               : 0
   }
@@ -201,12 +139,13 @@ export class PPU {
   }
 
   write(index: number, value: number) {
+    // console.log(index, value)
     switch (PPURegisterMap[index]) {
       case 'PPUCTRL':
-        this.writeBoolArrayCtrlRegister(value)
+        this.register.PPUCTRL = value;
         break
       case 'PPUMASK':
-        this.writeBoolArrayMaskRegister(value)
+        this.register.PPUMASK = value;
         break
       case 'OAMADDR':
         this.spriteRamAddr = value
@@ -229,18 +168,6 @@ export class PPU {
       default:
         throw new Error(`should not come ${this}`)
     }
-  }
-
-  writeBoolArrayCtrlRegister(value: number) {
-    convertDecimalToBoolArray(value).forEach((bool, index) => {
-      this.register.PPUCTRL[ControlRegisterMap[index]] = bool
-    })
-  }
-
-  writeBoolArrayMaskRegister(value: number) {
-    convertDecimalToBoolArray(value).forEach((bool, index) => {
-      this.register.PPUMASK[MaskRegisterMap[index]] = bool
-    })
   }
 
   writePpuData(value: number) {
@@ -301,7 +228,9 @@ export class PPU {
   }
 
   moveNextVramAddr() {
-    this.vRamAddr += this.register.PPUCTRL.ppuAddressIncrementMode ? 32 : 1
+    const AddressIncrementalModeBinary =  0b100;
+    this.vRamAddr += (this.register.PPUCTRL & AddressIncrementalModeBinary) === AddressIncrementalModeBinary
+                      ? 32 : 1
   }
 
   writeVRamAddress(value: number) {
@@ -314,26 +243,20 @@ export class PPU {
   }
 
   getNameSpace(): number {
-    const upper = this.register.PPUCTRL.nameTableUpper
-    const lowwer = this.register.PPUCTRL.nameTableLowwer
-    let base = 0x2000
-    base += upper === true ? 0x0800 : 0
-    base += lowwer === true ? 0x0400 : 0
-    return base
+    const nameTableBinaries = 0b11;
+    const base = this.register.PPUCTRL & nameTableBinaries;
+
+    return 0x2000 + (base * 0x400)
   }
 
   get currentAttributeTable() {
-    const { nameTableUpper, nameTableLowwer } = this.register.PPUCTRL;
-    let index = (nameTableUpper === true) ? 2 : 0;
-    index += (nameTableLowwer === true) ? 1: 0;
-    return Array.from(this.attributeTables[index]);
+    const nameTableBinaries = 0b11;
+    return this.attributeTables[this.register.PPUCTRL & nameTableBinaries] as any;
   }
 
   get currentNameTable() {
-    const { nameTableUpper, nameTableLowwer } = this.register.PPUCTRL;
-    let index = (nameTableUpper === true) ? 2 : 0;
-    index += (nameTableLowwer === true) ? 1: 0;
-    return Array.from(this.nameTables[index]);
+    const nameTableBinaries = 0b11;
+    return Array.from(this.nameTables[this.register.PPUCTRL & nameTableBinaries]);
   }
   
   run(cycle: number) {
@@ -353,23 +276,10 @@ export class PPU {
 
     if (this.line === VBlankLine) {
       this.register.PPUSTATUS |= 0x80;
-      if (this.register.PPUCTRL.isEnableNmi === true) {}
+      // if (this.register.PPUCTRL.isEnableNmi === true) {}
     }
 
     return
-  }
-
-  getTable(key: string): string {
-    const { nameTableUpper, nameTableLowwer } = this.register.PPUCTRL
-    const tableNumber = this.convertBoolToDecimal([nameTableUpper, nameTableLowwer])
-    return `${key}${tableNumber}`
-  }
-
-  convertBoolToDecimal(bools: boolean[]): number {
-    return bools.reduce((sum, next) => {
-      sum += next === true ? 1 : 0
-      return sum
-    }, 0)
   }
 
   buildSprites() {
@@ -378,23 +288,18 @@ export class PPU {
     while (inputRam.length !== 0) {
       sprites.push(inputRam.splice(0, 4))
     }
-    return sprites.map(this.createSpriteInfo.bind(this));
-  }
 
-  createSpriteInfo(sprite: number[]): SpriteInfo {
-    const upperColorBits = (sprite[2] >> 1) & 0b11
-    const patternIndex = sprite[1] + this.offsetCharacteSpriteData
-    return {
-      x: sprite[3],
-      // Sprite evaluation does not happen on the pre-render scanline.
-      // Because evaluation applies to the next line's sprite rendering,
-      // no sprites will be rendered on the first scanline,
-      // and this is why there is a 1 line offset on a sprite's Y coordinate.
-      y: sprite[0] - PreRenderLine,
-      patternIndex,
-      attribute: sprite[2],
-      drawInfo: this.createSpliteDrawInfo(patternIndex, upperColorBits),
-    }
+    return sprites.map((sprite: number[]) => {
+      const upperColorBits = (sprite[2] >> 1) & 0b11
+      const patternIndex = sprite[1] + this.offsetCharacteSpriteData
+      return {
+        x: sprite[3],
+        y: sprite[0] - PreRenderLine,
+        patternIndex,
+        attribute: sprite[2],
+        drawInfo: this.createSpliteDrawInfo(patternIndex, upperColorBits),
+      }
+    });
   }
 
   createSpliteDrawInfo(spriteIndex: number, upperColorBits: number) {
@@ -454,3 +359,24 @@ export class PPU {
 // 描画されるべきスプライトのために、 スプライトテンポラリレジスタとスプライトバッファレジスタが8スプライト分だけ存在します。 あるラインにおいて次のラインで描画されるべきスプライトが見つかった場合、 スプライトテンポラリレジスタに保持されます。 スプライトの探索の後、 スプライトテンポラリレジスタに基づいてスプライトバッファレジスタにスプライトのパターンがフェッチされます。 このパターンデータが次のラインで描画されます。 またスプライト用レジスタの最初のスプライトはスプライト#0と呼ばれます。 このスプライトがBG上に描画されるピクセルにおいて、ヒットフラグがセットされます。 このヒットフラグの利用例として横スクロールゲームなどでは、 ヒットするまでは横スクロール値を0として点数やタイムなどの情報を描画し、 ヒットが検出されたら横スクロール値を設定してスクロールしたゲーム画面を描画しています。
 
 
+// export interface ControlRegister {
+//   nameTableLowwer: boolean // 10(true, false): $2800, 11(true, true): $2C00
+//   nameTableUpper: boolean // 00(false, false): $2000, 01(false, true): $2400
+//   ppuAddressIncrementMode: boolean // false: +1, true: +32
+//   isSpriteBase: boolean // false: $0000  true: $1000
+//   isBgBase: boolean // false: $0000  true: $1000
+//   isLargesprite: boolean // false: 8x8  true: 8x16
+//   masterslabe: true // 常時true
+//   isEnableNmi: boolean // false: 無効  true: 有効
+// }
+
+// export interface MaskRegister {
+//   isDisplayMono: boolean // ディスプレイタイプ　0:カラー、1:モノクロ
+//   backgroundMask: boolean // 背景マスク、画面左8ピクセルを描画しない。0:描画しない、1:描画
+//   spriteMask: boolean // スプライトマスク、画面左8ピクセルを描画しない。0:描画しない、1:描画
+//   isBackgroundEnable: boolean // 背景有効　0:無効、1:有効
+//   isSpriteEnable: boolean // スプライト有効　0:無効、1:有効
+//   bgColorFlag2: boolean // 背景色
+//   bgColorFlag1: boolean // 000:黒, 001:緑
+//   bgColorFlag0: boolean // 010:青, 100:赤
+// }
