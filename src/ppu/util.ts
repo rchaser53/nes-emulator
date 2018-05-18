@@ -24,30 +24,34 @@ export const convertDecimalToBoolArray = (decimal: number): boolean[] => {
   return boolArray
 }
 
-export const createTwoBitTupple = (front: boolean[], back: boolean[]): boolTupple[] => {
-  return front.reduce<boolTupple[]>((stack, _, index) => {
-    return stack.concat([[front[index], back[index]]])
-  }, [])
-}
+export const createBaseArrays = () => [
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+]
 
 export const createSpriteInputs = (inputArray: number[]) => {
-  const front = inputArray.slice(8, 16).map((num) => {
-    return convertDecimalToBoolArray(num)
-  })
+  const backOffset = 8;
+  const BaseArray = createBaseArrays();
+  for (let i=0; i< 8; i++) {
+    for (let bit=0; bit<8; bit++) {
+      const baseBit = Math.pow(2, bit)
 
-  const back = inputArray.slice(0, 8).map((num) => {
-    return convertDecimalToBoolArray(num)
-  })
-
-  return front.reduce<number[][]>((stack, _, index) => {
-    const nums = createTwoBitTupple(back[index], front[index]).map((elem) => {
-      return elem.reduce((sum, elem, index) => {
-        sum += elem === true ? Math.pow(2, index) : 0
-        return sum
-      }, 0)
-    })
-    return stack.concat([nums])
-  }, [])
+      const back = (inputArray[i] & baseBit) === baseBit
+                      ? 1
+                      : 0;
+      const front = (inputArray[i + backOffset] & baseBit) === baseBit
+                      ? 2
+                      : 0;
+      BaseArray[i][bit] = front + back;
+    }
+  }
+  return BaseArray;
 }
 
 export const createColorTileDef = (inputs: number[]): number[][] => {
@@ -89,13 +93,6 @@ export const reverseArray = (inputArray: any[]): any[] => {
     baseArray[i] = inputArray[arrayLength - i - 1]
   }
   return baseArray
-}
-
-export const convertBoolArrayToDecimal = (boolArray: boolean[]): number => {
-  return boolArray.reduce((sum, next, index) => {
-    sum += next ? Math.pow(2, boolArray.length - 1 - index) : 0
-    return sum
-  }, 0)
 }
 
 export const convertIndexToRowColumn = (index: number): RowColun => {

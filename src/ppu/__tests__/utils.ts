@@ -1,8 +1,6 @@
 import {
   convertDecimalToBoolArray,
-  createTwoBitTupple,
   createSpriteInputs,
-  convertBoolArrayToDecimal,
   createColorTileDef,
   convertDecimalToTwoBit,
   convertIndexToRowColumn,
@@ -21,15 +19,6 @@ describe('PPU utils', () => {
       const input = 0b11
       const expected = [true, true, false, false, false, false, false, false]
       expect(convertDecimalToBoolArray(input)).toEqual(expected)
-    })
-  })
-
-  describe('createTwoBitTupple', () => {
-    test('create boolean tupple array', async () => {
-      const inputA = [true, false, false, true]
-      const inputB = [true, true, true, false]
-      const expected = [[true, true], [false, true], [false, true], [true, false]]
-      expect(createTwoBitTupple(inputA, inputB)).toEqual(expected)
     })
   })
 
@@ -90,24 +79,6 @@ describe('PPU utils', () => {
       ]
 
       expect(createSpriteInputs(input2)).toEqual(expected2)
-    })
-  })
-
-  describe('convertBoolArrayToDecimal', () => {
-    test('convert boolArray to decimal', async () => {
-      expect(convertBoolArrayToDecimal([false])).toEqual(0)
-      expect(convertBoolArrayToDecimal([true])).toEqual(1)
-      expect(convertBoolArrayToDecimal([true, false])).toEqual(2)
-      expect(convertBoolArrayToDecimal([true, false, true, false])).toEqual(10)
-    })
-  })
-
-  describe('convertIndexToRowColumn', () => {
-    test('convert index to row, column', async () => {
-      expect(convertIndexToRowColumn(0)).toEqual({ row: 0, column: 0 })
-      expect(convertIndexToRowColumn(5)).toEqual({ row: 0, column: 1 })
-      expect(convertIndexToRowColumn(63)).toEqual({ row: 0, column: 0 })
-      expect(convertIndexToRowColumn(64)).toEqual({ row: 1, column: 1 })
     })
   })
 })
