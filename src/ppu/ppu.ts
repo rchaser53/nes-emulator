@@ -1,4 +1,4 @@
-import { convertIndexToRowColumn, createColorTileDef, createSpriteInputs } from './util'
+import { convertIndexToRowColumn, createColorTileDef, createSpriteInputs, createBaseArrays } from './util'
 
 // 0x2000 - 0x2007
 export interface PPURegister {
@@ -45,6 +45,10 @@ const VBlankLine = 241;
 
 const DefaultPPUMASK = 0b00000000;
 const DefaultPPUCTRL = 0b01000000;
+
+const SpriteStartBottomBit = 0b10000000
+const SpriteStartRightBit = 0b1000000
+const PreferentialBackgroundBit = 0b100000
 
 export class PPU {
   cycle: number = 0
@@ -297,25 +301,34 @@ export class PPU {
         y: sprite[0] - PreRenderLine,
         patternIndex,
         attribute: sprite[2],
-        drawInfo: this.createSpliteDrawInfo(patternIndex, upperColorBits),
+        drawInfo: this.createSpliteDrawInfo(patternIndex, upperColorBits, sprite[2]),
       }
     });
   }
 
-  createSpliteDrawInfo(spriteIndex: number, upperColorBits: number) {
-    const sprite = createSpriteInputs(this.characteSpriteData[spriteIndex])
+  useBackgroundPalette(index: number, useBackground: boolean): boolean {
+    return useBackground || (index === 0x00) || (index === 0x04) || (index === 0x08) || (index === 0x0c)
+  }
 
-    return sprite.map((elem) => {
-      return elem
-        .map((num) => {
-          const paletteIndex = (upperColorBits << 2) | num
-          if ((paletteIndex === 0x00) || (paletteIndex === 0x04) || (paletteIndex === 0x08) || (paletteIndex === 0x0c)) {
-            return this.backgroundPalette[paletteIndex]
-          }
-          return this.spritePalette[paletteIndex]
-        })
-        .reverse()
-    })
+  createSpliteDrawInfo(spriteIndex: number, upperColorBits: number, attribute: number) {
+    const sprite = createSpriteInputs(this.characteSpriteData[spriteIndex])
+    const retSprites = createBaseArrays()
+    const startTop = ((attribute & SpriteStartBottomBit) === SpriteStartBottomBit) === false
+    const startLeft = ((attribute & SpriteStartRightBit) === SpriteStartRightBit) === false
+    const useBackground = ((attribute & PreferentialBackgroundBit) === PreferentialBackgroundBit)
+
+    for (let row = 0; row < 8; row++) {
+      for (let column = 0; column < 8; column++) {
+        const actualRow = startTop ? row : 7 - row;
+        const actualColumn = startLeft ? 7 - column : column;
+
+        const paletteIndex = (upperColorBits << 2) | sprite[row][column]
+        retSprites[actualRow][actualColumn] = (this.useBackgroundPalette(paletteIndex, useBackground))
+                                                  ? this.backgroundPalette[paletteIndex]
+                                                  : this.spritePalette[paletteIndex]
+      }
+    }
+    return retSprites
   }
 
   buildBackground() {
