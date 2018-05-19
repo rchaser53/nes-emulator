@@ -5,8 +5,8 @@ export type Pad = 'pad1' | 'pad2';
 
 export class Handler {
   ppu: PPU
-  workingMemory: Uint8Array
   programMemory: Uint8Array
+  workingMemory: Uint8Array
   logger: Logger
   pad1 = {
     memory: [0, 0, 0, 0, 0, 0, 0, 0],
@@ -15,6 +15,13 @@ export class Handler {
   pad2 = {
     memory: [0, 0, 0, 0, 0, 0, 0, 0],
     index: 0
+  }
+
+  constructor(ppu: PPU, programRam: Uint8Array, workingRam: Uint8Array, logger?: Logger) {
+    this.ppu = ppu
+    this.programMemory = programRam
+    this.workingMemory = workingRam
+    this.logger = logger || new Logger(false)
   }
 
   writePadMemory(key: Pad, value) {
@@ -33,13 +40,6 @@ export class Handler {
     return value;
   }
 
-  constructor(ppu: PPU, programRam: Uint8Array, logger?: Logger) {
-    this.ppu = ppu
-    this.workingMemory = new Uint8Array(0x2000)
-    this.programMemory = programRam
-    this.logger = logger || new Logger(false)
-  }
-
   writeCPU(address: number, value: any) {
     if (address <= 0x1fff) {
       this.workingMemory[address] = value
@@ -47,7 +47,13 @@ export class Handler {
       this.ppu.write(address - 0x2000, value)
     } else if (address <= 0x3fff) {
       throw new Error(`${address} is used. need to search!`)
-    } else if (address === 0x4016) {
+    } else if (address === 0x4014) {
+      const start = value * 0x100
+      for (let i = 0; i< 0x100; i++) {
+        this.ppu.spriteRam[i] = this.workingMemory[i+start]
+      }
+    }
+      else if (address === 0x4016) {
       this.writePadMemory('pad1', value);
     } else if (address === 0x4017) {
       this.writePadMemory('pad2', value);

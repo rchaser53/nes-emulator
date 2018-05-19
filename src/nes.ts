@@ -18,9 +18,11 @@ export class Nes {
   cpu: CPU
   ppu: PPU
   pad: Pad
+  handler: Handler
   logger: Logger
   programROM: Uint8Array
   characterROM: Uint8Array
+  workingROM: Uint8Array = new Uint8Array(0x2000)
   renderer: Renderer
 
   constructor(nesBuffer: ArrayBuffer) {
@@ -28,11 +30,12 @@ export class Nes {
 
     this.logger = new Logger(IsDebug)
     this.ppu = new PPU(this.characterROM)
-    const handler = new Handler(this.ppu, this.programROM, this.logger)
-    this.cpu = new CPU(handler, this.logger)
-    this.cpu.reset()
-    this.pad = new Pad(handler);
+    this.handler = new Handler(this.ppu, this.programROM, this.workingROM, this.logger)
+    this.pad = new Pad(this.handler)
     this.renderer = new Renderer()
+
+    this.cpu = new CPU(this.handler, this.logger)
+    this.cpu.reset()
   }
 
   load(nesBuffer) {
