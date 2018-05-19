@@ -37,7 +37,7 @@ export const DefualtRegister: Register = {
   A: 0x00, // Accumulator      8bit
   X: 0x00, // IndexesX         8bit
   Y: 0x00, // IndexesY         8bit
-  S: 0x00, // Stack Pointer    8bit
+  S: 0xff, // Stack Pointer    8bit
   P: DefaultStatusRegister, // Status Register  8bit
   PC: 0x0000 // Program Count    16bit
 }
@@ -61,6 +61,7 @@ const StatusRegisterMap = [
 ]
 
 const NmiBinary = 0b10000000;
+const BaseStackAddress = 0x100
 
 export class CPU {
   register: Register
@@ -327,10 +328,9 @@ export class CPU {
 
       // 次にPCの上位バイト、下位バイト、ステータスレジスタを順にスタックへ格納します。
       const address = this.register.PC
-      this.handler.writeCPU(0x100 | this.register.S, (address >> 8) & 0xff) // 上位バイト
-      this.handler.writeCPU(0x100 | (this.register.S - 1), address & 0xff) // 下位バイト
-      this.handler.writeCPU(0x100 | (this.register.S - 2), this.convertRegisterToDecimal()) // ステータスレジスタ
-      this.register.S -= 3
+      this.handler.writeCPU(BaseStackAddress | this.register.S, (address >> 8) & 0xff) // 上位バイト
+      this.handler.writeCPU(BaseStackAddress | --this.register.S, address & 0xff) // 下位バイト
+      this.handler.writeCPU(BaseStackAddress | --this.register.S, this.convertRegisterToDecimal()) // ステータスレジスタ
 
       // 次にIフラグをセットし、最後にPCの下位バイトを$FFFEから、上位バイトを$FFFFからフェッチします。
       this.register.P.I = true
@@ -433,9 +433,8 @@ export class CPU {
 
   pushStack() {
     const address = this.register.PC
-    this.handler.writeCPU(0x100 | this.register.S, (address >> 8) & 0xff)
-    this.handler.writeCPU(0x100 | (this.register.S - 1), (address - 1) & 0xff)
-    this.register.S -= 2
+    this.handler.writeCPU(BaseStackAddress | this.register.S, (address >> 8) & 0xff)
+    this.handler.writeCPU(BaseStackAddress | --this.register.S, (address - 1) & 0xff)
   }
 
   // 'RTS'
@@ -444,9 +443,8 @@ export class CPU {
   }
 
   popStack(): number {
-    const lowwer = this.handler.readCPU(0x100 | (this.register.S + 1))
-    const upper = this.handler.readCPU(0x100 | (this.register.S + 2)) << 8
-    this.register.S += 2
+    const lowwer = this.handler.readCPU(BaseStackAddress | ++this.register.S)
+    const upper = this.handler.readCPU(BaseStackAddress | ++this.register.S) << 8
     return lowwer + upper + 1
   }
 

@@ -1,6 +1,12 @@
 import { colors } from './colors'
 
-import { SpriteInfo } from '../ppu/ppu'
+export interface SpriteInfo {
+  x: number,
+  y: number,
+  patternIndex: number,
+  attribute: number,
+  drawInfo: number[][]
+}
 
 const CanvasIdSelector = '#nes'
 

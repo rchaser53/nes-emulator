@@ -18,14 +18,6 @@ export interface VramAddressInfo {
   index: number
 }
 
-export interface SpriteInfo {
-  x: number,
-  y: number,
-  patternIndex: number,
-  attribute: number,
-  drawInfo: number[][]
-}
-
 const PPURegisterMap = {
   0: 'PPUCTRL',
   1: 'PPUMASK',
@@ -53,8 +45,6 @@ const PreferentialBackgroundBit = 0b100000
 export class PPU {
   cycle: number = 0
   line: number = 0
-  background: any[] = []
-  tileY: number
   sprites: any[] = []
   spriteRamAddr: number = 0
   vRamAddr: number = 0
@@ -312,9 +302,7 @@ export class PPU {
   createSpliteDrawInfo(spriteIndex: number, upperColorBits: number, attribute: number) {
     const sprite = createSpriteInputs(this.characteSpriteData[spriteIndex])
     const retSprites = createBaseArrays()
-    const startTop = ((attribute & SpriteStartBottomBit) === SpriteStartBottomBit) === false
-    const startLeft = ((attribute & SpriteStartRightBit) === SpriteStartRightBit) === false
-    const useBackground = ((attribute & PreferentialBackgroundBit) === PreferentialBackgroundBit)
+    const { startTop, startLeft, useBackground  } = this.culculateAttribute(attribute);
 
     for (let row = 0; row < 8; row++) {
       for (let column = 0; column < 8; column++) {
@@ -328,6 +316,14 @@ export class PPU {
       }
     }
     return retSprites
+  }
+
+  culculateAttribute(attribute: number) {
+    return {
+      startTop: ((attribute & SpriteStartBottomBit) === SpriteStartBottomBit) === false,
+      startLeft: ((attribute & SpriteStartRightBit) === SpriteStartRightBit) === false,
+      useBackground: ((attribute & PreferentialBackgroundBit) === PreferentialBackgroundBit),
+    }
   }
 
   buildBackground() {
@@ -354,3 +350,12 @@ export class PPU {
   }
 }
 
+// 描画されるべきスプライトのために、 
+// スプライトテンポラリレジスタとスプライトバッファレジスタが8スプライト分だけ存在します。
+// あるラインにおいて次のラインで描画されるべきスプライトが見つかった場合、 スプライトテンポラリレジスタに保持されます。
+// スプライトの探索の後、 スプライトテンポラリレジスタに基づいてスプライトバッファレジスタにスプライトのパターンがフェッチされます。
+// このパターンデータが次のラインで描画されます。 またスプライト用レジスタの最初のスプライトはスプライト#0と呼ばれます。
+// このスプライトがBG上に描画されるピクセルにおいて、ヒットフラグがセットされます。
+// このヒットフラグの利用例として横スクロールゲームなどでは、
+// ヒットするまでは横スクロール値を0として点数やタイムなどの情報を描画し、
+// ヒットが検出されたら横スクロール値を設定してスクロールしたゲーム画面を描画しています。
