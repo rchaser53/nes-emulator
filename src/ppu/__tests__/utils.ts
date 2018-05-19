@@ -3,7 +3,6 @@ import {
   createSpriteInputs,
   createColorTileDef,
   convertDecimalToTwoBit,
-  convertIndexToRowColumn,
   reverseArray
 } from '../util'
 
