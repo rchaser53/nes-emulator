@@ -60,6 +60,8 @@ const StatusRegisterMap = [
   { key: 'C' }
 ]
 
+const NmiBinary = 0b10000000;
+
 export class CPU {
   register: Register
   handler: Handler
@@ -88,7 +90,7 @@ export class CPU {
   }
 
   get isNmi(): boolean {
-    return this.handler.ppu.register.PPUCTRL.isEnableNmi
+    return (this.handler.ppu.register.PPUCTRL & NmiBinary) === NmiBinary
   }
 
   nmi() {
