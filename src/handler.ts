@@ -63,6 +63,8 @@ export class Handler {
       this.logger.error(address, 'backup ram')
     } else if (0x8000 <= address) {
       throw new Error(`${address} shouldn't be written address!`)
+    } else {
+      throw new Error(`need to implement ${address.toString(16)}`);
     }
   }
 
@@ -84,6 +86,6 @@ export class Handler {
     } else if (0x8000 <= address) {
       return this.programMemory[address - 0x8000]
     }
-    throw new Error('why come?')
+    throw new Error(`need to implement ${address.toString(16)}`);
   }
 }
