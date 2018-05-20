@@ -74,7 +74,7 @@ describe('PPU utils', () => {
         [3, 3, 3, 3, 3, 3, 3, 3],
         [3, 3, 2, 2, 2, 3, 3, 3],
         [3, 3, 2, 2, 2, 3, 3, 3],
-        [0, 3, 3, 3, 3, 3, 3, 0],
+        [0, 3, 3, 3, 3, 3, 3, 0]
       ]
 
       expect(createSpriteInputs(input2)).toEqual(expected2)

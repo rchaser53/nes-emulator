@@ -32,26 +32,22 @@ export const createBaseArrays = () => [
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0]
 ]
 
 export const createSpriteInputs = (inputArray: number[]) => {
-  const backOffset = 8;
-  const BaseArray = createBaseArrays();
-  for (let i=0; i< 8; i++) {
-    for (let bit=0; bit<8; bit++) {
+  const backOffset = 8
+  const BaseArray = createBaseArrays()
+  for (let i = 0; i < 8; i++) {
+    for (let bit = 0; bit < 8; bit++) {
       const baseBit = Math.pow(2, bit)
 
-      const back = (inputArray[i] & baseBit) === baseBit
-                      ? 1
-                      : 0;
-      const front = (inputArray[i + backOffset] & baseBit) === baseBit
-                      ? 2
-                      : 0;
-      BaseArray[i][bit] = front + back;
+      const back = (inputArray[i] & baseBit) === baseBit ? 1 : 0
+      const front = (inputArray[i + backOffset] & baseBit) === baseBit ? 2 : 0
+      BaseArray[i][bit] = front + back
     }
   }
-  return BaseArray;
+  return BaseArray
 }
 
 export const createColorTileDef = (inputs: number[]): number[][] => {

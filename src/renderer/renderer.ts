@@ -1,10 +1,10 @@
 import { colors } from './colors'
 
 export interface SpriteInfo {
-  x: number,
-  y: number,
-  patternIndex: number,
-  attribute: number,
+  x: number
+  y: number
+  patternIndex: number
+  attribute: number
   drawInfo: number[][]
 }
 
@@ -21,7 +21,7 @@ export class Renderer {
   createCanvas() {
     const canvas = window.document.querySelector(CanvasIdSelector) as HTMLCanvasElement
     this.ctx = canvas.getContext('2d')
-    this.image = this.ctx.createImageData(256, 224);
+    this.image = this.ctx.createImageData(256, 224)
   }
 
   render(renderInput) {
@@ -36,11 +36,11 @@ export class Renderer {
       sprite.forEach((row, rowIndex) => {
         row.forEach((pixel, pixelIndex) => {
           const { x, y } = this.culculateXandY(spriteIndex, rowIndex, pixelIndex)
-          const baseIndex = (x * 4) + (y * 4 * 256)
+          const baseIndex = x * 4 + y * 4 * 256
           this.image.data[baseIndex] = colors[pixel][0]
           this.image.data[baseIndex + 1] = colors[pixel][1]
           this.image.data[baseIndex + 2] = colors[pixel][2]
-          this.image.data[baseIndex + 3] = 0xff;
+          this.image.data[baseIndex + 3] = 0xff
 
           if (224 < y) {
             return
@@ -54,14 +54,14 @@ export class Renderer {
     sprites.forEach((sprite: SpriteInfo, spriteIndex) => {
       sprite.drawInfo.forEach((row, rowIndex) => {
         row.forEach((pixel, pixelIndex) => {
-          const x = pixelIndex + sprite.x;
-          const y = rowIndex + sprite.y;
+          const x = pixelIndex + sprite.x
+          const y = rowIndex + sprite.y
 
-          const baseIndex = (x * 4) + (y * 4 * 256)
+          const baseIndex = x * 4 + y * 4 * 256
           this.image.data[baseIndex] = colors[pixel][0]
           this.image.data[baseIndex + 1] = colors[pixel][1]
           this.image.data[baseIndex + 2] = colors[pixel][2]
-          this.image.data[baseIndex + 3] = 0xff;
+          this.image.data[baseIndex + 3] = 0xff
         })
       })
     })

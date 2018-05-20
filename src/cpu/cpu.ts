@@ -25,8 +25,8 @@ export interface Register {
 const DefaultStatusRegister: StatusRegister = {
   N: false, // negative 演算結果のbit7が1の時にセット
   V: false, // overflow P演算結果がオーバーフローを起こした時にセット
-  R: true,  // NOTHING
-  B: true,  // breakMode set when BRK happen, clear IRQ happen
+  R: true, // NOTHING
+  B: true, // breakMode set when BRK happen, clear IRQ happen
   D: false, // decimal mode not implements
   I: true, // interupt? irq 0: enable irq, 1: ban irq
   Z: false, // zero flag
@@ -60,7 +60,7 @@ const StatusRegisterMap = [
   { key: 'C' }
 ]
 
-const NmiBinary = 0b10000000;
+const NmiBinary = 0b10000000
 
 export class CPU {
   register: Register
@@ -75,14 +75,16 @@ export class CPU {
   }
 
   run(): number {
+    if (this.isIrq) {
+      this.irqInterrupt()
+    }
+
     if (this.isNmi) {
-      this.nmi();
+      this.nmiInterrupt()
     }
 
     const opecode = this.handler.readCPU(this.register.PC)
     const order = this.fetch(opecode)
-
-    // this.logger.log(this.register.PC, order, opecode)
 
     this.executeOpeCode(order)
     this.cycle += order.cycle
@@ -93,19 +95,56 @@ export class CPU {
     return (this.handler.ppu.register.PPUCTRL & NmiBinary) === NmiBinary
   }
 
-  nmi() {
-    this.register.P.B = false;
-    // PCの上位バイト、 下位バイト、ステータスレジスタを順にスタックへ格納します。
-    const address = this.register.PC
-    this.handler.writeCPU(this.register.S-- , (address >> 8) & 0xff) // 上位バイト
-    this.handler.writeCPU(this.register.S--, address & 0xff) // 下位バイト
-    this.handler.writeCPU(this.register.S--, this.convertRegisterToDecimal()) // ステータスレジスタ
+  get isIrq(): boolean {
+    return this.register.P.I === true
+  }
 
-    // 次にIフラグをセットし、最後にPCの下位バイトを$FFFAから、上位バイトを$FFFBからフェッチします。
-    this.register.P.I = true;
+  nmiInterrupt() {
+    this.register.P.B = false
+
+    const address = this.register.PC
+    this.handler.writeCPU(this.register.S--, (address >> 8) & 0xff)
+    this.handler.writeCPU(this.register.S--, address & 0xff)
+    this.handler.writeCPU(this.register.S--, this.convertRegisterToDecimal())
+
+    this.register.P.I = true
     const upper = this.handler.readCPU(0xfffb)
     const lowwer = this.handler.readCPU(0xfffa)
     this.register.PC = (upper << 8) | lowwer
+  }
+
+  brkInterrupt() {
+    if (this.register.P.I === false) {
+      this.register.P.B = true
+      this.register.PC++
+
+      const address = this.register.PC
+      this.handler.writeCPU(this.register.S--, (address >> 8) & 0xff)
+      this.handler.writeCPU(this.register.S--, address & 0xff)
+      this.handler.writeCPU(this.register.S--, this.convertRegisterToDecimal())
+
+      this.register.P.I = true
+      const upper = this.handler.readCPU(0xffff)
+      const lowwer = this.handler.readCPU(0xfffe)
+      this.register.PC = (upper << 8) | lowwer
+    }
+  }
+
+  irqInterrupt() {
+    if (this.register.P.I === false) {
+      this.register.P.B = false
+      this.register.PC++
+
+      const address = this.register.PC
+      this.handler.writeCPU(this.register.S--, (address >> 8) & 0xff)
+      this.handler.writeCPU(this.register.S--, address & 0xff)
+      this.handler.writeCPU(this.register.S--, this.convertRegisterToDecimal())
+
+      this.register.P.I = true
+      const upper = this.handler.readCPU(0xffff)
+      const lowwer = this.handler.readCPU(0xfffe)
+      this.register.PC = (upper << 8) | lowwer
+    }
   }
 
   fetch(opecode: number): Order {
@@ -176,7 +215,7 @@ export class CPU {
   executeOpeCode(order: Order) {
     switch (order.opecode) {
       case 'BRK':
-        this.interruput()
+        this.brkInterrupt()
         break
 
       case 'SEI':
@@ -232,7 +271,7 @@ export class CPU {
         break
 
       case 'RTS':
-        this.register.PC = this.returnCaller()
+        this.register.PC = this.popStack()
         break
 
       case 'TAY':
@@ -260,81 +299,59 @@ export class CPU {
     const address = this.executeDataByAddress(order.address)
     switch (order.opecode) {
       case 'STA':
-      this.handler.writeCPU(address, this.register.A)
-      break
+        this.handler.writeCPU(address, this.register.A)
+        break
 
-    case 'STX':
-      this.handler.writeCPU(address, this.register.X)
-      break
+      case 'STX':
+        this.handler.writeCPU(address, this.register.X)
+        break
 
-    case 'ADC':
-      this.addRegister('A', this.handler.readCPU(address))
-      break
+      case 'ADC':
+        this.addRegister('A', this.handler.readCPU(address))
+        break
 
-    case 'AND':
-      this.logicalOperation('A', this.handler.readCPU(address) & this.register.A);
-      break
+      case 'AND':
+        this.logicalOperation('A', this.handler.readCPU(address) & this.register.A)
+        break
 
-    case 'ORA':
-      this.logicalOperation('A', this.handler.readCPU(address) | this.register.A);
-      break
+      case 'ORA':
+        this.logicalOperation('A', this.handler.readCPU(address) | this.register.A)
+        break
 
-    case 'EOR':
-      this.logicalOperation('A', this.register.A ^ this.handler.readCPU(address))
-      break
+      case 'EOR':
+        this.logicalOperation('A', this.register.A ^ this.handler.readCPU(address))
+        break
 
-    case 'SBC':
-      this.substractRegister('A', this.handler.readCPU(address))
-      break
+      case 'SBC':
+        this.substractRegister('A', this.handler.readCPU(address))
+        break
 
-    case 'LDA':
-      this.insertRegister('A', this.handler.readCPU(address))
-      break
+      case 'LDA':
+        this.insertRegister('A', this.handler.readCPU(address))
+        break
 
-    case 'LDX':
-      this.insertRegister('X', this.handler.readCPU(address))
-      break
+      case 'LDX':
+        this.insertRegister('X', this.handler.readCPU(address))
+        break
 
-    case 'LDY':
-      this.insertRegister('Y', this.handler.readCPU(address))
-      break
+      case 'LDY':
+        this.insertRegister('Y', this.handler.readCPU(address))
+        break
 
-    case 'JMP':
-      this.register.PC = address
-      break
+      case 'JMP':
+        this.register.PC = address
+        break
 
-    case 'CMP':
-      this.register.P.C = this.setCompare('A', this.handler.readCPU(address))
-      break
+      case 'CMP':
+        this.register.P.C = this.setCompare('A', this.handler.readCPU(address))
+        break
 
-    case 'CPX':
-      this.register.P.C = this.setCompare('X', this.handler.readCPU(address))
-      break
+      case 'CPX':
+        this.register.P.C = this.setCompare('X', this.handler.readCPU(address))
+        break
 
-    default:
-      throw new Error(`${JSON.stringify(order)} is not implemented!`)
-    }
-  }
-
-  interruput() {
-    // 割り込みが確認された時、Iフラグがセットされていれば割り込みは無視します。
-    if (this.register.P.I === false) {
-      // Iフラグがクリアされていれば、割り込み動作を開始します。
-      // BRKでは、Bフラグをセットし、PCに1を加算します。
-      this.register.P.B = true
-      this.register.PC++
-
-      // 次にPCの上位バイト、下位バイト、ステータスレジスタを順にスタックへ格納します。
-      const address = this.register.PC
-      this.handler.writeCPU(this.register.S--, (address >> 8) & 0xff) // 上位バイト
-      this.handler.writeCPU(this.register.S--, address & 0xff) // 下位バイト
-      this.handler.writeCPU(this.register.S--, this.convertRegisterToDecimal()) // ステータスレジスタ
-
-      // 次にIフラグをセットし、最後にPCの下位バイトを$FFFEから、上位バイトを$FFFFからフェッチします。
-      this.register.P.I = true
-      const upper = this.handler.readCPU(0xffff)
-      const lowwer = this.handler.readCPU(0xfffe)
-      this.register.PC = (upper << 8) | lowwer
+      default:
+        throw new Error(`${JSON.stringify(order)} is not implemented!`)
     }
   }
 
@@ -367,7 +384,7 @@ export class CPU {
 
   logicalOperation(key: string, value: number) {
     this.register.P.N = !!(value & 0x80)
-    this.register.P.Z = (value === 0)
+    this.register.P.Z = value === 0
     this.register[key] = value
   }
 
@@ -422,7 +439,6 @@ export class CPU {
     this.register.PC += TwoPCUseAddress.includes(address) ? 2 : 1
   }
 
-  // 'JSR'
   goToSubroutine(address: string): number {
     const jumpedAddress = this.executeDataByAddress(address)
     this.pushStack()
@@ -431,18 +447,13 @@ export class CPU {
 
   pushStack() {
     const address = this.register.PC
-    this.handler.writeCPU((this.register.S--), (address >> 8) & 0xff)
-    this.handler.writeCPU((this.register.S--), (address - 1) & 0xff)
-  }
-
-  // 'RTS'
-  returnCaller(): number {
-    return this.popStack()
+    this.handler.writeCPU(this.register.S--, (address >> 8) & 0xff)
+    this.handler.writeCPU(this.register.S--, (address - 1) & 0xff)
   }
 
   popStack(): number {
-    const lowwer = this.handler.readCPU((++this.register.S))
-    const upper = this.handler.readCPU((++this.register.S)) << 8
+    const lowwer = this.handler.readCPU(++this.register.S)
+    const upper = this.handler.readCPU(++this.register.S) << 8
     return lowwer + upper + 1
   }
 
@@ -452,14 +463,11 @@ export class CPU {
   }
 
   reset() {
-    // 初期化のための6クロックの後に動作を開始します。
-    // todo
-    
+    // TBD initialize
     this.register.P.I = true
 
     const lowwer = this.handler.readCPU(0xfffc) & 0xff
     const upper = (this.handler.readCPU(0xfffd) & 0xff) << 8
-    this.register.PC = (upper | lowwer) || 0x8000
-
+    this.register.PC = upper | lowwer || 0x8000
   }
 }

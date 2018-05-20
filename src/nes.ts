@@ -60,11 +60,11 @@ export class Nes {
     while (true) {
       const cycle = this.cpu.run()
       const rendererInput = this.ppu.run(cycle * 3)
-      if (rendererInput == null) continue;
+      if (rendererInput == null) continue
 
       this.renderer.render(rendererInput)
-      break;
+      break
     }
-    requestAnimationFrame(this.run.bind(this));
+    requestAnimationFrame(this.run.bind(this))
   }
 }

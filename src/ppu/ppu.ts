@@ -29,14 +29,14 @@ const PPURegisterMap = {
   7: 'PPUDATA'
 }
 
-const PreRenderLine = 8;
+const PreRenderLine = 8
 const LineLimit = 261
-const VBlankLine = 241;
+const VBlankLine = 241
 // const BoarderCycle = 341;
 // const SpriteNumber = 100;
 
-const DefaultPPUMASK = 0b00000000;
-const DefaultPPUCTRL = 0b01000000;
+const DefaultPPUMASK = 0b00000000
+const DefaultPPUCTRL = 0b01000000
 
 const SpriteStartBottomBit = 0b10000000
 const SpriteStartRightBit = 0b1000000
@@ -54,24 +54,21 @@ export class PPU {
   characteSpriteData: number[][]
   spriteRam: Uint8Array = new Uint8Array(0x100)
 
-  patternTables: Uint8Array[] = [
-    new Uint8Array(0x1000),
-    new Uint8Array(0x1000)
-  ];
+  patternTables: Uint8Array[] = [new Uint8Array(0x1000), new Uint8Array(0x1000)]
 
   nameTables: Uint8Array[] = [
     new Uint8Array(0x3c0),
     new Uint8Array(0x3c0),
     new Uint8Array(0x3c0),
     new Uint8Array(0x3c0)
-  ];
+  ]
 
   attributeTables: Uint8Array[] = [
     new Uint8Array(0x40),
     new Uint8Array(0x40),
     new Uint8Array(0x40),
     new Uint8Array(0x40)
-  ];
+  ]
 
   nameAttributeMirror: Uint8Array = new Uint8Array(0xeff) //  $3000～$3EFF
   backgroundPalette: Uint8Array = new Uint8Array(0x10) //  $3F00～$3F0F
@@ -101,10 +98,8 @@ export class PPU {
   }
 
   get offsetCharacteSpriteData() {
-    const SpriteBaseBinary = 0b1000;
-    return (this.register.PPUCTRL & SpriteBaseBinary) === SpriteBaseBinary
-              ? 0x1000 / 16
-              : 0
+    const SpriteBaseBinary = 0b1000
+    return (this.register.PPUCTRL & SpriteBaseBinary) === SpriteBaseBinary ? 0x1000 / 16 : 0
   }
 
   read(index: number): number {
@@ -112,17 +107,17 @@ export class PPU {
       case 'PPUSTATUS':
         return this.register.PPUSTATUS
       case 'PPUDATA':
-        let ret;
+        let ret
         const { key, address, index } = this.getTargetVram()
         switch (key) {
           case 'patternTables':
           case 'nameTables':
           case 'attributeTables':
             ret = this[key][index][address]
-            break;
+            break
           default:
             ret = this[key][address]
-            break;
+            break
         }
         this.moveNextVramAddr()
         return ret
@@ -135,10 +130,10 @@ export class PPU {
   write(index: number, value: number) {
     switch (PPURegisterMap[index]) {
       case 'PPUCTRL':
-        this.register.PPUCTRL = value;
+        this.register.PPUCTRL = value
         break
       case 'PPUMASK':
-        this.register.PPUMASK = value;
+        this.register.PPUMASK = value
         break
       case 'OAMADDR':
         this.spriteRamAddr = value
@@ -168,7 +163,7 @@ export class PPU {
     // Addresses $3F10/$3F14/$3F18/$3F1C are mirrors of $3F00/$3F04/$3F08/$3F0C
     // Note that this goes for writing as well as reading
     if (key === 'spritePalette') {
-      if ((address === 0x00) || (address === 0x04) || (address === 0x08) || (address === 0x0c)) {
+      if (address === 0x00 || address === 0x04 || address === 0x08 || address === 0x0c) {
         this.backgroundPalette[address] = value
         return
       }
@@ -179,10 +174,10 @@ export class PPU {
       case 'nameTables':
       case 'attributeTables':
         this[key][index][address] = value
-        break;
+        break
       default:
         this[key][address] = value
-        break;
+        break
     }
   }
 
@@ -221,9 +216,8 @@ export class PPU {
   }
 
   moveNextVramAddr() {
-    const AddressIncrementalModeBinary =  0b100;
-    this.vRamAddr += (this.register.PPUCTRL & AddressIncrementalModeBinary) === AddressIncrementalModeBinary
-                      ? 32 : 1
+    const AddressIncrementalModeBinary = 0b100
+    this.vRamAddr += (this.register.PPUCTRL & AddressIncrementalModeBinary) === AddressIncrementalModeBinary ? 32 : 1
   }
 
   writeVRamAddress(value: number) {
@@ -236,22 +230,22 @@ export class PPU {
   }
 
   getNameSpace(): number {
-    const nameTableBinaries = 0b11;
-    const base = this.register.PPUCTRL & nameTableBinaries;
+    const nameTableBinaries = 0b11
+    const base = this.register.PPUCTRL & nameTableBinaries
 
-    return 0x2000 + (base * 0x400)
+    return 0x2000 + base * 0x400
   }
 
   get currentAttributeTable() {
-    const nameTableBinaries = 0b11;
-    return this.attributeTables[this.register.PPUCTRL & nameTableBinaries] as any;
+    const nameTableBinaries = 0b11
+    return this.attributeTables[this.register.PPUCTRL & nameTableBinaries] as any
   }
 
   get currentNameTable() {
-    const nameTableBinaries = 0b11;
-    return Array.from(this.nameTables[this.register.PPUCTRL & nameTableBinaries]);
+    const nameTableBinaries = 0b11
+    return Array.from(this.nameTables[this.register.PPUCTRL & nameTableBinaries])
   }
-  
+
   run(cycle: number) {
     this.cycle += cycle
     this.line++
@@ -259,7 +253,7 @@ export class PPU {
     if (this.line === LineLimit) {
       this.colorTileBuffer = createColorTileDef(this.currentAttributeTable)
       this.line = 0
-      this.register.PPUSTATUS ^= 0x80;
+      this.register.PPUSTATUS ^= 0x80
 
       return {
         sprites: this.buildSprites(),
@@ -268,8 +262,9 @@ export class PPU {
     }
 
     if (this.line === VBlankLine) {
-      this.register.PPUSTATUS |= 0x80;
-      // if (this.register.PPUCTRL.isEnableNmi === true) {}
+      this.register.PPUSTATUS |= 0x80
+      // const NmiBinary = 0b10000000
+      // if ((this.register.PPUCTRL & NmiBinary) === NmiBinary) { }
     }
 
     return
@@ -290,29 +285,29 @@ export class PPU {
         y: sprite[0] - PreRenderLine,
         patternIndex,
         attribute: sprite[2],
-        drawInfo: this.createSpliteDrawInfo(patternIndex, upperColorBits, sprite[2]),
+        drawInfo: this.createSpliteDrawInfo(patternIndex, upperColorBits, sprite[2])
       }
-    });
+    })
   }
 
   useBackgroundPalette(index: number, useBackground: boolean): boolean {
-    return useBackground || (index === 0x00) || (index === 0x04) || (index === 0x08) || (index === 0x0c)
+    return useBackground || index === 0x00 || index === 0x04 || index === 0x08 || index === 0x0c
   }
 
   createSpliteDrawInfo(spriteIndex: number, upperColorBits: number, attribute: number) {
     const sprite = createSpriteInputs(this.characteSpriteData[spriteIndex])
     const retSprites = createBaseArrays()
-    const { startTop, startLeft, useBackground  } = this.culculateAttribute(attribute);
+    const { startTop, startLeft, useBackground } = this.culculateAttribute(attribute)
 
     for (let row = 0; row < 8; row++) {
       for (let column = 0; column < 8; column++) {
-        const actualRow = startTop ? row : 7 - row;
-        const actualColumn = startLeft ? 7 - column : column;
+        const actualRow = startTop ? row : 7 - row
+        const actualColumn = startLeft ? 7 - column : column
 
         const paletteIndex = (upperColorBits << 2) | sprite[row][column]
-        retSprites[actualRow][actualColumn] = (this.useBackgroundPalette(paletteIndex, useBackground))
-                                                  ? this.backgroundPalette[paletteIndex]
-                                                  : this.spritePalette[paletteIndex]
+        retSprites[actualRow][actualColumn] = this.useBackgroundPalette(paletteIndex, useBackground)
+          ? this.backgroundPalette[paletteIndex]
+          : this.spritePalette[paletteIndex]
       }
     }
     return retSprites
@@ -322,7 +317,7 @@ export class PPU {
     return {
       startTop: ((attribute & SpriteStartBottomBit) === SpriteStartBottomBit) === false,
       startLeft: ((attribute & SpriteStartRightBit) === SpriteStartRightBit) === false,
-      useBackground: ((attribute & PreferentialBackgroundBit) === PreferentialBackgroundBit),
+      useBackground: (attribute & PreferentialBackgroundBit) === PreferentialBackgroundBit
     }
   }
 
@@ -340,9 +335,7 @@ export class PPU {
       return elem
         .map((num) => {
           const base = (this.colorTileBuffer[row][column] << 2) | num
-          const paletteIndex = (base === 0x04) || (base === 0x08) || (base === 0x0c)
-                                  ? 0x00
-                                  : base;
+          const paletteIndex = base === 0x04 || base === 0x08 || base === 0x0c ? 0x00 : base
           return this.backgroundPalette[paletteIndex]
         })
         .reverse()
@@ -350,7 +343,7 @@ export class PPU {
   }
 }
 
-// 描画されるべきスプライトのために、 
+// 描画されるべきスプライトのために、
 // スプライトテンポラリレジスタとスプライトバッファレジスタが8スプライト分だけ存在します。
 // あるラインにおいて次のラインで描画されるべきスプライトが見つかった場合、 スプライトテンポラリレジスタに保持されます。
 // スプライトの探索の後、 スプライトテンポラリレジスタに基づいてスプライトバッファレジスタにスプライトのパターンがフェッチされます。

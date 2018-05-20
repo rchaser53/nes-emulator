@@ -64,7 +64,7 @@ describe('CPU', () => {
     expect(cpu.register.PC).toEqual(0x8024)
     expect(cpu.register.S).toEqual(0x000e)
 
-    cpu.register.PC = cpu.returnCaller()
+    cpu.register.PC = cpu.popStack()
     expect(cpu.register.PC).toEqual(0x8024)
     expect(cpu.register.S).toEqual(0x0010)
   })
