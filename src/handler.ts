@@ -80,8 +80,10 @@ export class Handler {
       throw new Error(`${address} is used. need to search!`)
     } else if (address <= 0x7fff) {
       throw new Error(`${address} is used. need to search!`)
-    } else if (0x8000 <= address) {
+    } else if (address < 0xC000) {
       return this.programMemory[address - 0x8000]
+    } else if (0xC000 <= address) {
+      return this.programMemory[address - 0xC000]
     }
     throw new Error(`need to implement ${address.toString(16)}`)
   }
