@@ -127,7 +127,7 @@ export class PPU {
       default:
         break
     }
-    throw new Error(`should not come here! ${this}`)
+    throw new Error(`should not come ${PPURegisterMap[index]}`)
   }
 
   write(index: number, value: number) {
@@ -157,7 +157,7 @@ export class PPU {
         this.register[PPURegisterMap[index]] = value
         break
       default:
-        throw new Error(`should not come ${this}`)
+        throw new Error(`should not come ${PPURegisterMap[index]}`)
     }
   }
 
