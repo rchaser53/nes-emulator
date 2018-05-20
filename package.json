@@ -1,21 +1,20 @@
 {
-  "name": "hoge-emu",
+  "name": "nes-emulator",
   "version": "1.0.0",
-  "description": "",
+  "description": "nes emulator for JavaScript",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
     "format": "./node_modules/.bin/prettier --write \"src/**/*.{ts,html,js,md}\"",
-    "test": "jest test --no-cache",
-    "build": "tsc -p ."
+    "test": "jest test --no-cache"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rchaser53/hoge-emu.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "rchaser53",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/rchaser53/hoge-emu/issues"
   },
