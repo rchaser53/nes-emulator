@@ -4,5 +4,8 @@ node_js:
 
 sudo: false
 
+notifications:
+  email: false
+
 scripts:
   - "npm run test"
