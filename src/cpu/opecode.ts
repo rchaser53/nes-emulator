@@ -93,7 +93,8 @@ export const OpecodesMap: { [key: string]: Order} = {
   
   "4c": { opecode: 'JMP', data: 0x5597, address: 'Absolute', len: 3, cycle: 3 },          //  Absolute      JMP $5597     $4C   3   3
   "20": { opecode: 'JSR', data: 0x5597, address: 'Absolute', len: 3, cycle: 6 },          //  Absolute      JSR $5597     $20   3   6
-
+  "40": { opecode: 'RTI', data: 0x0000, address: 'Implied', len: 1, cycle: 6 },           //  Implied       RTI           $40   1   6
+  
   "c9": { opecode: 'CMP', data: 0x0044, address: 'Immediate', len: 2, cycle: 2 },         //  Immediate     CMP #$44      $C9   2   2
 
   "a8": { opecode: 'TAY', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       TAY           $A8   1   2

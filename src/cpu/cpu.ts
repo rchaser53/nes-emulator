@@ -147,6 +147,13 @@ export class CPU {
     }
   }
 
+  returnForInterrupt() {
+    this.convertDecimalToRegister(this.handler.readCPU(++this.register.S))
+    const lowwer = this.handler.readCPU(++this.register.S) & 0xff
+    const upper = this.handler.readCPU(++this.register.S) & 0xff
+    this.register.PC = (upper << 8) | lowwer
+  }
+
   fetch(opecode: number): Order {
     this.register.PC++
     const opeObject = OpecodesMap[opecode.toString(16)]
@@ -210,6 +217,13 @@ export class CPU {
       sum += statusRegister[key] === true ? Math.pow(2, index) : 0
       return sum
     }, 0)
+  }
+
+  convertDecimalToRegister(input: number) {
+    return StatusRegisterMap.forEach(({ key }, index) => {
+      const base = Math.pow(2, index)
+      this.register.P[key] = (base & input) === base ? true : 0
+    })
   }
 
   executeOpeCode(order: Order) {
@@ -288,6 +302,10 @@ export class CPU {
 
       case 'JSR':
         this.register.PC = this.goToSubroutine(order.address)
+        break
+
+      case 'RTI':
+        this.returnForInterrupt()
         break
 
       default:
@@ -463,7 +481,6 @@ export class CPU {
   }
 
   reset() {
-    // TBD initialize
     this.register.P.I = true
 
     const lowwer = this.handler.readCPU(0xfffc) & 0xff
