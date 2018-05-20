@@ -33,12 +33,17 @@ describe('Hexadecimal', () => {
 
 describe('CPU', () => {
   let handler, cpu: CPU
+  const interrupt = {
+    isNmi: false,
+    isBrk: false,
+    isIrq: false
+  }
   beforeEach(() => {
     const programMemory = Array.apply(null, Array(3000)).map((_, index) => index % 256)
     const workingMemory = Array.apply(null, Array(3000)).map((_, index) => index % 256)
-    handler = new Handler(new PPU(new Uint8Array(0x1000)), programMemory, workingMemory)
+    handler = new Handler(new PPU(new Uint8Array(0x1000), interrupt), programMemory, workingMemory)
     handler.workingMemory = workingMemory
-    cpu = new CPU(handler)
+    cpu = new CPU(handler, interrupt)
   })
 
   test('getAbsolute', async () => {

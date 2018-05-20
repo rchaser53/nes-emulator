@@ -1,6 +1,7 @@
 import { Logger } from '../debug/logger'
 import { OpecodesMap, Order } from './opecode'
 import { Handler } from '../handler'
+import { Interrupt } from '../nes'
 
 export interface StatusRegister {
   N: boolean
@@ -63,14 +64,16 @@ const StatusRegisterMap = [
 const NmiBinary = 0b10000000
 
 export class CPU {
+  interrupt: Interrupt
   register: Register
   handler: Handler
   logger: Logger
   cycle: number = 0
 
-  constructor(handler: Handler, logger?: Logger) {
+  constructor(handler: Handler, interrupt: Interrupt, logger?: Logger) {
     this.register = DefualtRegister
     this.handler = handler
+    this.interrupt = interrupt
     this.logger = logger || new Logger(false)
   }
 
@@ -93,10 +96,11 @@ export class CPU {
 
   get isNmi(): boolean {
     return (this.handler.ppu.register.PPUCTRL & NmiBinary) === NmiBinary
+              && this.interrupt.isNmi
   }
 
   get isIrq(): boolean {
-    return this.register.P.I === true
+    return this.register.P.I === false
   }
 
   nmiInterrupt() {
@@ -111,6 +115,8 @@ export class CPU {
     const upper = this.handler.readCPU(0xfffb)
     const lowwer = this.handler.readCPU(0xfffa)
     this.register.PC = (upper << 8) | lowwer
+
+    this.interrupt.isNmi = false;
   }
 
   brkInterrupt() {

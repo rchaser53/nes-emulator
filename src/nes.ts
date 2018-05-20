@@ -14,6 +14,12 @@ const NES_HEADER_SIZE = 0x0010
 
 const IsDebug = false
 
+export interface Interrupt {
+  isNmi: boolean
+  isBrk: boolean
+  isIrq: boolean
+}
+
 export class Nes {
   cpu: CPU
   ppu: PPU
@@ -24,17 +30,22 @@ export class Nes {
   characterROM: Uint8Array
   workingROM: Uint8Array = new Uint8Array(0x2000)
   renderer: Renderer
+  interrupt: Interrupt = {
+    isNmi: false,
+    isBrk: false,
+    isIrq: false,
+  }
 
   constructor(nesBuffer: ArrayBuffer) {
     this.load(nesBuffer)
 
     this.logger = new Logger(IsDebug)
-    this.ppu = new PPU(this.characterROM)
+    this.ppu = new PPU(this.characterROM, this.interrupt)
     this.handler = new Handler(this.ppu, this.programROM, this.workingROM, this.logger)
     this.pad = new Pad(this.handler)
     this.renderer = new Renderer()
 
-    this.cpu = new CPU(this.handler, this.logger)
+    this.cpu = new CPU(this.handler, this.interrupt, this.logger)
     this.cpu.reset()
   }
 

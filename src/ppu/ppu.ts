@@ -1,4 +1,5 @@
 import { convertIndexToRowColumn, createColorTileDef, createSpriteInputs, createBaseArrays } from './util'
+import { Interrupt } from '../nes'
 
 // 0x2000 - 0x2007
 export interface PPURegister {
@@ -43,6 +44,7 @@ const SpriteStartRightBit = 0b1000000
 const PreferentialBackgroundBit = 0b100000
 
 export class PPU {
+  interrupt: Interrupt
   cycle: number = 0
   line: number = 0
   sprites: any[] = []
@@ -88,13 +90,14 @@ export class PPU {
     PPUDATA: 0x00
   }
 
-  constructor(characterROM: any) {
+  constructor(characterROM: Uint8Array, interrupt: Interrupt) {
     const sprites: any = []
     const characterArray = Array.from(characterROM)
     while (characterArray.length !== 0) {
       sprites.push(characterArray.splice(0, 16))
     }
     this.characteSpriteData = sprites
+    this.interrupt = interrupt
   }
 
   get offsetCharacteSpriteData() {
@@ -263,6 +266,7 @@ export class PPU {
 
     if (this.line === VBlankLine) {
       this.register.PPUSTATUS |= 0x80
+      this.interrupt.isNmi = true
       // const NmiBinary = 0b10000000
       // if ((this.register.PPUCTRL & NmiBinary) === NmiBinary) { }
     }
