@@ -239,7 +239,7 @@ export class CPU {
         break
 
       case 'SEI':
-        this.register.P.I = false
+        this.register.P.I = true
         break
 
       case 'SEC':
