@@ -38,8 +38,12 @@ export const OpecodesMap: { [key: string]: Order} = {
   "1": { opecode: 'ORA', data: 0x44, address: 'Indirect,X',   len: 2, cycle: 6 },         //  Indirect,X    ORA ($44,X)   $01   2   6
   "11": { opecode: 'ORA', data: 0x44, address: 'Indirect,Y',   len: 2, cycle: 5 },        //  Indirect,Y    ORA ($44),Y   $11   2   5 +1
 
-  "a2": { opecode: 'LDX', data: 0x0044, address: 'Immediate', len: 2, cycle: 2  },        //  Immediate     LDX #$44      $A2   2   2
+  "a2": { opecode: 'LDX', data: 0x0044, address: 'Immediate', len: 2, cycle: 2 },         //  Immediate     LDX #$44      $A2   2   2
   "a6": { opecode: 'LDX', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 3 },          //  Zero Page     LDX $44       $A6   2   3
+  "b6": { opecode: 'LDX', data: 0x0044, address: 'ZeroPage,Y', len: 2, cycle: 4 },        //  Zero Page,Y   LDX $44,Y     $B6   2   4
+  "ae": { opecode: 'LDX', data: 0x4400, address: 'Absolute', len: 3, cycle: 4 },          //  Absolute      LDX $4400     $AE   3   4
+  "be": { opecode: 'LDX', data: 0x4400, address: 'Absolute,Y', len: 3, cycle: 4 },        //  Absolute,Y    LDX $4400,Y   $BE   3   4 +1
+
   "a0": { opecode: 'LDY', data: 0x0044, address: 'Immediate', len: 2, cycle: 2  },        //  Immediate     LDY #$44      $A0   2   2
   "a4": { opecode: 'LDY', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 3  },         //  Zero Page     LDY $44       $A4   2   3
   
