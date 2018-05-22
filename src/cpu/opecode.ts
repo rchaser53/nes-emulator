@@ -83,6 +83,9 @@ export const OpecodesMap: { [key: string]: Order} = {
   "e1": { opecode: 'SBC', data: 0x0044, address: 'Indirect,X',  len: 2, cycle: 6 },        //  Indirect,X    SBC ($44,X)   $E1   2   6
   "f1": { opecode: 'SBC', data: 0x0044, address: 'Indirect,Y',  len: 2, cycle: 5 },        //  Indirect,Y    SBC ($44),Y   $F1   2   5 +1
 
+  "e8": { opecode: 'INX', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       INX           $E8   1   2
+  "ca": { opecode: 'DEX', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       DEX           $CA   1   2
+  "c8": { opecode: 'INY', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       INY           $C8   1   2
   "88": { opecode: 'DEY', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       DEY           $88   1   2
 
   "c6": { opecode: 'DEC', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 5 },          //  Zero Page     DEC $44       $C6   2   5
@@ -105,7 +108,6 @@ export const OpecodesMap: { [key: string]: Order} = {
   "18": { opecode: 'CLC', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       CLC           $18   1   2
   "f8": { opecode: 'SED', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       SED           $f8   1   2
 
-  "e8": { opecode: 'INX', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       INX           $E8   1   2
   "e0": { opecode: 'CPX', data: 0x0044, address: 'Immediate', len: 2, cycle: 2 },         //  Immediate     CPX #$44      $E0   2   2
 
 }

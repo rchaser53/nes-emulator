@@ -278,6 +278,10 @@ export class CPU {
         this.addMemoryData(order.address, -1)
         break
 
+      case 'DEX':
+        this.decreaseRegister('X', 1)
+        break
+
       case 'DEY':
         this.decreaseRegister('Y', 1)
         break
@@ -288,6 +292,10 @@ export class CPU {
 
       case 'INX':
         this.addRegister('X', 1)
+        break
+
+      case 'INY':
+        this.addRegister('Y', 1)
         break
 
       case 'RTS':
