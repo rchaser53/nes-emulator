@@ -382,6 +382,10 @@ export class CPU {
         this.register.P.C = this.setCompare('X', this.handler.readCPU(address))
         break
 
+      case 'CPY':
+        this.register.P.C = this.setCompare('Y', this.handler.readCPU(address))
+        break
+
       default:
         throw new Error(`${JSON.stringify(order)} is not implemented!`)
     }

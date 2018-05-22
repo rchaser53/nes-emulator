@@ -110,6 +110,10 @@ export const OpecodesMap: { [key: string]: Order} = {
 
   "e0": { opecode: 'CPX', data: 0x0044, address: 'Immediate', len: 2, cycle: 2 },         //  Immediate     CPX #$44      $E0   2   2
 
+
+  "c0": { opecode: 'CPY', data: 0x0044, address: 'Immediate', len: 2, cycle: 2 },         //  Immediate     CPY #$44      $C0   2   2
+  "c4": { opecode: 'CPY', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 3 },          //  Zero Page     CPY $44       $C4   2   3
+  "cc": { opecode: 'CPY', data: 0x4400, address: 'Absolute', len: 3, cycle: 4 },          //  Absolute      CPY $4400     $CC   3   4
 }
 
 export const HelloOpecodes = [
