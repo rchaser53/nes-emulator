@@ -461,12 +461,12 @@ export class CPU {
   changeNVZFlag(registerKey: string, beforeRegisterValue: number) {
     this.register.P.V = this.isOverFlagTrue(registerKey, beforeRegisterValue)
     this.register.P.N = !!(this.register[registerKey] & 0x80)
-    this.register.P.Z === (0 === this.register[registerKey])
+    this.register.P.Z = (0 === this.register[registerKey])
   }
 
   changeNVFlag(registerKey: string, beforeRegisterValue: number) {
     this.register.P.N = !!(this.register[registerKey] & 0x80)
-    this.register.P.Z === (0 === this.register[registerKey])
+    this.register.P.Z = (0 === this.register[registerKey])
   }
 
   isOverFlagTrue(registerKey: string, beforeRegisterValue: number): boolean {
