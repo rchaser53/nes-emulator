@@ -79,6 +79,10 @@ export class PPU {
 
   colorTileBuffer: number[][] = []
 
+  isHorizontal: boolean = true
+  offSetX: number = 0
+  offSetY: number = 0
+
   register: PPURegister = {
     PPUCTRL: DefaultPPUCTRL,
     PPUMASK: DefaultPPUMASK,
@@ -108,6 +112,7 @@ export class PPU {
   read(index: number): number {
     switch (PPURegisterMap[index]) {
       case 'PPUSTATUS':
+        this.isHorizontal = true
         return this.register.PPUSTATUS
       case 'PPUDATA':
         let ret
@@ -152,12 +157,24 @@ export class PPU {
         this.writePpuData(value)
         this.moveNextVramAddr()
         break
-      case 'PPUSTATUS':
       case 'PPUSCROLL':
+        this.writeScrollRegister(value)
+        break
+      case 'PPUSTATUS':
         this.register[PPURegisterMap[index]] = value
         break
       default:
         throw new Error(`should not come ${PPURegisterMap[index]}`)
+    }
+  }
+
+  writeScrollRegister(value) {
+    if (this.isHorizontal) {
+      this.isHorizontal = false
+      this.offSetX = value
+    } else {
+      this.isHorizontal = true
+      this.offSetY = value
     }
   }
 
