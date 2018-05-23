@@ -254,6 +254,10 @@ export class CPU {
         this.insertRegister('A', this.register.Y)
         break
 
+      case 'TAY':
+        this.insertRegister('Y', this.register.A)
+        break
+
       case 'BNE':
         this.branchPC(this.register.P.Z, false, order.address)
         break
@@ -300,10 +304,6 @@ export class CPU {
 
       case 'RTS':
         this.register.PC = this.popStack()
-        break
-
-      case 'TAY':
-        this.insertRegister('Y', this.register.A)
         break
 
       case 'CLC':
@@ -403,7 +403,8 @@ export class CPU {
     const ret = this.handler.readCPU(targetMemory) + value
     this.handler.writeCPU(targetMemory, ret)
 
-    this.register.P.Z === (0 === ret)
+    this.register.P.Z = (0 === ret)
+    this.register.P.N = !!(ret & 0x80)
   }
 
   createADCData(address: string): number {
