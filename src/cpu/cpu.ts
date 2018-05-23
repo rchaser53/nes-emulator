@@ -291,11 +291,11 @@ export class CPU {
         break
 
       case 'INX':
-        this.addRegister('X', 1)
+        this.increaseRegister('X', 1)
         break
 
       case 'INY':
-        this.addRegister('Y', 1)
+        this.increaseRegister('Y', 1)
         break
 
       case 'RTS':
@@ -459,16 +459,27 @@ export class CPU {
     this.register.P.Z === (0 === this.register[registerKey])
   }
 
+  changeNVFlag(registerKey: string, beforeRegisterValue: number) {
+    this.register.P.N = !!(this.register[registerKey] & 0x80)
+    this.register.P.Z === (0 === this.register[registerKey])
+  }
+
   isOverFlagTrue(registerKey: string, beforeRegisterValue: number): boolean {
     if (beforeRegisterValue <= 0x7f && 0x80 <= this.register[registerKey]) return true
     if (this.register[registerKey] <= 0x7f && 0x80 <= beforeRegisterValue) return true
     return false
   }
 
+  increaseRegister(registerKey: string, value: number) {
+    const beforeRegisterValue = this.register[registerKey]
+    this.register[registerKey] = (this.register[registerKey] + value) & 0xff
+    this.changeNVFlag(registerKey, beforeRegisterValue)
+  }
+
   decreaseRegister(registerKey: string, value: number) {
     const beforeRegisterValue = this.register[registerKey]
-    this.register[registerKey] -= value
-    this.changeNVZFlag(registerKey, beforeRegisterValue)
+    this.register[registerKey] = (this.register[registerKey] - value) & 0xff
+    this.changeNVFlag(registerKey, beforeRegisterValue)
   }
 
   changeProgramCount(address: string) {
