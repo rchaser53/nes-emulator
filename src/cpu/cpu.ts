@@ -427,7 +427,7 @@ export class CPU {
   insertRegister(registerKey: string, value: number) {
     const beforeRegisterValue = this.register[registerKey]
     this.register[registerKey] = value
-    this.changeNVZFlag(registerKey, beforeRegisterValue)
+    this.changeNZFlag(registerKey, beforeRegisterValue)
   }
 
   addRegister(registerKey: string, value: number) {
@@ -453,6 +453,11 @@ export class CPU {
     this.changeNVZFlag(registerKey, beforeRegisterValue)
   }
 
+  changeNZFlag(registerKey: string, beforeRegisterValue: number) {
+    this.register.P.N = !!(this.register[registerKey] & 0x80)
+    this.register.P.Z = (0 === this.register[registerKey])
+  }
+
   changeNVZFlag(registerKey: string, beforeRegisterValue: number) {
     this.register.P.V = this.isOverFlagTrue(registerKey, beforeRegisterValue)
     this.register.P.N = !!(this.register[registerKey] & 0x80)
@@ -473,13 +478,13 @@ export class CPU {
   increaseRegister(registerKey: string, value: number) {
     const beforeRegisterValue = this.register[registerKey]
     this.register[registerKey] = (this.register[registerKey] + value) & 0xff
-    this.changeNVFlag(registerKey, beforeRegisterValue)
+    this.changeNZFlag(registerKey, beforeRegisterValue)
   }
 
   decreaseRegister(registerKey: string, value: number) {
     const beforeRegisterValue = this.register[registerKey]
     this.register[registerKey] = (this.register[registerKey] - value) & 0xff
-    this.changeNVFlag(registerKey, beforeRegisterValue)
+    this.changeNZFlag(registerKey, beforeRegisterValue)
   }
 
   changeProgramCount(address: string) {
