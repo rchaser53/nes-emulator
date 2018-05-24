@@ -54,28 +54,31 @@ export class PPU {
   isVramAddrUpper: boolean = true
 
   characteSpriteData: number[][]
-  spriteRam: Uint8Array = new Uint8Array(0x100)
+  spriteRam: number[] = [...new Array(0x100)].map(_ => 0)
 
-  patternTables: Uint8Array[] = [new Uint8Array(0x1000), new Uint8Array(0x1000)]
-
-  nameTables: Uint8Array[] = [
-    new Uint8Array(0x3c0),
-    new Uint8Array(0x3c0),
-    new Uint8Array(0x3c0),
-    new Uint8Array(0x3c0)
+  patternTables: number[][] = [
+    [...new Array(0x1000)].map(_ => 0),
+    [...new Array(0x1000)].map(_ => 0),
   ]
 
-  attributeTables: Uint8Array[] = [
-    new Uint8Array(0x40),
-    new Uint8Array(0x40),
-    new Uint8Array(0x40),
-    new Uint8Array(0x40)
+  nameTables: number[][] = [
+    [...new Array(0x3c0)].map(_ => 0),
+    [...new Array(0x3c0)].map(_ => 0),
+    [...new Array(0x3c0)].map(_ => 0),
+    [...new Array(0x3c0)].map(_ => 0),
   ]
 
-  nameAttributeMirror: Uint8Array = new Uint8Array(0xeff) //  $3000～$3EFF
-  backgroundPalette: Uint8Array = new Uint8Array(0x10) //  $3F00～$3F0F
-  spritePalette: Uint8Array = new Uint8Array(0x10) //  $3F10～$3F1F
-  paletteMirror: Uint8Array = new Uint8Array(0xd0) //  $3F20～$3FFF
+  attributeTables: number[][] = [
+    [...new Array(0x40)].map(_ => 0),
+    [...new Array(0x40)].map(_ => 0),
+    [...new Array(0x40)].map(_ => 0),
+    [...new Array(0x40)].map(_ => 0),
+  ]
+
+  nameAttributeMirror: number[] = [...new Array(0xeff)].map(_ => 0) //  $3000～$3EFF
+  backgroundPalette: number[] = [...new Array(0x10)].map(_ => 0)    //  $3F00～$3F0F
+  spritePalette: number[] = [...new Array(0x10)].map(_ => 0)        //  $3F10～$3F1F
+  paletteMirror: number[] = [...new Array(0xd0)].map(_ => 0)        //  $3F20～$3FFF
 
   colorTileBuffer: number[][] = []
 
@@ -109,6 +112,16 @@ export class PPU {
     return (this.register.PPUCTRL & SpriteBaseBinary) === SpriteBaseBinary ? 0x1000 / 16 : 0
   }
 
+  get currentAttributeTable() {
+    const nameTableBinaries = 0b11
+    return this.attributeTables[this.register.PPUCTRL & nameTableBinaries]
+  }
+
+  get currentNameTable() {
+    const nameTableBinaries = 0b11
+    return this.nameTables[this.register.PPUCTRL & nameTableBinaries]
+  }
+
   read(index: number): number {
     switch (PPURegisterMap[index]) {
       case 'PPUSTATUS':
@@ -136,6 +149,7 @@ export class PPU {
   }
 
   write(index: number, value: number) {
+    // console.log(index, value)
     switch (PPURegisterMap[index]) {
       case 'PPUCTRL':
         this.register.PPUCTRL = value
@@ -256,22 +270,13 @@ export class PPU {
     return 0x2000 + base * 0x400
   }
 
-  get currentAttributeTable() {
-    const nameTableBinaries = 0b11
-    return this.attributeTables[this.register.PPUCTRL & nameTableBinaries] as any
-  }
-
-  get currentNameTable() {
-    const nameTableBinaries = 0b11
-    return Array.from(this.nameTables[this.register.PPUCTRL & nameTableBinaries])
-  }
-
   run(cycle: number) {
     this.cycle += cycle
     this.line++
 
     if (this.line === LineLimit) {
       this.colorTileBuffer = createColorTileDef(this.currentAttributeTable)
+
       this.line = 0
       this.register.PPUSTATUS ^= 0x80
 
@@ -293,9 +298,8 @@ export class PPU {
 
   buildSprites() {
     const sprites: any[] = []
-    const inputRam: number[] = Array.from(this.spriteRam)
-    while (inputRam.length !== 0) {
-      sprites.push(inputRam.splice(0, 4))
+    while (this.spriteRam.length !== 0) {
+      sprites.push(this.spriteRam.splice(0, 4))
     }
 
     return sprites.map((sprite: number[]) => {
@@ -343,6 +347,8 @@ export class PPU {
   }
 
   buildBackground() {
+
+
     return this.currentNameTable.map((elem, index) => {
       return this.createBackgroundSprite(elem, index)
     })
