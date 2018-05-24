@@ -44,6 +44,10 @@ const SpriteStartRightBit = 0b1000000
 const PreferentialBackgroundBit = 0b100000
 const nameTableBinaries = 0b11
 
+const ColumnSpriteNumber = 32
+const RowSpriteNumber = 30
+const AttributeSpliteRowColumnNumber = 8;
+
 export class PPU {
   interrupt: Interrupt
   cycle: number = 0
@@ -113,16 +117,137 @@ export class PPU {
     return (this.register.PPUCTRL & SpriteBaseBinary) === SpriteBaseBinary ? 0x1000 / 16 : 0
   }
 
-  get currentAttributeTable() {
-    return this.attributeTables[this.register.PPUCTRL & nameTableBinaries]
+  get currentTableIndex() {
+    return this.register.PPUCTRL & nameTableBinaries
+  }
+
+  get offsetAttributeTableXIndex() {
+    return Math.floor(this.offSetX / ColumnSpriteNumber)
+  }
+
+  get offsetAttributeTableYIndex() {
+    return Math.floor(this.offSetX / RowSpriteNumber)
+  }
+
+  get offsetNameTableXIndex() {
+    return Math.floor(this.offSetX / AttributeSpliteRowColumnNumber)
+  }
+
+  get offsetNameTableYIndex() {
+    return Math.floor(this.offSetY / AttributeSpliteRowColumnNumber)
   }
 
   get currentNameTable() {
-    return this.nameTables[this.register.PPUCTRL & nameTableBinaries]
+    const nameTable = [...new Array(0x3c0)].map(_ => 0)
+    for (let column = 0; column < ColumnSpriteNumber; column++) {
+      for (let row = 0; row < RowSpriteNumber; row++) {
+        let totalColumn = 0
+        let totalRow = 0
+
+        switch (this.currentTableIndex) {
+          case 0:
+          totalColumn = this.offsetNameTableXIndex  + column
+          totalRow = this.offsetNameTableYIndex + row
+            break
+          case 1:
+          totalColumn = this.offsetNameTableXIndex + column + ColumnSpriteNumber
+          totalRow = this.offsetNameTableYIndex + row
+            break
+          case 2:
+          totalColumn = this.offsetNameTableXIndex + column
+          totalRow = this.offsetNameTableYIndex + row + RowSpriteNumber
+            break
+          default:
+          totalColumn = this.offsetNameTableXIndex + column + ColumnSpriteNumber
+          totalRow = this.offsetNameTableYIndex + row + RowSpriteNumber
+            break
+        }
+
+        let targetIndex = 0
+        let nameTableIndex = column + (row * RowSpriteNumber)
+        if (totalColumn < ColumnSpriteNumber) {
+          // table 0
+          if (totalRow < RowSpriteNumber) {
+            targetIndex = totalColumn + (totalRow * ColumnSpriteNumber)
+            nameTable[nameTableIndex] = this.nameTables[0][targetIndex]
+          }
+          // table 2
+          else {
+            targetIndex = totalColumn + ((totalRow - RowSpriteNumber) * ColumnSpriteNumber)
+            nameTable[nameTableIndex] = this.nameTables[2][targetIndex]
+          }
+        } else {
+          // table 1
+          if (totalRow < RowSpriteNumber) {
+            targetIndex = (totalColumn - ColumnSpriteNumber) + (totalRow * ColumnSpriteNumber)
+            nameTable[nameTableIndex] = this.nameTables[1][targetIndex]
+          }
+          // table 3
+          else {
+            targetIndex = (totalColumn - ColumnSpriteNumber) + ((totalRow - RowSpriteNumber) * ColumnSpriteNumber)
+            nameTable[nameTableIndex] = this.nameTables[2][targetIndex]
+          }
+        }
+      }
+    }
+    return nameTable
   }
 
-  get currentTableIndex() {
-    return this.register.PPUCTRL & nameTableBinaries
+
+  get currentAttributeTable() {
+    const attributeTable = [...new Array(0x40)].map(_ => 0)
+    for (let column = 0; column < AttributeSpliteRowColumnNumber; column++) {
+      for (let row = 0; row < AttributeSpliteRowColumnNumber; row++) {
+        let totalColumn = 0
+        let totalRow = 0
+
+        switch (this.currentTableIndex) {
+          case 0:
+          totalColumn = this.offsetAttributeTableXIndex  + column
+          totalRow = this.offsetAttributeTableYIndex + row
+            break
+          case 1:
+          totalColumn = this.offsetAttributeTableXIndex + column + AttributeSpliteRowColumnNumber
+          totalRow = this.offsetAttributeTableYIndex + row
+            break
+          case 2:
+          totalColumn = this.offsetAttributeTableXIndex + column
+          totalRow = this.offsetAttributeTableYIndex + row + AttributeSpliteRowColumnNumber
+            break
+          default:
+          totalColumn = this.offsetAttributeTableXIndex + column + AttributeSpliteRowColumnNumber
+          totalRow = this.offsetAttributeTableYIndex + row + AttributeSpliteRowColumnNumber
+            break
+        }
+
+        let targetIndex = 0
+        let attributeIndex = column + (row * AttributeSpliteRowColumnNumber)
+        if (totalColumn < AttributeSpliteRowColumnNumber) {
+          // table 0
+          if (totalRow < AttributeSpliteRowColumnNumber) {
+            targetIndex = totalColumn + (totalRow * AttributeSpliteRowColumnNumber)
+            attributeTable[attributeIndex] = this.attributeTables[0][targetIndex]
+          }
+          // table 2
+          else {
+            targetIndex = totalColumn + ((totalRow - AttributeSpliteRowColumnNumber) * AttributeSpliteRowColumnNumber)
+            attributeTable[attributeIndex] = this.attributeTables[2][targetIndex]
+          }
+        } else {
+          // table 1
+          if (totalRow < AttributeSpliteRowColumnNumber) {
+            targetIndex = (totalColumn - AttributeSpliteRowColumnNumber) + (totalRow * AttributeSpliteRowColumnNumber)
+            attributeTable[attributeIndex] = this.attributeTables[1][targetIndex]
+          }
+          // table 3
+          else {
+            targetIndex = (totalColumn - AttributeSpliteRowColumnNumber) + ((totalRow - AttributeSpliteRowColumnNumber) * AttributeSpliteRowColumnNumber)
+            attributeTable[attributeIndex] = this.attributeTables[2][targetIndex]
+          }
+        }
+      }
+    }
+    return attributeTable
   }
 
   read(index: number): number {
@@ -280,6 +405,7 @@ export class PPU {
     if (this.line === LineLimit) {
       this.colorTileBuffer = createColorTileDef(this.currentAttributeTable)
 
+      // console.log(this.colorTileBuffer)
       this.line = 0
       this.register.PPUSTATUS ^= 0x80
 
@@ -349,68 +475,8 @@ export class PPU {
     }
   }
 
-  get offsetTableXIndex() {
-    return Math.floor(this.offSetX / 8)
-  }
-
-  get offsetTableYIndex() {
-    return Math.floor(this.offSetY / 8)
-  }
-
   buildBackground() {
-    const nameTable = [...new Array(0x3c0)].map(_ => 0)
-    for (let column = 0; column < 32; column++) {
-      for (let row = 0; row < 30; row++) {
-        let totalColumn = 0
-        let totalRow = 0
-
-        switch (this.currentTableIndex) {
-          case 0:
-          totalColumn = this.offsetTableXIndex  + column
-          totalRow = this.offsetTableYIndex + row
-            break
-          case 1:
-          totalColumn = this.offsetTableXIndex + column + 32
-          totalRow = this.offsetTableYIndex + row
-            break
-          case 2:
-          totalColumn = this.offsetTableXIndex + column
-          totalRow = this.offsetTableYIndex + row + 30
-            break
-          default:
-          totalColumn = this.offsetTableXIndex + column + 32
-          totalRow = this.offsetTableYIndex + row + 30
-            break
-        }
-
-        let targetIndex = 0
-        if (totalColumn < 32) {
-          // table 0
-          if (totalRow < 30) {
-            targetIndex = totalColumn + (totalRow * 32)
-            nameTable[targetIndex] = this.nameTables[0][targetIndex]
-          }
-          // table 2
-          else {
-            targetIndex = totalColumn + ((totalRow - 30) * 32)
-            nameTable[targetIndex] = this.nameTables[2][targetIndex]
-          }
-        } else {
-          // table 1
-          if (totalRow < 30) {
-            targetIndex = (totalColumn - 32) + (totalRow * 32)
-            nameTable[targetIndex] = this.nameTables[1][targetIndex]
-          }
-          // table 3
-          else {
-            targetIndex = (totalColumn - 32) + ((totalRow - 30) * 32)
-            nameTable[targetIndex] = this.nameTables[2][targetIndex]
-          }
-        }
-      }
-    }
-
-    return nameTable.map((elem, index) => {
+    return this.currentNameTable.map((elem, index) => {
       return this.createBackgroundSprite(elem, index)
     })
   }
@@ -418,7 +484,6 @@ export class PPU {
   createBackgroundSprite(characterIndex: number, nameIndex: number) {
     const { row, column } = convertIndexToRowColumn(nameIndex)
     const sprite = createSpriteInputs(this.characteSpriteData[characterIndex])
-
     return sprite.map((elem) => {
       return elem
         .map((num) => {
