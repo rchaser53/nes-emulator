@@ -42,6 +42,7 @@ const DefaultPPUCTRL = 0b01000000
 const SpriteStartBottomBit = 0b10000000
 const SpriteStartRightBit = 0b1000000
 const PreferentialBackgroundBit = 0b100000
+const nameTableBinaries = 0b11
 
 export class PPU {
   interrupt: Interrupt
@@ -113,13 +114,15 @@ export class PPU {
   }
 
   get currentAttributeTable() {
-    const nameTableBinaries = 0b11
     return this.attributeTables[this.register.PPUCTRL & nameTableBinaries]
   }
 
   get currentNameTable() {
-    const nameTableBinaries = 0b11
     return this.nameTables[this.register.PPUCTRL & nameTableBinaries]
+  }
+
+  get currentTableIndex() {
+    return this.register.PPUCTRL & nameTableBinaries
   }
 
   read(index: number): number {
@@ -346,10 +349,68 @@ export class PPU {
     }
   }
 
+  get offsetTableXIndex() {
+    return Math.floor(this.offSetX / 8)
+  }
+
+  get offsetTableYIndex() {
+    return Math.floor(this.offSetY / 8)
+  }
+
   buildBackground() {
+    const nameTable = [...new Array(0x3c0)].map(_ => 0)
+    for (let column = 0; column < 32; column++) {
+      for (let row = 0; row < 30; row++) {
+        let totalColumn = 0
+        let totalRow = 0
 
+        switch (this.currentTableIndex) {
+          case 0:
+          totalColumn = this.offsetTableXIndex  + column
+          totalRow = this.offsetTableYIndex + row
+            break
+          case 1:
+          totalColumn = this.offsetTableXIndex + column + 32
+          totalRow = this.offsetTableYIndex + row
+            break
+          case 2:
+          totalColumn = this.offsetTableXIndex + column
+          totalRow = this.offsetTableYIndex + row + 30
+            break
+          default:
+          totalColumn = this.offsetTableXIndex + column + 32
+          totalRow = this.offsetTableYIndex + row + 30
+            break
+        }
 
-    return this.currentNameTable.map((elem, index) => {
+        let targetIndex = 0
+        if (totalColumn < 32) {
+          // table 0
+          if (totalRow < 30) {
+            targetIndex = totalColumn + (totalRow * 32)
+            nameTable[targetIndex] = this.nameTables[0][targetIndex]
+          }
+          // table 2
+          else {
+            targetIndex = totalColumn + ((totalRow - 30) * 32)
+            nameTable[targetIndex] = this.nameTables[2][targetIndex]
+          }
+        } else {
+          // table 1
+          if (totalRow < 30) {
+            targetIndex = (totalColumn - 32) + (totalRow * 32)
+            nameTable[targetIndex] = this.nameTables[1][targetIndex]
+          }
+          // table 3
+          else {
+            targetIndex = (totalColumn - 32) + ((totalRow - 30) * 32)
+            nameTable[targetIndex] = this.nameTables[2][targetIndex]
+          }
+        }
+      }
+    }
+
+    return nameTable.map((elem, index) => {
       return this.createBackgroundSprite(elem, index)
     })
   }
