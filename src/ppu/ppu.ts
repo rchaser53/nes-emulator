@@ -126,7 +126,7 @@ export class PPU {
   }
 
   get offsetAttributeTableYIndex() {
-    return Math.floor(this.offSetX / RowSpriteNumber)
+    return Math.floor(this.offSetY / RowSpriteNumber)
   }
 
   get offsetNameTableXIndex() {
@@ -165,6 +165,7 @@ export class PPU {
 
         let targetIndex = 0
         let nameTableIndex = column + (row * RowSpriteNumber)
+
         if (totalColumn < ColumnSpriteNumber) {
           // table 0
           if (totalRow < RowSpriteNumber) {
@@ -222,9 +223,11 @@ export class PPU {
 
         let targetIndex = 0
         let attributeIndex = column + (row * AttributeSpliteRowColumnNumber)
+
         if (totalColumn < AttributeSpliteRowColumnNumber) {
           // table 0
           if (totalRow < AttributeSpliteRowColumnNumber) {
+            // console.log(this.offSetX, this.offsetAttributeTableXIndex, column, row, 'table0')
             targetIndex = totalColumn + (totalRow * AttributeSpliteRowColumnNumber)
             attributeTable[attributeIndex] = this.attributeTables[0][targetIndex]
           }
@@ -236,7 +239,9 @@ export class PPU {
         } else {
           // table 1
           if (totalRow < AttributeSpliteRowColumnNumber) {
+            // console.log(this.offSetX, this.offsetAttributeTableXIndex, column, row, 'table1')
             targetIndex = (totalColumn - AttributeSpliteRowColumnNumber) + (totalRow * AttributeSpliteRowColumnNumber)
+            // attributeTable[attributeIndex] = this.attributeTables[1][targetIndex]
             attributeTable[attributeIndex] = this.attributeTables[1][targetIndex]
           }
           // table 3
