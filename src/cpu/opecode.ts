@@ -44,14 +44,18 @@ export const OpecodesMap: { [key: string]: Order} = {
   "ae": { opecode: 'LDX', data: 0x4400, address: 'Absolute', len: 3, cycle: 4 },          //  Absolute      LDX $4400     $AE   3   4
   "be": { opecode: 'LDX', data: 0x4400, address: 'Absolute,Y', len: 3, cycle: 4 },        //  Absolute,Y    LDX $4400,Y   $BE   3   4 +1
 
-  "a0": { opecode: 'LDY', data: 0x0044, address: 'Immediate', len: 2, cycle: 2  },        //  Immediate     LDY #$44      $A0   2   2
-  "a4": { opecode: 'LDY', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 3  },         //  Zero Page     LDY $44       $A4   2   3
+  "a0": { opecode: 'LDY', data: 0x0044, address: 'Immediate', len: 2, cycle: 2 },         //  Immediate     LDY #$44      $A0   2   2
+  "a4": { opecode: 'LDY', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 3 },          //  Zero Page     LDY $44       $A4   2   3
   
-  "9a": { opecode: 'TXS', data: 0x0000, address: 'Implied', len: 1, cycle: 2  },          //  Implied       TXS           $9A   1   2
-  "98": { opecode: 'TYA', data: 0x0000, address: 'Implied', len: 1, cycle: 2  },          //  Implied       TYA           $98   1   2
+  "9a": { opecode: 'TXS', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       TXS           $9A   1   2
+  "98": { opecode: 'TYA', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       TYA           $98   1   2
 
-  "85": { opecode: 'STA', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 3  },         //  Zero Page     STA $44       $85   2   3
+  "85": { opecode: 'STA', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 3 },          //  Zero Page     STA $44       $85   2   3
+  "95": { opecode: 'STA', data: 0x0044, address: 'ZeroPage,X', len: 2, cycle: 4 },        //  Zero Page,X   STA $44,X     $95   2   4
   "8d": { opecode: 'STA', data: 0x4400, address: 'Absolute', len: 3, cycle: 4 },          //  Absolute      STA $4400     $8D   3   4
+  "9d": { opecode: 'STA', data: 0x4400, address: 'Absolute,X', len: 3, cycle: 4 },        //  Absolute,X    STA $4400,X   $9D   3   4 +1
+  "99": { opecode: 'STA', data: 0x4400, address: 'Absolute,Y', len: 3, cycle: 4 },        //  Absolute,Y    STA $4400,Y   $99   3   4 +1
+  "81": { opecode: 'STA', data: 0x0044, address: 'Indirect,X', len: 2, cycle: 6 },        //  Indirect,X    STA ($44,X)   $81   2   6
   "91": { opecode: 'STA', data: 0x0044, address: 'Indirect,Y', len: 2, cycle: 5 },        //  Indirect,Y    STA ($44),Y   $91   2   5 +1
 
   "86": { opecode: 'STX', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 3 },          //  Zero Page     STX $44       $86   2   3

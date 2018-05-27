@@ -396,13 +396,6 @@ export class PPU {
     this.isVramAddrUpper = !this.isVramAddrUpper
   }
 
-  getNameSpace(): number {
-    const nameTableBinaries = 0b11
-    const base = this.register.PPUCTRL & nameTableBinaries
-
-    return 0x2000 + base * 0x400
-  }
-
   run(cycle: number) {
     this.cycle += cycle
     this.line++
@@ -410,7 +403,6 @@ export class PPU {
     if (this.line === LineLimit) {
       this.colorTileBuffer = createColorTileDef(this.currentAttributeTable)
 
-      // console.log(this.colorTileBuffer)
       this.line = 0
       this.register.PPUSTATUS ^= 0x80
 
