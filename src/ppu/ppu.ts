@@ -408,7 +408,9 @@ export class PPU {
 
       return {
         sprites: this.buildSprites(),
-        background: this.buildBackground()
+        background: this.buildBackground(),
+        offSetX: this.offSetX,
+        offSetY: this.offSetY
       }
     }
 

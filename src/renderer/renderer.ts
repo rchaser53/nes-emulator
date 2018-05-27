@@ -24,19 +24,22 @@ export class Renderer {
     this.image = this.ctx.createImageData(256, 224)
   }
 
-  render(renderInput) {
-    this.renderBackground(renderInput.background)
-    this.renderSprite(renderInput.sprites)
+  render({ background, sprites, offSetX, offSetY }) {
+    this.renderBackground(background, offSetX, offSetY)
+    this.renderSprite(sprites)
 
     this.ctx.putImageData(this.image, 0, 0)
   }
 
-  renderBackground(background) {
+  renderBackground(background, offsetX, offsetY) {
+    const actualOffsetX = (offsetX % 8 * 4)
+    const actualOffsetY = (offsetY % 8 * 4 * 256)
+
     background.forEach((sprite, spriteIndex) => {
       sprite.forEach((row, rowIndex) => {
         row.forEach((pixel, pixelIndex) => {
           const { x, y } = this.culculateXandY(spriteIndex, rowIndex, pixelIndex)
-          const baseIndex = x * 4 + y * 4 * 256
+          const baseIndex = x * 4 + y * 4 * 256 - (actualOffsetX + actualOffsetY)
           this.image.data[baseIndex] = colors[pixel][0]
           this.image.data[baseIndex + 1] = colors[pixel][1]
           this.image.data[baseIndex + 2] = colors[pixel][2]
