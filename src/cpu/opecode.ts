@@ -65,7 +65,10 @@ export const OpecodesMap: { [key: string]: Order} = {
   "10": { opecode: 'BPL', data: 0x0044, address: 'Relative', len: 2, cycle: 2 },          //  Relative      BPL $44       $10   2   2 +1or2
   "90": { opecode: 'BCC', data: 0x0044, address: 'Relative', len: 2, cycle: 2 },          //  Relative      BCC $44       $90   2   2 +1or2
   "b0": { opecode: 'BCS', data: 0x0044, address: 'Relative', len: 2, cycle: 2 },          //  Relative      BCS $44       $B0   2   2 +1or2
-  "d0": { opecode: 'BNE', data: 0x0044, address: 'Relative', len: 2, cycle: 2  },         //  Relative      BNE $44       $D0   2   2 +1or2
+  "d0": { opecode: 'BNE', data: 0x0044, address: 'Relative', len: 2, cycle: 2 },          //  Relative      BNE $44       $D0   2   2 +1or2
+  "70": { opecode: 'BVS', data: 0x0044, address: 'Relative', len: 2, cycle: 2 },          //  Relative      BVS $44       $70   2   2 +1or2
+  "50": { opecode: 'BVC', data: 0x0044, address: 'Relative', len: 2, cycle: 2 },          //  Relative      BVC $44       $50   2   2 +1or2
+
   "f0": { opecode: 'BEQ', data: 0x0044, address: 'Relative', len: 2, cycle: 2 },          //  Relative      BEQ $44       $F0   2   2 +1or2
 
   "60": { opecode: 'RTS', data: 0x0000, address: 'Implied', len: 1, cycle: 6 },           //  Implied       RTS           $60   1   6

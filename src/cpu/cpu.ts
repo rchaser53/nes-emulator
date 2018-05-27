@@ -274,6 +274,14 @@ export class CPU {
         this.branchPC(this.register.P.Z, false, order.address)
         break
 
+      case 'BVS':
+        this.branchPC(this.register.P.V, true, order.address)
+        break
+
+      case 'BVC':
+        this.branchPC(this.register.P.V, false, order.address)
+        break
+
       case 'BPL':
         this.branchPC(this.register.P.N, false, order.address)
         break
