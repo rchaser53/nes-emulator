@@ -59,31 +59,31 @@ export class PPU {
   isVramAddrUpper: boolean = true
 
   characteSpriteData: number[][]
-  spriteRam: number[] = [...new Array(0x100)].map(_ => 0)
+  spriteRam: number[] = [...new Array(0x100)].fill(0)
 
   patternTables: number[][] = [
-    [...new Array(0x1000)].map(_ => 0),
-    [...new Array(0x1000)].map(_ => 0),
+    [...new Array(0x1000)].fill(0),
+    [...new Array(0x1000)].fill(0),
   ]
 
   nameTables: number[][] = [
-    [...new Array(0x3c0)].map(_ => 0),
-    [...new Array(0x3c0)].map(_ => 0),
-    [...new Array(0x3c0)].map(_ => 0),
-    [...new Array(0x3c0)].map(_ => 0),
+    [...new Array(0x3c0)].fill(0),
+    [...new Array(0x3c0)].fill(0),
+    [...new Array(0x3c0)].fill(0),
+    [...new Array(0x3c0)].fill(0),
   ]
 
   attributeTables: number[][] = [
-    [...new Array(0x40)].map(_ => 0),
-    [...new Array(0x40)].map(_ => 0),
-    [...new Array(0x40)].map(_ => 0),
-    [...new Array(0x40)].map(_ => 0),
+    [...new Array(0x40)].fill(0),
+    [...new Array(0x40)].fill(0),
+    [...new Array(0x40)].fill(0),
+    [...new Array(0x40)].fill(0),
   ]
 
-  nameAttributeMirror: number[] = [...new Array(0xeff)].map(_ => 0) //  $3000～$3EFF
-  backgroundPalette: number[] = [...new Array(0x10)].map(_ => 0)    //  $3F00～$3F0F
-  spritePalette: number[] = [...new Array(0x10)].map(_ => 0)        //  $3F10～$3F1F
-  paletteMirror: number[] = [...new Array(0xd0)].map(_ => 0)        //  $3F20～$3FFF
+  nameAttributeMirror: number[] = [...new Array(0xeff)].fill(0) //  $3000～$3EFF
+  backgroundPalette: number[] = [...new Array(0x10)].fill(0)    //  $3F00～$3F0F
+  spritePalette: number[] = [...new Array(0x10)].fill(0)        //  $3F10～$3F1F
+  paletteMirror: number[] = [...new Array(0xd0)].fill(0)        //  $3F20～$3FFF
 
   colorTileBuffer: number[][] = []
 
@@ -138,7 +138,7 @@ export class PPU {
   }
 
   get currentNameTable() {
-    const nameTable = [...new Array(0x3c0)].map(_ => 0)
+    const nameTable = [...new Array(0x3c0)].fill(0)
 
     for (let column = 0; column < ColumnSpriteNumber; column++) {
       for (let row = 0; row < RowSpriteNumber; row++) {
@@ -154,7 +154,7 @@ export class PPU {
   }
 
   get currentAttributeTable() {
-    const attributeTable = [...new Array(0x40)].map(_ => 0)
+    const attributeTable = [...new Array(0x40)].fill(0)
     for (let column = 0; column < AttributeSpliteRowColumnNumber; column++) {
       for (let row = 0; row < AttributeSpliteRowColumnNumber; row++) {
         const baseX = (this.offsetNameTableXIndex + column) % AttributeSpliteRowColumnNumber
