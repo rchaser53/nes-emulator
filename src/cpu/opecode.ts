@@ -111,6 +111,9 @@ export const OpecodesMap: { [key: string]: Order} = {
   
   "c9": { opecode: 'CMP', data: 0x0044, address: 'Immediate', len: 2, cycle: 2 },         //  Immediate     CMP #$44      $C9   2   2
 
+  "24": { opecode: 'BIT', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 3 },          //  Zero Page     BIT $44       $24   2   3
+  "2c": { opecode: 'BIT', data: 0x4400, address: 'Absolute', len: 3, cycle: 4 },          //  Absolute      BIT $4400     $2C   3   4
+
   "a8": { opecode: 'TAY', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       TAY           $A8   1   2
 
   "18": { opecode: 'CLC', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       CLC           $18   1   2

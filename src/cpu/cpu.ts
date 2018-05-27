@@ -254,6 +254,10 @@ export class CPU {
         this.register.P.C = true
         break
 
+      case 'BIT':
+        this.testBitInMemoryWithA(order.address)
+        break
+
       case 'TXS':
         this.insertRegister('S', this.register.X + 0x0100)
         break
@@ -401,6 +405,17 @@ export class CPU {
       default:
         throw new Error(`${JSON.stringify(order)} is not implemented!`)
     }
+  }
+
+  // BIT (Test Bits in M with A)
+  // メモリのデータをAでテストします。
+  // A and M の結果でZフラグをセットし、Mのビット7をNへ、ビット6をVへ転送します。
+  // flags: N V Z
+  testBitInMemoryWithA(address: string) {
+    const base = this.handler.readCPU(this.executeDataByAddress(address))
+    this.register.P.Z = (this.register.A & base) === 0
+    this.register.P.V = this.isOverFlagTrue('A', base)
+    this.register.P.N = !!((this.register.A & base) & 0x80)
   }
 
   setCompare(key: string, value: number): boolean {
