@@ -108,7 +108,10 @@ export const OpecodesMap: { [key: string]: Order} = {
   "c9": { opecode: 'CMP', data: 0x0044, address: 'Immediate', len: 2, cycle: 2 },         //  Immediate     CMP #$44      $C9   2   2
 
   "a8": { opecode: 'TAY', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       TAY           $A8   1   2
+
   "18": { opecode: 'CLC', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       CLC           $18   1   2
+  "d8": { opecode: 'CLD', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       CLD           $D8   1   2
+
   "f8": { opecode: 'SED', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       SED           $f8   1   2
 
   "e0": { opecode: 'CPX', data: 0x0044, address: 'Immediate', len: 2, cycle: 2 },         //  Immediate     CPX #$44      $E0   2   2

@@ -318,6 +318,10 @@ export class CPU {
         this.register.P.C = false
         break
 
+      case 'CLD':
+        this.register.P.D = false
+        break
+
       case 'SED':
         // this order is no mean
         break
