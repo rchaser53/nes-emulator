@@ -53,7 +53,10 @@ export const OpecodesMap: { [key: string]: Order} = {
   "85": { opecode: 'STA', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 3  },         //  Zero Page     STA $44       $85   2   3
   "8d": { opecode: 'STA', data: 0x4400, address: 'Absolute', len: 3, cycle: 4 },          //  Absolute      STA $4400     $8D   3   4
   "91": { opecode: 'STA', data: 0x0044, address: 'Indirect,Y', len: 2, cycle: 5 },        //  Indirect,Y    STA ($44),Y   $91   2   5 +1
+
   "86": { opecode: 'STX', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 3 },          //  Zero Page     STX $44       $86   2   3
+  "96": { opecode: 'STX', data: 0x0044, address: 'ZeroPage,Y', len: 2, cycle: 4 },        //  Zero Page,Y   STX $44,Y     $96   2   4
+  "8e": { opecode: 'STX', data: 0x4400, address: 'Absolute', len: 3, cycle: 4 },          //  Absolute      STX $4400     $8E   3   4
 
   "10": { opecode: 'BPL', data: 0x0044, address: 'Relative', len: 2, cycle: 2 },          //  Relative      BPL $44       $10   2   2 +1or2
   "90": { opecode: 'BCC', data: 0x0044, address: 'Relative', len: 2, cycle: 2 },          //  Relative      BCC $44       $90   2   2 +1or2
@@ -109,7 +112,6 @@ export const OpecodesMap: { [key: string]: Order} = {
   "f8": { opecode: 'SED', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       SED           $f8   1   2
 
   "e0": { opecode: 'CPX', data: 0x0044, address: 'Immediate', len: 2, cycle: 2 },         //  Immediate     CPX #$44      $E0   2   2
-
 
   "c0": { opecode: 'CPY', data: 0x0044, address: 'Immediate', len: 2, cycle: 2 },         //  Immediate     CPY #$44      $C0   2   2
   "c4": { opecode: 'CPY', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 3 },          //  Zero Page     CPY $44       $C4   2   3
