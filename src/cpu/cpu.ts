@@ -188,6 +188,10 @@ export class CPU {
         return this.getAbsoluteIndex(PC, 'Y')
       case 'ZeroPage':
         return this.handler.readCPU(PC)
+      case 'ZeroPage,X':
+        return this.getZeroIndex(PC, 'X')
+      case 'ZeroPage,Y':
+        return this.getZeroIndex(PC, 'Y')
       case 'Relative':
         return this.getRelative(PC)
       default:
@@ -215,6 +219,10 @@ export class CPU {
 
   getAbsoluteIndex(PC: number, registerKey: string): number {
     return this.getAbsolute(PC) + this.register[registerKey]
+  }
+
+  getZeroIndex(PC: number, registerKey: string): number {
+    return this.handler.readCPU(PC) + this.register[registerKey]
   }
 
   convertRegisterToDecimal(): number {
