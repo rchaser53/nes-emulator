@@ -143,7 +143,7 @@ export class PPU {
     for (let column = 0; column < ColumnSpriteNumber; column++) {
       for (let row = 0; row < RowSpriteNumber; row++) {
         const baseX = (this.offsetNameTableXIndex + column) % ColumnSpriteNumber
-        const baseY = ((this.offsetNameTableYIndex + row) % RowSpriteNumber) * ColumnSpriteNumber
+        const baseY = ((this.offsetNameTableYIndex + row) % RowSpriteNumber) * RowSpriteNumber
 
         const targetIndex = baseX + baseY
         const nameTableIndex = column + (row * RowSpriteNumber)
