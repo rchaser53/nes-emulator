@@ -41,7 +41,7 @@ describe('CPU', () => {
   beforeEach(() => {
     const programMemory = Array.apply(null, Array(3000)).map((_, index) => index % 256)
     const workingMemory = Array.apply(null, Array(3000)).map((_, index) => index % 256)
-    handler = new Handler(new PPU(new Uint8Array(0x1000), interrupt), programMemory, workingMemory)
+    handler = new Handler(new PPU(new Uint8Array(0x1000), interrupt, false), programMemory, workingMemory)
     handler.workingMemory = workingMemory
     cpu = new CPU(handler, interrupt)
   })

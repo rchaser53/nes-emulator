@@ -10,7 +10,7 @@ import { Renderer } from './renderer/renderer'
 const HeaderSize = 0x0010
 const ProgramROMIndex = 4
 const ChacterROMIndex = 5
-const NES_HEADER_SIZE = 0x0010
+const NesHeaderSize = 0x0010
 
 const IsDebug = false
 
@@ -35,12 +35,13 @@ export class Nes {
     isBrk: false,
     isIrq: false,
   }
+  isHorizontalMirror: boolean = false
 
   constructor(nesBuffer: ArrayBuffer) {
     this.load(nesBuffer)
 
     this.logger = new Logger(IsDebug)
-    this.ppu = new PPU(this.characterROM, this.interrupt)
+    this.ppu = new PPU(this.characterROM, this.interrupt, this.isHorizontalMirror)
     this.handler = new Handler(this.ppu, this.programROM, this.workingROM, this.logger)
     this.pad = new Pad(this.handler)
     this.renderer = new Renderer()
@@ -50,10 +51,13 @@ export class Nes {
   }
 
   load(nesBuffer) {
-    const { programROM, characterROM } = this.parse(nesBuffer)
+    const { programROM, characterROM, isHorizontalMirror } = this.parse(nesBuffer)
 
     this.programROM = programROM
     this.characterROM = characterROM
+
+    // https://wiki.nesdev.com/w/index.php/INES#Flags_6
+    this.isHorizontalMirror = isHorizontalMirror
   }
 
   parse(rawBuffer) {
@@ -62,8 +66,9 @@ export class Nes {
     const characterROMEnd = characterROMStart + buf[ChacterROMIndex] * 0x2000
 
     return {
-      programROM: buf.slice(NES_HEADER_SIZE, characterROMStart - 1),
-      characterROM: buf.slice(characterROMStart, characterROMEnd - 1)
+      programROM: buf.slice(NesHeaderSize, characterROMStart - 1),
+      characterROM: buf.slice(characterROMStart, characterROMEnd - 1),
+      isHorizontalMirror: (buf[5] & 0b1) === 0b1
     }
   }
 

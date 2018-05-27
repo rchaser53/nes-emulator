@@ -49,6 +49,7 @@ const RowSpriteNumber = 30
 const AttributeSpliteRowColumnNumber = 8;
 
 export class PPU {
+  isHorizontalMirror: boolean = false
   interrupt: Interrupt
   cycle: number = 0
   line: number = 0
@@ -102,7 +103,7 @@ export class PPU {
     PPUDATA: 0x00
   }
 
-  constructor(characterROM: Uint8Array, interrupt: Interrupt) {
+  constructor(characterROM: Uint8Array, interrupt: Interrupt, isHorizontalMirror: boolean) {
     const sprites: any = []
     const characterArray = Array.from(characterROM)
     while (characterArray.length !== 0) {
@@ -110,6 +111,7 @@ export class PPU {
     }
     this.characteSpriteData = sprites
     this.interrupt = interrupt
+    this.isHorizontalMirror = this.isHorizontalMirror
   }
 
   get offsetCharacteSpriteData() {
@@ -118,6 +120,7 @@ export class PPU {
   }
 
   get currentTableIndex() {
+    if (this.isHorizontalMirror) return 0
     return this.register.PPUCTRL & nameTableBinaries
   }
 
