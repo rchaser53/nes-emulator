@@ -139,117 +139,29 @@ export class PPU {
 
   get currentNameTable() {
     const nameTable = [...new Array(0x3c0)].map(_ => 0)
+
     for (let column = 0; column < ColumnSpriteNumber; column++) {
       for (let row = 0; row < RowSpriteNumber; row++) {
-        let totalColumn = 0
-        let totalRow = 0
+        const baseX = (this.offsetNameTableXIndex + column) % ColumnSpriteNumber
+        const baseY = ((this.offsetNameTableYIndex + row) % RowSpriteNumber) * ColumnSpriteNumber
 
-        switch (this.currentTableIndex) {
-          case 0:
-          totalColumn = this.offsetNameTableXIndex  + column
-          totalRow = this.offsetNameTableYIndex + row
-            break
-          case 1:
-          totalColumn = this.offsetNameTableXIndex + column + ColumnSpriteNumber
-          totalRow = this.offsetNameTableYIndex + row
-            break
-          case 2:
-          totalColumn = this.offsetNameTableXIndex + column
-          totalRow = this.offsetNameTableYIndex + row + RowSpriteNumber
-            break
-          default:
-          totalColumn = this.offsetNameTableXIndex + column + ColumnSpriteNumber
-          totalRow = this.offsetNameTableYIndex + row + RowSpriteNumber
-            break
-        }
-
-        let targetIndex = 0
-        let nameTableIndex = column + (row * RowSpriteNumber)
-
-        if (totalColumn < ColumnSpriteNumber) {
-          // table 0
-          if (totalRow < RowSpriteNumber) {
-            targetIndex = totalColumn + (totalRow * ColumnSpriteNumber)
-            nameTable[nameTableIndex] = this.nameTables[0][targetIndex]
-          }
-          // table 2
-          else {
-            targetIndex = totalColumn + ((totalRow - RowSpriteNumber) * ColumnSpriteNumber)
-            nameTable[nameTableIndex] = this.nameTables[2][targetIndex]
-          }
-        } else {
-          // table 1
-          if (totalRow < RowSpriteNumber) {
-            targetIndex = (totalColumn - ColumnSpriteNumber) + (totalRow * ColumnSpriteNumber)
-            nameTable[nameTableIndex] = this.nameTables[1][targetIndex]
-          }
-          // table 3
-          else {
-            targetIndex = (totalColumn - ColumnSpriteNumber) + ((totalRow - RowSpriteNumber) * ColumnSpriteNumber)
-            nameTable[nameTableIndex] = this.nameTables[2][targetIndex]
-          }
-        }
+        const targetIndex = baseX + baseY
+        const nameTableIndex = column + (row * RowSpriteNumber)
+        nameTable[nameTableIndex] = this.nameTables[this.currentTableIndex][targetIndex]
       }
     }
     return nameTable
   }
 
-
   get currentAttributeTable() {
     const attributeTable = [...new Array(0x40)].map(_ => 0)
     for (let column = 0; column < AttributeSpliteRowColumnNumber; column++) {
       for (let row = 0; row < AttributeSpliteRowColumnNumber; row++) {
-        let totalColumn = 0
-        let totalRow = 0
-
-        switch (this.currentTableIndex) {
-          case 0:
-          totalColumn = this.offsetAttributeTableXIndex  + column
-          totalRow = this.offsetAttributeTableYIndex + row
-            break
-          case 1:
-          totalColumn = this.offsetAttributeTableXIndex + column + AttributeSpliteRowColumnNumber
-          totalRow = this.offsetAttributeTableYIndex + row
-            break
-          case 2:
-          totalColumn = this.offsetAttributeTableXIndex + column
-          totalRow = this.offsetAttributeTableYIndex + row + AttributeSpliteRowColumnNumber
-            break
-          default:
-          totalColumn = this.offsetAttributeTableXIndex + column + AttributeSpliteRowColumnNumber
-          totalRow = this.offsetAttributeTableYIndex + row + AttributeSpliteRowColumnNumber
-            break
-        }
-
-        let targetIndex = 0
-        let attributeIndex = column + (row * AttributeSpliteRowColumnNumber)
-
-        if (totalColumn < AttributeSpliteRowColumnNumber) {
-          // table 0
-          if (totalRow < AttributeSpliteRowColumnNumber) {
-            // console.log(this.offSetX, this.offsetAttributeTableXIndex, column, row, 'table0')
-            targetIndex = totalColumn + (totalRow * AttributeSpliteRowColumnNumber)
-            attributeTable[attributeIndex] = this.attributeTables[0][targetIndex]
-          }
-          // table 2
-          else {
-            targetIndex = totalColumn + ((totalRow - AttributeSpliteRowColumnNumber) * AttributeSpliteRowColumnNumber)
-            attributeTable[attributeIndex] = this.attributeTables[2][targetIndex]
-          }
-        } else {
-          // table 1
-          if (totalRow < AttributeSpliteRowColumnNumber) {
-            // console.log(this.offSetX, this.offsetAttributeTableXIndex, column, row, 'table1')
-            targetIndex = (totalColumn - AttributeSpliteRowColumnNumber) + (totalRow * AttributeSpliteRowColumnNumber)
-            // attributeTable[attributeIndex] = this.attributeTables[1][targetIndex]
-            attributeTable[attributeIndex] = this.attributeTables[1][targetIndex]
-          }
-          // table 3
-          else {
-            targetIndex = (totalColumn - AttributeSpliteRowColumnNumber) + ((totalRow - AttributeSpliteRowColumnNumber) * AttributeSpliteRowColumnNumber)
-            attributeTable[attributeIndex] = this.attributeTables[2][targetIndex]
-          }
-        }
+        const baseX = (this.offsetNameTableXIndex + column) % AttributeSpliteRowColumnNumber
+        const baseY = ((this.offsetNameTableYIndex + row) % AttributeSpliteRowColumnNumber) * AttributeSpliteRowColumnNumber
+        const targetIndex = baseX + baseY
+        const attributeTableIndex = column + (row * AttributeSpliteRowColumnNumber)
+        attributeTable[attributeTableIndex] = this.nameTables[this.currentTableIndex][targetIndex]
       }
     }
     return attributeTable
