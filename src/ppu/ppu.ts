@@ -140,21 +140,20 @@ export class PPU {
     return Math.floor(this.offSetY / AttributeSpliteRowColumnNumber)
   }
 
-    get currentNameTable() {
-      const nameTable = [...new Array(0x3c0)].fill(0)
+  get currentNameTable() {
+    const nameTable = [...new Array(0x3c0)].fill(0)
 
-      for (let column = 0; column < ColumnSpriteNumber; column++) {
-        for (let row = 0; row < RowSpriteNumber; row++) {
-          const baseX = (this.offsetNameTableXIndex + column) % ColumnSpriteNumber
-          const baseY = ((this.offsetNameTableYIndex + row) % RowSpriteNumber) * RowSpriteNumber
-
-          const targetIndex = baseX + baseY
-          const nameTableIndex = column + (row * ColumnSpriteNumber)
-          nameTable[nameTableIndex] = this.nameTables[this.currentTableIndex][targetIndex]
-        }
+    for (let column = 0; column < ColumnSpriteNumber; column++) {
+      for (let row = 0; row < RowSpriteNumber; row++) {
+        const baseX = (this.offsetNameTableXIndex + column) % ColumnSpriteNumber
+        const baseY = ((this.offsetNameTableYIndex + row) % RowSpriteNumber) * ColumnSpriteNumber
+        const targetIndex = baseX + baseY
+        const nameTableIndex = column + (row * ColumnSpriteNumber)
+        nameTable[nameTableIndex] = this.nameTables[this.currentTableIndex][targetIndex]
       }
-      return nameTable
     }
+    return nameTable
+  }
 
   get currentAttributeTable() {
     const attributeTable = [...new Array(0x40)].fill(0)
@@ -164,7 +163,7 @@ export class PPU {
         const baseY = ((this.offsetNameTableYIndex + row) % AttributeSpliteRowColumnNumber) * AttributeSpliteRowColumnNumber
         const targetIndex = baseX + baseY
         const attributeTableIndex = column + (row * AttributeSpliteRowColumnNumber)
-        attributeTable[attributeTableIndex] = this.nameTables[this.currentTableIndex][targetIndex]
+        attributeTable[attributeTableIndex] = this.attributeTables[this.currentTableIndex][targetIndex]
       }
     }
     return attributeTable
