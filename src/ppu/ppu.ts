@@ -159,8 +159,8 @@ export class PPU {
     const attributeTable = [...new Array(0x40)].fill(0)
     for (let column = 0; column < AttributeSpliteRowColumnNumber; column++) {
       for (let row = 0; row < AttributeSpliteRowColumnNumber; row++) {
-        const baseX = (this.offsetNameTableXIndex + column) % AttributeSpliteRowColumnNumber
-        const baseY = ((this.offsetNameTableYIndex + row) % AttributeSpliteRowColumnNumber) * AttributeSpliteRowColumnNumber
+        const baseX = (this.offsetAttributeTableXIndex + column) % AttributeSpliteRowColumnNumber
+        const baseY = ((this.offsetAttributeTableYIndex + row) % AttributeSpliteRowColumnNumber) * AttributeSpliteRowColumnNumber
         const targetIndex = baseX + baseY
         const attributeTableIndex = column + (row * AttributeSpliteRowColumnNumber)
         attributeTable[attributeTableIndex] = this.attributeTables[this.currentTableIndex][targetIndex]
