@@ -196,7 +196,6 @@ export class PPU {
   }
 
   write(index: number, value: number) {
-    // console.log(index, value)
     switch (PPURegisterMap[index]) {
       case 'PPUCTRL':
         this.register.PPUCTRL = value
@@ -340,8 +339,9 @@ export class PPU {
 
   buildSprites() {
     const sprites: any[] = []
-    while (this.spriteRam.length !== 0) {
-      sprites.push(this.spriteRam.splice(0, 4))
+    const baseArray = this.spriteRam.slice(0, this.spriteRam.length)
+    while (baseArray.length !== 0) {
+      sprites.push(baseArray.splice(0, 4))
     }
 
     return sprites.map((sprite: number[]) => {
