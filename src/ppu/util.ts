@@ -93,7 +93,7 @@ export const reverseArray = (inputArray: any[]): any[] => {
 
 export const convertIndexToRowColumn = (index: number): RowColun => {
   const row = Math.floor(index / 64)
-  const column = Math.floor((index % 15) / 4)
+  const column = Math.floor((index % 64) / 4)
 
   return { row, column }
 }
