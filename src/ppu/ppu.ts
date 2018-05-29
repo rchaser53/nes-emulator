@@ -394,9 +394,17 @@ export class PPU {
     })
   }
 
+  culculateInputIndex(nameIndex: number): number {
+    const scrollX = Math.floor(this.offSetX / 8)
+    const scrollY = Math.floor(this.offSetY / 8)
+    return (nameIndex + scrollX + scrollY) % 960
+  }
+
   createBackgroundSprite(characterIndex: number, nameIndex: number) {
-    const { row, column } = convertIndexToRowColumn(nameIndex)
+    const inputIndex = this.culculateInputIndex(nameIndex)
+    const { row, column } = convertIndexToRowColumn(inputIndex)
     const sprite = createSpriteInputs(this.characteSpriteData[characterIndex])
+
     return sprite.map((elem) => {
       return elem
         .map((num) => {
