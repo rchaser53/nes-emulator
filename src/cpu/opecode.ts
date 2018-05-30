@@ -46,7 +46,13 @@ export const OpecodesMap: { [key: string]: Order} = {
 
   "a0": { opecode: 'LDY', data: 0x0044, address: 'Immediate', len: 2, cycle: 2 },         //  Immediate     LDY #$44      $A0   2   2
   "a4": { opecode: 'LDY', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 3 },          //  Zero Page     LDY $44       $A4   2   3
-  
+
+  "4a": { opecode: 'LSR', data: 0x0044, address: 'Accumulator', len: 1, cycle: 2 },          //  Accumulator   LSR A         $4A   1   2
+  "46": { opecode: 'LSR', data: 0x0044, address: 'ZeroPage', len: 2, cycle: 5 },          //  Zero Page     LSR $44       $46   2   5
+  "56": { opecode: 'LSR', data: 0x0044, address: 'ZeroPage,X', len: 2, cycle: 6 },        //  Zero Page,X   LSR $44,X     $56   2   6
+  "4e": { opecode: 'LSR', data: 0x4400, address: 'Absolute', len: 3, cycle: 6 },          //  Absolute      LSR $4400     $4E   3   6
+  "5e": { opecode: 'LSR', data: 0x4400, address: 'Absolute,X', len: 3, cycle: 6 },        //  Absolute,X    LSR $4400,X   $5E   3   6 +1
+
   "9a": { opecode: 'TXS', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       TXS           $9A   1   2
   "98": { opecode: 'TYA', data: 0x0000, address: 'Implied', len: 1, cycle: 2 },           //  Implied       TYA           $98   1   2
 
