@@ -346,6 +346,11 @@ export class CPU {
         this.returnForInterrupt()
         break
 
+      case 'LSR':
+        this.register.P.C = (this.register.A & 0b1) === 0b1
+        this.register.A = this.register.A >> 1
+        break
+
       default:
         this.executeOpeCodeWithAddress(order)
     }
