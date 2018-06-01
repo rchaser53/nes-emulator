@@ -39,6 +39,8 @@ const VBlankLine = 241
 const DefaultPPUMASK = 0b00000000
 const DefaultPPUCTRL = 0b01000000
 
+const MaskBitsCondition = 0b11110;
+const SpriteHitBiz = 0b100000;
 const SpriteStartBottomBit = 0b10000000
 const SpriteStartRightBit = 0b1000000
 const PreferentialBackgroundBit = 0b100000
@@ -343,7 +345,12 @@ export class PPU {
     }
 
     return sprites.map((sprite: number[]) => {
-      const upperColorBits = (sprite[2] >> 1) & 0b11
+      let upperColorBits = (sprite[2] >> 1) & 0b11
+      if (this.isSpriteZero) {
+        upperColorBits = 0
+        this.register.PPUSTATUS ^= SpriteHitBiz;
+      }
+
       const patternIndex = sprite[1] + this.offsetCharacteSpriteData
       return {
         x: sprite[3],
@@ -353,6 +360,10 @@ export class PPU {
         drawInfo: this.createSpliteDrawInfo(patternIndex, upperColorBits, sprite[2])
       }
     })
+  }
+
+  isSpriteZero(): boolean {
+    return (this.register.PPUMASK & MaskBitsCondition) !== 0 && (this.register.PPUSTATUS & SpriteHitBiz) === SpriteHitBiz;
   }
 
   useBackgroundPalette(index: number, useBackground: boolean): boolean {
