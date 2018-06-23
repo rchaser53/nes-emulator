@@ -57,9 +57,9 @@ export class Renderer {
     sprites.forEach((sprite: SpriteInfo, spriteIndex) => {
       sprite.drawInfo.forEach((row, rowIndex) => {
         row.forEach((pixel, pixelIndex) => {
+          if (pixel === 0) return
           const x = pixelIndex + sprite.x
           const y = rowIndex + sprite.y
-
           const baseIndex = x * 4 + y * 4 * 256
           this.image.data[baseIndex] = colors[pixel][0]
           this.image.data[baseIndex + 1] = colors[pixel][1]

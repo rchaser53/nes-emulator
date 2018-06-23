@@ -367,7 +367,7 @@ export class PPU {
   }
 
   useBackgroundPalette(index: number, useBackground: boolean): boolean {
-    return useBackground || index === 0x00 || index === 0x04 || index === 0x08 || index === 0x0c
+    return useBackground || index === 0x04 || index === 0x08 || index === 0x0c
   }
 
   createSpliteDrawInfo(spriteIndex: number, upperColorBits: number, attribute: number) {
