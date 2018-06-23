@@ -14,4 +14,4 @@ it's inspired by [bokuweb's flownes](https://github.com/bokuweb/flownes).
 
 working now!
 
-<img src="working.gif" />
+<img src="working2.gif" />
